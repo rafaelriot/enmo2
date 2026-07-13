@@ -1,0 +1,6 @@
+# Activar el motor de redireccionamiento de Apache
+RewriteEngine On
+
+# Si la petición va dirigida a la carpeta api/, redirigirla de forma interna a api/public/
+RewriteCond %{REQUEST_URI} ^/api/ [NC]
+RewriteRule ^api/(.*)$ api/public/$1 [L,QSA]
