@@ -388,53 +388,7 @@ $app->group('/api/usuarios', function ($group) {
 
 
 
-    // Actualizar datos del usuario (POST /api/usuarios/update)
-    $group->post('/update', function (Request $request, Response $response) {
-        $data = json_decode($request->getBody()->getContents(), true);
 
-        $id = $data['id'] ?? null;
-        $nombre = $data['nombre'] ?? '';
-        $email = $data['email'] ?? '';
-        $telefono = $data['telefono'] ?? '';
-
-        if (!$id || empty($nombre) || empty($email) || empty($telefono)) {
-            $response->getBody()->write(json_encode([
-                "status" => "error",
-                "message" => "El ID, nombre, correo y teléfono son obligatorios."
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-        }
-
-        try {
-            $dbObj = new Db();
-            $db = $dbObj->connect();
-
-            $sql = "UPDATE usuarios 
-                    SET nombre = :nombre, email = :email, telefono = :telefono 
-                    WHERE id = :id";
-            
-            $stmt = $db->prepare($sql);
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':email' => $email,
-                ':telefono' => $telefono,
-                ':id' => $id
-            ]);
-
-            $response->getBody()->write(json_encode([
-                "status" => "success",
-                "message" => "Perfil actualizado correctamente."
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-
-        } catch (PDOException $e) {
-            $response->getBody()->write(json_encode([
-                "status" => "error",
-                "message" => "Error al actualizar perfil: " . $e->getMessage()
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
-        }
-    });
 
     // Registrar nuevo usuario (cliente) (POST /api/usuarios/registro)
     $group->post('/registro', function (Request $request, Response $response) {
