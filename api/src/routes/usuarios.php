@@ -377,21 +377,10 @@ $app->group('/api/usuarios', function ($group) {
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
-':repartidor_id' => $repartidor_id,
-                ':lat' => $lat,
-                ':lng' => $lng
-            ]);
-
-            $response->getBody()->write(json_encode([
-                "status" => "success",
-                "message" => "Ubicación actualizada correctamente."
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-
         } catch (PDOException $e) {
             $response->getBody()->write(json_encode([
-                "status" => "error",
-                "message" => "Error al guardar ubicación: " . $e->getMessage()
+                "status"  => "error",
+                "message" => "Error del servidor: " . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
