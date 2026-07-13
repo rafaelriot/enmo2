@@ -154,6 +154,8 @@
 <p class="font-label-sm text-white/80">Genera ingresos con la precisión de un motorizado.</p>
 </div>
 </div>
+<!-- Formulario principal -->
+<form id="registro-repartidor-form" novalidate>
 <!-- Personal Info Form -->
 <section class="space-y-md">
 <h2 class="font-title-md text-primary flex items-center gap-2">
@@ -163,15 +165,41 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
 <div class="space-y-xs">
 <label class="font-label-bold text-on-surface-variant">Nombre Completo</label>
-<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="Ej. Juan Pérez" type="text"/>
+<input id="input-nombre" class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="Ej. Juan Pérez" type="text" required/>
+<p class="text-xs text-error hidden" id="err-nombre">Ingresa tu nombre completo.</p>
 </div>
 <div class="space-y-xs">
 <label class="font-label-bold text-on-surface-variant">Correo Electrónico</label>
-<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="repartidor@enmo2.com" type="email"/>
+<input id="input-email" class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="repartidor@enmo2.com" type="email" required/>
+<p class="text-xs text-error hidden" id="err-email">Ingresa un correo electrónico válido.</p>
 </div>
 <div class="space-y-xs">
 <label class="font-label-bold text-on-surface-variant">Teléfono</label>
-<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="+52 55 1234 5678" type="tel"/>
+<input id="input-telefono" class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="9991234567" type="tel" maxlength="10" required/>
+<p class="text-xs text-error hidden" id="err-telefono">Ingresa tu teléfono de 10 dígitos.</p>
+</div>
+</div>
+</section>
+
+<!-- Contraseña -->
+<section class="space-y-md pt-4">
+<h2 class="font-title-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">lock</span>
+                Seguridad de la Cuenta
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-xs">
+<label class="font-label-bold text-on-surface-variant">Contraseña</label>
+<input id="input-password" class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="Mínimo 6 caracteres" type="password" required/>
+<p class="text-xs text-error hidden" id="err-password">La contraseña debe tener al menos 6 caracteres.</p>
+<button type="button" id="btn-sugerir-pass" class="text-primary text-xs font-label-bold mt-1 hover:underline flex items-center gap-1">
+  <span class="material-symbols-outlined text-sm">auto_fix_high</span> Sugerir contraseña segura
+</button>
+</div>
+<div class="space-y-xs">
+<label class="font-label-bold text-on-surface-variant">Confirmar Contraseña</label>
+<input id="input-confirm" class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="Repite tu contraseña" type="password" required/>
+<p class="text-xs text-error hidden" id="err-confirm">Las contraseñas no coinciden.</p>
 </div>
 </div>
 </section>
@@ -225,21 +253,131 @@
                 </label>
 </div>
 </div>
+</form>
 </main>
 <!-- Sticky Bottom Action Button -->
 <div class="fixed bottom-0 left-0 w-full p-margin-mobile bg-white/80 backdrop-blur-md z-50 md:max-w-2xl md:left-1/2 md:-translate-x-1/2">
-<button class="w-full kinetic-gradient text-white py-4 rounded-xl font-headline-lg-mobile text-headline-lg-mobile shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3">
-<span>Enviar Solicitud</span>
+<button type="submit" form="registro-repartidor-form" id="btn-registrar" class="w-full kinetic-gradient text-white py-4 rounded-xl font-headline-lg-mobile text-headline-lg-mobile shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3">
+<span>Crear Cuenta de Repartidor</span>
 <span class="material-symbols-outlined">send</span>
 </button>
 </div>
 <!-- Hidden Input Logic Script -->
 <script>
+        // Retroceder
+        const btnAtras = document.querySelector('header button');
+        if (btnAtras) {
+            btnAtras.addEventListener('click', () => {
+                window.location.href = 'inicio_de_sesion.html';
+            });
+        }
+
+        // Sugeridor de contraseña segura
+        const btnSugerir = document.getElementById('btn-sugerir-pass');
+        const inputPass = document.getElementById('input-password');
+        const inputConfirm = document.getElementById('input-confirm');
+
+        if (btnSugerir && inputPass && inputConfirm) {
+            btnSugerir.addEventListener('click', () => {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+                let pass = "";
+                for (let i = 0; i < 12; i++) {
+                    pass += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                inputPass.value = pass;
+                inputConfirm.value = pass;
+                inputPass.type = 'text'; // Mostrar temporalmente
+                alert(`Contraseña generada: ${pass}\n\n(Se ha copiado automáticamente a los campos de contraseña)`);
+            });
+        }
+
+        // Envío e integración con la base de datos
+        const form = document.getElementById('registro-repartidor-form');
+        const btnRegistrar = document.getElementById('btn-registrar');
+
+        if (form && btnRegistrar) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Ocultar mensajes de error
+                document.querySelectorAll('.text-error').forEach(el => el.classList.add('hidden'));
+
+                const nombre = document.getElementById('input-nombre').value.trim();
+                const email = document.getElementById('input-email').value.trim();
+                const telefono = document.getElementById('input-telefono').value.trim();
+                const password = inputPass.value;
+                const confirm = inputConfirm.value;
+                const terms = document.getElementById('terms').checked;
+
+                let hasError = false;
+
+                if (!nombre) {
+                    document.getElementById('err-nombre').classList.remove('hidden');
+                    hasError = true;
+                }
+                if (!email || !email.includes('@')) {
+                    document.getElementById('err-email').classList.remove('hidden');
+                    hasError = true;
+                }
+                if (telefono.length < 10) {
+                    document.getElementById('err-telefono').classList.remove('hidden');
+                    hasError = true;
+                }
+                if (password.length < 6) {
+                    document.getElementById('err-password').classList.remove('hidden');
+                    hasError = true;
+                }
+                if (password !== confirm) {
+                    document.getElementById('err-confirm').classList.remove('hidden');
+                    hasError = true;
+                }
+                if (!terms) {
+                    alert('Debes aceptar los Términos y Condiciones para continuar.');
+                    hasError = true;
+                }
+
+                if (hasError) return;
+
+                // Deshabilitar botón
+                btnRegistrar.disabled = true;
+                const origText = btnRegistrar.innerHTML;
+                btnRegistrar.innerHTML = `<span>Registrando...</span><span class="material-symbols-outlined animate-spin">sync</span>`;
+
+                try {
+                    const response = await fetch('api/usuarios/registro', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nombre,
+                            email,
+                            telefono,
+                            password,
+                            rol: 'repartidor' // Especificar el rol de repartidor
+                        })
+                    });
+                    const result = await response.json();
+
+                    if (response.ok && result.status === 'success') {
+                        alert('¡Cuenta de repartidor creada exitosamente! Ahora puedes iniciar sesión.');
+                        window.location.href = 'inicio_de_sesion.html';
+                    } else {
+                        alert(result.message || 'Error al registrar la cuenta.');
+                        btnRegistrar.disabled = false;
+                        btnRegistrar.innerHTML = origText;
+                    }
+                } catch (error) {
+                    console.error("Error en registro:", error);
+                    alert('Error de conexión con el servidor.');
+                    btnRegistrar.disabled = false;
+                    btnRegistrar.innerHTML = origText;
+                }
+            });
+        }
+
         // Simple interactive feedback for bento cards
         document.querySelectorAll('.bento-upload-card').forEach(card => {
             card.addEventListener('click', () => {
                 const icon = card.querySelector('.material-symbols-outlined');
-                const label = card.querySelector('.font-label-bold');
                 
                 // Simulate file selection
                 icon.innerText = 'check_circle';
