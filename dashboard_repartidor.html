@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>enMo2 Rider Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <link rel="apple-touch-icon" href="images/icon-192.png"/>
+    <link rel="manifest" href="manifest.json"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#ff591f",
+                        "surface-container": "#eeeef0",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#3e4a3c",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2f3133",
+                        "surface-bright": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "background": "#f9f9fc",
+                        "surface-tint": "#006e25",
+                        "surface": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#852400",
+                        "primary-fixed": "#83fc8e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#541300",
+                        "secondary-container": "#feb700",
+                        "on-background": "#1a1c1e",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#28a745",
+                        "outline-variant": "#bdcab9",
+                        "surface-container-high": "#e8e8ea",
+                        "on-primary-fixed": "#002106",
+                        "primary-fixed-dim": "#66df75",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-secondary-fixed": "#271900",
+                        "outline": "#6e7b6b",
+                        "on-surface": "#1a1c1e",
+                        "inverse-primary": "#66df75",
+                        "on-secondary-container": "#6b4b00",
+                        "inverse-on-surface": "#f0f0f3",
+                        "surface-container-low": "#f3f3f6",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "surface-container-highest": "#e2e2e5",
+                        "secondary": "#7c5800",
+                        "on-primary-container": "#00330d",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#ffdea8",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "tertiary": "#ae3200",
+                        "secondary-fixed-dim": "#ffba20",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "primary": "#006e25",
+                        "surface-dim": "#dadadc",
+                        "surface-variant": "#e2e2e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "48px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "title-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .speed-line-accent {
+            border-left: 4px solid;
+            border-image: linear-gradient(to bottom, #006e25, #feb700, #ff591f) 1;
+        }
+        .kinetic-gradient {
+            background: linear-gradient(135deg, #006e25 0%, #28a745 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface pb-32">
+<!-- Navigation Drawer / Sidebar -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-[9998] hidden opacity-0 transition-opacity duration-300"></div>
+<aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-surface-container-lowest border-r border-surface-container-highest z-[9999] -translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-2xl">
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center gap-2">
+      <h3 class="font-display-lg text-headline-lg-mobile font-black tracking-tighter text-primary">enMo2</h3>
+    </div>
+    <button id="btn-close-sidebar" class="p-2 rounded-full hover:bg-surface-container transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+  </div>
+  
+  <!-- User Profile Info in Sidebar -->
+  <div class="flex items-center gap-3 p-4 bg-surface-container rounded-xl mb-6">
+    <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-black text-lg" id="sidebar-user-avatar">?</div>
+    <div class="min-w-0 flex-grow">
+      <h4 class="font-title-md text-sm text-on-surface font-bold truncate" id="sidebar-user-name">Repartidor</h4>
+      <p class="text-xs text-on-surface-variant truncate" id="sidebar-user-email">email@enmo2.com</p>
+    </div>
+  </div>
+
+  <nav class="flex-grow space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-container/10 text-primary transition-colors font-label-bold" href="dashboard_repartidor.html">
+      <span class="material-symbols-outlined">home</span>
+      <span>Inicio</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold" href="pedidos_disponibles.html">
+      <span class="material-symbols-outlined">local_mall</span>
+      <span>Disponibles</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold" href="perfil_del_repartidor.html">
+      <span class="material-symbols-outlined">person</span>
+      <span>Mi Perfil</span>
+    </a>
+  </nav>
+
+  <div class="pt-6 border-t border-surface-container">
+    <button id="btn-logout" class="w-full py-3 rounded-xl bg-error-container text-on-error-container font-label-bold text-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">logout</span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background border-b-2 border-surface-container-highest dark:border-outline-variant h-16">
+  <div class="flex justify-between items-center px-margin-mobile h-full w-full max-w-screen-xl mx-auto">
+    <div class="flex items-center gap-sm">
+      <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150" id="btn-menu">
+        <span class="material-symbols-outlined text-primary">menu</span>
+      </button>
+      <img alt="enMo2 Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY1YdwQ3gOVBr6Rlmed7xFrfbH6dFckNd0uIDxuZssapBiRBLfHxDvdfo_JHXZ5AuRHgLq3ELRV3UC9-rk_9DDbZCTOehcw18H6jAGnitd8WCROUsXFf8_7TzNeSHfP5_acKju6f7jEtqWbcVgb5b9WE0PHNPS4lo765ch69MD5s1b3hR-rGUsJ68gKBp74J8j7NmzGDZ2kkO9mthNgiq_bfkvUnHnekzJzWMEu_gveZ9hTVXvxYcmVdoI6D9SP-xXYhB1J12TserB"/>
+    </div>
+    <div class="flex items-center gap-2">
+      <button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
+        <span class="material-symbols-outlined text-primary">notifications</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="mt-20 px-margin-mobile max-w-lg mx-auto">
+  <!-- Title & Date Selector Filter -->
+  <section class="mb-6 flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-xs text-on-surface-variant font-bold mb-1">Hola, <span id="txt-repartidor-name-saludo" class="text-primary font-black">Repartidor</span> 👋</p>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background font-black leading-none">Inicio</h1>
+      </div>
+      <span class="text-xs text-primary font-bold bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wider" id="txt-periodo-badge">Hoy</span>
+    </div>
+
+    <!-- Filtros Temporales (Hoy, Semana, Mes) -->
+    <div class="flex bg-surface-container-low p-1 rounded-xl w-full">
+      <button data-filter="hoy" class="filter-btn flex-1 py-2.5 rounded-lg text-center font-label-bold text-xs transition-all bg-primary text-on-primary shadow-sm">
+        Hoy
+      </button>
+      <button data-filter="semana" class="filter-btn flex-1 py-2.5 rounded-lg text-center font-label-bold text-xs transition-all text-on-surface-variant hover:bg-surface-container-high/40">
+        Semana
+      </button>
+      <button data-filter="mes" class="filter-btn flex-1 py-2.5 rounded-lg text-center font-label-bold text-xs transition-all text-on-surface-variant hover:bg-surface-container-high/40">
+        Mes
+      </button>
+    </div>
+  </section>
+
+  <!-- Bento Stats Grid -->
+  <section class="mb-8">
+    <div class="grid grid-cols-2 gap-sm">
+      <!-- KPI 1: Performance Score (Dynamic) -->
+      <div class="col-span-2 rounded-xl p-md flex items-center justify-between shadow-sm kinetic-gradient text-white overflow-hidden relative">
+        <div class="relative z-10">
+          <p class="text-label-sm font-label-bold opacity-90 uppercase tracking-widest">Performance Score</p>
+          <h2 class="text-display-lg font-display-lg mt-1 animate-pulse" id="kpi-calificacion">5.0</h2>
+        </div>
+        <div class="relative z-10 text-right">
+          <span class="material-symbols-outlined text-[48px] opacity-30">grade</span>
+          <div class="mt-1 flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full text-label-sm">
+            <span class="material-symbols-outlined text-[14px]">trending_up</span>
+            <span>Promedio</span>
+          </div>
+        </div>
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+          <div class="absolute h-[1px] w-full bg-white top-1/4 -skew-y-12"></div>
+          <div class="absolute h-[1px] w-full bg-white top-2/4 -skew-y-12"></div>
+        </div>
+      </div>
+
+      <!-- KPI 2: Ganancias Totales -->
+      <div class="bg-surface-container-lowest rounded-xl p-md border-b-2 border-primary-container/30 shadow-sm flex flex-col justify-between h-28">
+        <p class="text-label-sm font-label-bold text-on-surface-variant uppercase text-xs">Ganancias</p>
+        <p class="font-headline-lg-mobile text-headline-lg-mobile text-primary mt-1 font-black" id="kpi-ganancias">$0.00</p>
+        <p class="text-[10px] text-primary font-bold">Cobrado en periodo</p>
+      </div>
+
+      <!-- KPI 3: Entregas Realizadas -->
+      <div class="bg-surface-container-lowest rounded-xl p-md border-b-2 border-secondary-container/30 shadow-sm flex flex-col justify-between h-28">
+        <p class="text-label-sm font-label-bold text-on-surface-variant uppercase text-xs">Entregas</p>
+        <p class="font-headline-lg-mobile text-headline-lg-mobile text-secondary mt-1 font-black" id="kpi-entregas">0</p>
+        <p class="text-[10px] text-secondary font-bold">Pedidos finalizados</p>
+      </div>
+
+      <!-- KPI 4: Tiempo Promedio -->
+      <div class="col-span-2 bg-surface-container-lowest rounded-xl p-md border border-surface-container shadow-sm flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-secondary-container/10 flex items-center justify-center text-secondary">
+            <span class="material-symbols-outlined">schedule</span>
+          </div>
+          <div>
+            <p class="text-label-sm font-label-bold text-on-surface-variant uppercase text-xs">Tiempo Promedio</p>
+            <p class="text-xs text-on-surface-variant">Duración de entrega por viaje</p>
+          </div>
+        </div>
+        <p class="font-headline-lg-mobile text-xl text-on-surface font-black" id="kpi-tiempo-promedio">--</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Historial de Pedidos -->
+  <section class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h3 class="font-title-md text-title-md text-on-background flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">history</span>
+        Historial del Periodo
+      </h3>
+      <span class="text-xs text-outline font-bold" id="orders-count-label">0 pedidos</span>
+    </div>
+    
+    <div class="space-y-3" id="orders-container">
+      <!-- Render dinámico aquí -->
+      <p class="text-center text-on-surface-variant font-label-sm py-4">Cargando historial...</p>
+    </div>
+  </section>
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-2 pb-safe bg-surface border-t-2 border-surface-container-highest shadow-lg z-50 rounded-t-xl">
+  <a class="flex flex-col items-center justify-center bg-primary-container/10 text-primary rounded-full px-5 py-2 transition-transform active:scale-90" href="dashboard_repartidor.html">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+    <span class="font-label-sm text-[10px] font-bold">Inicio</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="pedidos_disponibles.html">
+    <span class="material-symbols-outlined">local_mall</span>
+    <span class="font-label-sm text-[10px] font-bold">Disponibles</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="pedido_en_curso.html">
+    <span class="material-symbols-outlined">map</span>
+    <span class="font-label-sm text-[10px] font-bold">Mapa</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:text-primary transition-colors" href="perfil_del_repartidor.html">
+    <span class="material-symbols-outlined">person</span>
+    <span class="font-label-sm text-[10px] font-bold">Mi Perfil</span>
+  </a>
+</nav>
+
+<!-- Logic & Sourcing -->
+<script>
+    // 1. Verificación de sesión de usuario
+    const usuarioStr = localStorage.getItem('usuario');
+    if (!usuarioStr) {
+        window.location.href = 'inicio_de_sesion.html';
+    }
+    const usuario = JSON.parse(usuarioStr);
+
+    // Cargar datos en el menú lateral (sidebar) y saludo
+    document.getElementById('sidebar-user-name').textContent = usuario.nombre;
+    document.getElementById('sidebar-user-email').textContent = usuario.email;
+    document.getElementById('txt-repartidor-name-saludo').textContent = usuario.nombre;
+
+    // Colocar iniciales en el avatar
+    const inicialesAvatar = usuario.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+    const avatarEl = document.getElementById('sidebar-user-avatar');
+    if (avatarEl) {
+        avatarEl.textContent = inicialesAvatar;
+    }
+
+    // Control del menú lateral (Sidebar/Drawer)
+    const btnMenu = document.getElementById('btn-menu');
+    const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    function toggleSidebar(show) {
+        if (show) {
+            sidebarBackdrop.classList.remove('hidden');
+            setTimeout(() => {
+                sidebarBackdrop.classList.remove('opacity-0');
+                sidebar.classList.remove('-translate-x-full');
+            }, 10);
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.add('opacity-0');
+            setTimeout(() => {
+                sidebarBackdrop.classList.add('hidden');
+            }, 300);
+        }
+    }
+
+    btnMenu.addEventListener('click', () => toggleSidebar(true));
+    btnCloseSidebar.addEventListener('click', () => toggleSidebar(false));
+    sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+
+    // Cerrar sesión
+    const btnLogout = document.getElementById('btn-logout');
+    btnLogout.addEventListener('click', () => {
+        localStorage.removeItem('usuario');
+        window.location.href = 'inicio_de_sesion.html';
+    });
+
+    // 2. Filtros y Datos
+    let filtroActual = 'hoy';
+    let todosLosPedidos = [];
+
+    // Cargar Pedidos del Repartidor
+    async function cargarPedidosDashboard() {
+        try {
+            const response = await fetch(`api/pedidos/repartidor/${usuario.id}`);
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                todosLosPedidos = result.data;
+                filtrarPedidos(filtroActual);
+            } else {
+                document.getElementById('orders-container').innerHTML = 
+                    `<p class="text-center text-error font-label-sm">${result.message || 'Error al obtener pedidos.'}</p>`;
+            }
+        } catch (error) {
+            console.error("Error obteniendo pedidos:", error);
+            document.getElementById('orders-container').innerHTML = 
+                '<p class="text-center text-error font-label-sm">Error de conexión al cargar pedidos.</p>';
+        }
+    }
+
+    function filtrarPedidos(filtro) {
+        filtroActual = filtro;
+
+        // Actualizar visualmente la barra de filtros
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            const type = btn.getAttribute('data-filter');
+            if (type === filtro) {
+                btn.className = "filter-btn flex-1 py-2.5 rounded-lg text-center font-label-bold text-xs transition-all bg-primary text-on-primary shadow-sm";
+            } else {
+                btn.className = "filter-btn flex-1 py-2.5 rounded-lg text-center font-label-bold text-xs transition-all text-on-surface-variant hover:bg-surface-container-high/40";
+            }
+        });
+
+        // Actualizar etiqueta del badge superior
+        const labelMap = { 'hoy': 'Hoy', 'semana': 'Esta Semana', 'mes': 'Este Mes' };
+        document.getElementById('txt-periodo-badge').textContent = labelMap[filtro];
+
+        const hoy = new Date();
+        let fechaLimite = new Date();
+
+        if (filtro === 'hoy') {
+            fechaLimite.setHours(0, 0, 0, 0); // Desde las 00:00 del día de hoy
+        } else if (filtro === 'semana') {
+            // Hace 7 días
+            fechaLimite.setDate(hoy.getDate() - 7);
+            fechaLimite.setHours(0, 0, 0, 0);
+        } else if (filtro === 'mes') {
+            // Hace 30 días
+            fechaLimite.setDate(hoy.getDate() - 30);
+            fechaLimite.setHours(0, 0, 0, 0);
+        }
+
+        const pedidosFiltrados = todosLosPedidos.filter(p => {
+            // Si el pedido no está entregado (está activo), se muestra siempre
+            if (p.estado !== 'entregado') {
+                return true;
+            }
+            // Si está entregado, se filtra según su fecha de entrega (updated_at)
+            const fechaEntrega = new Date(p.updated_at.replace(/-/g, '/'));
+            return fechaEntrega >= fechaLimite;
+        });
+
+        // Calcular KPIs en base al periodo filtrado
+        const entregados = pedidosFiltrados.filter(p => p.estado === 'entregado');
+        
+        // 1. Entregas realizadas
+        document.getElementById('kpi-entregas').textContent = entregados.length;
+
+        // 2. Ganancias totales
+        const ganancias = entregados.reduce((sum, p) => sum + parseFloat(p.precio), 0);
+        document.getElementById('kpi-ganancias').textContent = `$${ganancias.toFixed(2)}`;
+
+        // 3. Tiempo promedio de entrega
+        let totalMinutes = 0;
+        let countDelivered = 0;
+        entregados.forEach(p => {
+            const diffMs = new Date(p.updated_at) - new Date(p.created_at);
+            const diffMins = Math.round(diffMs / 60000);
+            if (diffMins > 0) {
+                totalMinutes += diffMins;
+                countDelivered++;
+            }
+        });
+        const avgTime = countDelivered > 0 ? Math.round(totalMinutes / countDelivered) : 0;
+        document.getElementById('kpi-tiempo-promedio').innerHTML = avgTime > 0 ? `${avgTime} <span class="text-label-sm font-normal">min</span>` : '--';
+
+        // 4. Performance Score (Calificaciones recibidas)
+        const calificaciones = entregados.filter(p => p.calificacion_estrellas !== null && p.calificacion_estrellas !== undefined);
+        if (calificaciones.length > 0) {
+            const sumEstrellas = calificaciones.reduce((sum, p) => sum + parseInt(p.calificacion_estrellas), 0);
+            const scorePromedio = (sumEstrellas / calificaciones.length).toFixed(1);
+            document.getElementById('kpi-calificacion').textContent = scorePromedio;
+        } else {
+            document.getElementById('kpi-calificacion').textContent = "5.0";
+        }
+
+        // Mostrar contador de pedidos filtrados
+        document.getElementById('orders-count-label').textContent = `${pedidosFiltrados.length} pedido${pedidosFiltrados.length !== 1 ? 's' : ''}`;
+
+        // Renderizar lista filtrada
+        renderizarPedidosFiltrados(pedidosFiltrados);
+    }
+
+    // Renderizar la lista de pedidos filtrada
+    function renderizarPedidosFiltrados(pedidos) {
+        const container = document.getElementById('orders-container');
+        if (pedidos.length === 0) {
+            container.innerHTML = 
+                `<p class="text-center text-on-surface-variant font-label-sm py-8">No hay pedidos registrados en este periodo.</p>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        pedidos.forEach(pedido => {
+            let icon = 'package_2';
+            if (pedido.direccion_entrega.toLowerCase().includes('plaza') || pedido.direccion_entrega.toLowerCase().includes('centro')) {
+                icon = 'shopping_cart';
+            } else if (pedido.direccion_entrega.toLowerCase().includes('restaurante') || pedido.direccion_entrega.toLowerCase().includes('comida')) {
+                icon = 'restaurant';
+            }
+
+            const date = new Date(pedido.created_at);
+            const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+            let statusBadgeBg = 'bg-primary/10 text-primary';
+            let labelEstado = pedido.estado.toUpperCase();
+
+            if (pedido.estado === 'pendiente') {
+                statusBadgeBg = 'bg-error-container text-error';
+                labelEstado = 'PENDIENTE';
+            } else if (pedido.estado === 'asignado') {
+                statusBadgeBg = 'bg-secondary-container text-on-secondary-container';
+                labelEstado = 'ASIGNADO';
+            } else if (pedido.estado === 'en_camino_recogida') {
+                statusBadgeBg = 'bg-secondary-container text-on-secondary-container';
+                labelEstado = 'EN CAMINO';
+            } else if (pedido.estado === 'en_ruta') {
+                statusBadgeBg = 'bg-tertiary-fixed text-tertiary';
+                labelEstado = 'EN RUTA';
+            } else if (pedido.estado === 'entregado') {
+                statusBadgeBg = 'bg-primary/10 text-primary';
+                labelEstado = 'ENTREGADO';
+            }
+
+            // Si tiene calificación, mostrar estrellas debajo del estatus en el historial
+            let ratingHtml = '';
+            if (pedido.estado === 'entregado' && pedido.calificacion_estrellas) {
+                ratingHtml = `<div class="flex items-center justify-end text-[#feb700] gap-0.5 mt-1">
+                    <span class="text-[10px] font-bold text-on-surface-variant mr-1">Tú calif.:</span>
+                    ${Array.from({length: pedido.calificacion_estrellas}).map(() => '<span class="material-symbols-outlined text-xs" style="font-variation-settings: \'FILL\' 1;">star</span>').join('')}
+                </div>`;
+            }
+
+            const cardHtml = `
+                <div class="bg-surface-container-lowest rounded-xl p-md shadow-sm speed-line-accent border border-surface-container flex justify-between items-center gap-4 group active:scale-[0.98] transition-transform cursor-pointer" onclick="window.location.href='pedido_en_curso.html?id=${pedido.id}'">
+                    <div class="flex items-center gap-md min-w-0">
+                        <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-primary">${icon}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-label-bold text-on-surface">Orden #${pedido.id}</p>
+                            <p class="text-label-sm text-on-surface-variant truncate">${pedido.direccion_entrega.split(' -> ')[1] || pedido.direccion_entrega} • ${timeStr}</p>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <span class="${statusBadgeBg} px-3 py-1 rounded-full text-[10px] font-bold uppercase whitespace-nowrap">${labelEstado}</span>
+                        <p class="mt-1 font-label-bold text-on-surface">+$${parseFloat(pedido.precio).toFixed(2)}</p>
+                        ${ratingHtml}
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', cardHtml);
+        });
+
+        // Configurar micro-interacciones
+        document.querySelectorAll('.speed-line-accent').forEach(card => {
+            card.addEventListener('mousedown', () => card.style.transform = 'scale(0.98)');
+            card.addEventListener('mouseup', () => card.style.transform = 'scale(1)');
+            card.addEventListener('mouseleave', () => card.style.transform = 'scale(1)');
+        });
+    }
+
+    // Configurar controladores de eventos de filtro
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const filter = e.currentTarget.getAttribute('data-filter');
+                filtrarPedidos(filter);
+            });
+        });
+        cargarPedidosDashboard();
+    });
+
+    // 🛡️ Registrar Service Worker de PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+                .catch(err => console.error('Error registrando Service Worker:', err));
+        });
+    }
+</script>
+</body>
+</html>

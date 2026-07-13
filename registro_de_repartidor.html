@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>enMo2 - Registro de Repartidor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#1a1c1e",
+                    "surface-container": "#eeeef0",
+                    "primary-fixed-dim": "#66df75",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#f0f0f3",
+                    "surface-bright": "#f9f9fc",
+                    "on-surface": "#1a1c1e",
+                    "inverse-surface": "#2f3133",
+                    "surface-tint": "#006e25",
+                    "secondary-fixed": "#ffdea8",
+                    "on-secondary-container": "#6b4b00",
+                    "on-tertiary-container": "#541300",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#ff591f",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb59e",
+                    "surface-dim": "#dadadc",
+                    "secondary": "#7c5800",
+                    "background": "#f9f9fc",
+                    "surface-container-high": "#e8e8ea",
+                    "outline-variant": "#bdcab9",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#3a0b00",
+                    "primary": "#006e25",
+                    "on-primary-container": "#00330d",
+                    "surface-container-highest": "#e2e2e5",
+                    "surface-variant": "#e2e2e5",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#00531a",
+                    "on-surface-variant": "#3e4a3c",
+                    "inverse-primary": "#66df75",
+                    "primary-fixed": "#83fc8e",
+                    "secondary-container": "#feb700",
+                    "secondary-fixed-dim": "#ffba20",
+                    "on-primary-fixed": "#002106",
+                    "tertiary": "#ae3200",
+                    "on-secondary-fixed-variant": "#5e4200",
+                    "surface-container-low": "#f3f3f6",
+                    "surface": "#f9f9fc",
+                    "on-tertiary-fixed-variant": "#852400",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#ffdbd0",
+                    "primary-container": "#28a745",
+                    "on-secondary-fixed": "#271900",
+                    "outline": "#6e7b6b",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "base": "8px",
+                    "margin-desktop": "32px",
+                    "gutter": "16px",
+                    "sm": "12px",
+                    "xs": "4px",
+                    "lg": "48px",
+                    "md": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "body-lg": ["Plus Jakarta Sans"],
+                    "label-bold": ["Hanken Grotesk"],
+                    "label-sm": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "title-md": ["Hanken Grotesk"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .kinetic-gradient {
+            background: linear-gradient(90deg, #006e25 0%, #feb700 50%, #ae3200 100%);
+        }
+        .speed-line {
+            height: 4px;
+            background: linear-gradient(90deg, #006e25 0%, #feb700 30%, #ae3200 60%, transparent 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input:focus {
+            border-bottom: 2px solid #006e25 !important;
+            box-shadow: none !important;
+            outline: none !important;
+        }
+        .bento-upload-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-upload-card:active {
+            transform: scale(0.98);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background w-full top-0 sticky z-50">
+<div class="flex items-center px-margin-mobile h-16 w-full gap-4">
+<button class="hover:opacity-80 snappy transition-all duration-200">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">
+                Regístrate como Repartidor
+            </h1>
+</div>
+<div class="speed-line w-full"></div>
+</header>
+<main class="px-margin-mobile pt-md space-y-lg max-w-2xl mx-auto">
+<!-- Brand Illustration / Momentum Section -->
+<div class="relative w-full h-48 rounded-xl overflow-hidden shadow-md">
+<div class="bg-cover bg-center w-full h-full" data-alt="A dynamic photography of a professional delivery rider on a vibrant motorcycle speeding through a clean modern urban street during sunset. The rider wears a colorful helmet with green yellow and orange stripes. Motion blur lines accentuate the sense of velocity and precision logistics. The overall aesthetic is optimistic high energy and professional matching a kinetic modernism style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDxcGl5vceWX-rT4IS1ab2hARgZRvaKyXqeD5UoIhLXS6PDQTiRklJZqZQGE3KcE5KIvyRyFBzN7MCSzbcqqPZ0bsCdT7l3SDQ8EhhRhX1GIj1Utqc-kqYO3Xj3vZtL_JgkuA5Z9YPF5cfDR8irmzdEGQELTRjVJdtW9jw84_nSsGTzgvlFwUgt_5Ltih3iYcpleVVO2-3YzIndNZiAOPoqCNOAIeFS_RnQK3U5lCU_kTfJqIk6cRp6pvPnT90B3UDFnEP0DKRJukM1')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-md">
+<p class="font-title-md text-white">Únete a la flota enMo2</p>
+<p class="font-label-sm text-white/80">Genera ingresos con la precisión de un motorizado.</p>
+</div>
+</div>
+<!-- Personal Info Form -->
+<section class="space-y-md">
+<h2 class="font-title-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">person</span>
+                Información Personal
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-xs">
+<label class="font-label-bold text-on-surface-variant">Nombre Completo</label>
+<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="Ej. Juan Pérez" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-bold text-on-surface-variant">Correo Electrónico</label>
+<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="repartidor@enmo2.com" type="email"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-bold text-on-surface-variant">Teléfono</label>
+<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="+52 55 1234 5678" type="tel"/>
+</div>
+</div>
+</section>
+<!-- Vehicle Info Section -->
+<section class="space-y-md">
+<h2 class="font-title-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">speed</span>
+                Datos del Vehículo
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-xs">
+<label class="font-label-bold text-on-surface-variant">Modelo de Moto</label>
+<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="Ej. Yamaha FZ-S" type="text"/>
+</div>
+<div class="space-y-xs">
+<label class="font-label-bold text-on-surface-variant">Número de Placa</label>
+<input class="w-full bg-surface-container-lowest border-0 border-b-2 border-outline-variant py-3 px-0 focus:ring-0 font-body-md" placeholder="ABC-1234" type="text"/>
+</div>
+</div>
+</section>
+<!-- Document Upload - Bento Grid -->
+<section class="space-y-md">
+<h2 class="font-title-md text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">description</span>
+                Documentación Requerida
+            </h2>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-gutter">
+<button class="bento-upload-card flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary">badge</span>
+<span class="font-label-bold text-on-surface leading-tight">Identificación Oficial</span>
+<span class="font-label-sm text-outline mt-1">(INE/Pasaporte)</span>
+</button>
+<button class="bento-upload-card flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary">drive_eta</span>
+<span class="font-label-bold text-on-surface leading-tight">Licencia de Conducir</span>
+<span class="font-label-sm text-outline mt-1">(Vigente)</span>
+</button>
+<button class="bento-upload-card col-span-2 md:col-span-1 flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary">shield</span>
+<span class="font-label-bold text-on-surface leading-tight">Seguro de Moto</span>
+<span class="font-label-sm text-outline mt-1">(Cobertura vigente)</span>
+</button>
+</div>
+</section>
+<!-- Terms & Conditions -->
+<div class="bg-surface-container-low p-md rounded-xl space-y-xs">
+<div class="flex gap-2">
+<input class="mt-1 rounded border-outline-variant text-primary focus:ring-primary" id="terms" type="checkbox"/>
+<label class="font-label-sm text-on-surface-variant" for="terms">
+                    Al enviar esta solicitud, acepto los <span class="text-primary underline font-semibold">Términos y Condiciones</span> y la <span class="text-primary underline font-semibold">Política de Privacidad</span> de enMo2. Confirmo que toda la información proporcionada es verídica.
+                </label>
+</div>
+</div>
+</main>
+<!-- Sticky Bottom Action Button -->
+<div class="fixed bottom-0 left-0 w-full p-margin-mobile bg-white/80 backdrop-blur-md z-50 md:max-w-2xl md:left-1/2 md:-translate-x-1/2">
+<button class="w-full kinetic-gradient text-white py-4 rounded-xl font-headline-lg-mobile text-headline-lg-mobile shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3">
+<span>Enviar Solicitud</span>
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<!-- Hidden Input Logic Script -->
+<script>
+        // Simple interactive feedback for bento cards
+        document.querySelectorAll('.bento-upload-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const icon = card.querySelector('.material-symbols-outlined');
+                const label = card.querySelector('.font-label-bold');
+                
+                // Simulate file selection
+                icon.innerText = 'check_circle';
+                icon.classList.remove('text-on-surface-variant');
+                icon.classList.add('text-primary');
+                card.classList.add('bg-primary-fixed/20', 'border-primary');
+                card.classList.remove('border-outline-variant', 'border-dashed');
+                card.style.borderStyle = 'solid';
+            });
+        });
+    </script>
+</body></html>

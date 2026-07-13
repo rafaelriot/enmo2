@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>enMo2 Rider Profile - Carlos Ruiz</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#ff591f",
+                        "surface-container": "#eeeef0",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#3e4a3c",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2f3133",
+                        "surface-bright": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "background": "#f9f9fc",
+                        "surface-tint": "#006e25",
+                        "surface": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#852400",
+                        "primary-fixed": "#83fc8e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#541300",
+                        "secondary-container": "#feb700",
+                        "on-background": "#1a1c1e",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#28a745",
+                        "outline-variant": "#bdcab9",
+                        "surface-container-high": "#e8e8ea",
+                        "on-primary-fixed": "#002106",
+                        "primary-fixed-dim": "#66df75",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-secondary-fixed": "#271900",
+                        "outline": "#6e7b6b",
+                        "on-surface": "#1a1c1e",
+                        "inverse-primary": "#66df75",
+                        "on-secondary-container": "#6b4b00",
+                        "inverse-on-surface": "#f0f0f3",
+                        "surface-container-low": "#f3f3f6",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "surface-container-highest": "#e2e2e5",
+                        "secondary": "#7c5800",
+                        "on-primary-container": "#00330d",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#ffdea8",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "tertiary": "#ae3200",
+                        "secondary-fixed-dim": "#ffba20",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "primary": "#006e25",
+                        "surface-dim": "#dadadc",
+                        "surface-variant": "#e2e2e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "48px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "title-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .speed-line-accent {
+            border-left: 4px solid;
+            border-image: linear-gradient(to bottom, #006e25, #feb700, #ff591f) 1;
+        }
+        .kinetic-gradient {
+            background: linear-gradient(135deg, #006e25 0%, #28a745 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface pb-32">
+<!-- Navigation Drawer / Sidebar -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-[9998] hidden opacity-0 transition-opacity duration-300"></div>
+<aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-surface-container-lowest border-r border-surface-container-highest z-[9999] -translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-2xl">
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center gap-2">
+      <h3 class="font-display-lg text-headline-lg-mobile font-black tracking-tighter text-primary">enMo2</h3>
+    </div>
+    <button id="btn-close-sidebar" class="p-2 rounded-full hover:bg-surface-container transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+  </div>
+  
+  <!-- User Profile Info in Sidebar -->
+  <div class="flex items-center gap-3 p-4 bg-surface-container rounded-xl mb-6">
+    <div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-black text-lg" id="sidebar-user-avatar">?</div>
+    <div class="min-w-0 flex-grow">
+      <h4 class="font-title-md text-sm text-on-surface font-bold truncate" id="sidebar-user-name">Repartidor</h4>
+      <p class="text-xs text-on-surface-variant truncate" id="sidebar-user-email">email@enmo2.com</p>
+    </div>
+  </div>
+
+  <nav class="flex-grow space-y-2">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold" href="dashboard_repartidor.html">
+      <span class="material-symbols-outlined">home</span>
+      <span>Inicio</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold" href="pedidos_disponibles.html">
+      <span class="material-symbols-outlined">local_mall</span>
+      <span>Pedidos Disponibles</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-container/10 text-primary transition-colors font-label-bold" href="perfil_del_repartidor.html">
+      <span class="material-symbols-outlined">person</span>
+      <span>Mi Perfil</span>
+    </a>
+  </nav>
+
+  <div class="pt-6 border-t border-surface-container">
+    <button id="btn-logout" class="w-full py-3 rounded-xl bg-error-container text-on-error-container font-label-bold text-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">logout</span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background border-b-2 border-surface-container-highest dark:border-outline-variant h-16">
+<div class="flex justify-between items-center px-margin-mobile h-full w-full max-w-screen-xl mx-auto">
+<div class="flex items-center gap-sm">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150" id="btn-menu">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<img alt="enMo2 Logo" class="h-8 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY1YdwQ3gOVBr6Rlmed7xFrfbH6dFckNd0uIDxuZssapBiRBLfHxDvdfo_JHXZ5AuRHgLq3ELRV3UC9-rk_9DDbZCTOehcw18H6jAGnitd8WCROUsXFf8_7TzNeSHfP5_acKju6f7jEtqWbcVgb5b9WE0PHNPS4lo765ch69MD5s1b3hR-rGUsJ68gKBp74J8j7NmzGDZ2kkO9mthNgiq_bfkvUnHnekzJzWMEu_gveZ9hTVXvxYcmVdoI6D9SP-xXYhB1J12TserB"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="mt-20 px-margin-mobile max-w-lg mx-auto">
+<!-- Rider Profile Hero -->
+<section class="relative mb-8 pt-4">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<div class="w-24 h-24 rounded-full border-4 border-primary-container overflow-hidden shadow-lg">
+<img class="w-full h-full object-cover" data-alt="A high-quality studio portrait of a professional male delivery rider named Carlos Ruiz, wearing a grey enMo2 branded polo shirt. He is smiling warmly with a confident expression, set against a clean, light grey background that matches the modern logistics aesthetic. The lighting is soft and cinematic, highlighting his professional demeanor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf_9m_bXPKukWlpM339Fq5KuW00pqX1x-XUTIxDd56a2hkTNnuyoA-U6pn-1ApH5OhgkDBd4u6jbmsb5CwG7qUR4WqurjF-cI9Zjd4CGIykptbziBGOn9D7lWkcyxZDT2_c_K31MsMPWrIsWYJp3JDnC3XShEUP3KOlBYECA3anXQdyEHSH_XON5UUgaQnDcg-g-Rr4XB9EUnzhOcvoI0sVKfu4Ut8hJb0Ywfa_6k5bN3tOnV8p9t5C1lYo82Rcclx50LB9Baywipm"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background flex items-center gap-2" id="rider-name-container">
+  <span id="rider-name">Cargando...</span>
+  <span id="rider-status-badge" class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-primary text-on-primary">ON</span>
+</h1>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-bold">
+<span class="material-symbols-outlined text-[16px]">motorcycle</span>
+<span id="rider-phone">...</span>
+</div>
+<button onclick="toggleModalEditar(true)" class="mt-2 text-primary font-label-bold flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+<span>Editar Perfil</span>
+</button>
+</div>
+</div>
+<!-- Status Toggle -->
+<div class="flex flex-col items-end gap-1">
+<span class="text-label-sm font-label-bold text-on-surface-variant uppercase tracking-wider">Status</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="statusToggle" type="checkbox"/>
+<div class="w-14 h-8 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+<div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none peer-checked:opacity-0 transition-opacity">
+<span class="text-[10px] font-black text-on-surface-variant">OFF</span>
+</div>
+<div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+<span class="text-[10px] font-black text-white">ON</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Bento Stats Grid -->
+<div class="grid grid-cols-2 gap-sm">
+<div class="col-span-2 rounded-xl p-md flex items-center justify-between shadow-sm kinetic-gradient text-white overflow-hidden relative">
+<div class="relative z-10">
+<p class="text-label-sm font-label-bold opacity-90 uppercase tracking-widest">Performance Score</p>
+<h2 class="text-display-lg font-display-lg mt-1" id="performance-score-val">4.9</h2>
+</div>
+<div class="relative z-10 text-right">
+<span class="material-symbols-outlined text-[48px] opacity-30">grade</span>
+<div class="mt-1 flex items-center gap-1 bg-white/20 px-2 py-1 rounded-full text-label-sm">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>Top 5%</span>
+</div>
+</div>
+<!-- Abstract geometric speed lines background -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<div class="absolute h-[1px] w-full bg-white top-1/4 -skew-y-12"></div>
+<div class="absolute h-[1px] w-full bg-white top-2/4 -skew-y-12"></div>
+<div class="absolute h-[1px] w-full bg-white top-3/4 -skew-y-12"></div>
+</div>
+</div>
+
+</div>
+<div class="col-span-2 bg-surface-container-lowest rounded-xl p-md border-b-2 border-primary-container/20 shadow-sm flex flex-col gap-3">
+  <div class="flex items-center justify-between border-b border-surface-container pb-2">
+    <p class="text-xs font-label-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
+      Documentación y Verificación
+    </p>
+    <span class="bg-primary/15 text-primary text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+      <span class="material-symbols-outlined text-[12px] font-bold">check_circle</span> VERIFICADO
+    </span>
+  </div>
+  <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+    <div class="flex items-center justify-between py-1 border-b border-surface-container/50">
+      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
+        <span class="material-symbols-outlined text-primary text-[16px]">file_present</span>
+        Licencia de Conducir
+      </span>
+      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
+        <span>Adjunto</span>
+        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
+      </span>
+    </div>
+    <div class="flex items-center justify-between py-1 border-b border-surface-container/50">
+      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
+        <span class="material-symbols-outlined text-primary text-[16px]">security</span>
+        Seguro de Moto
+      </span>
+      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
+        <span>Vigente</span>
+        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
+      </span>
+    </div>
+    <div class="flex items-center justify-between py-1">
+      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
+        <span class="material-symbols-outlined text-primary text-[16px]">home_pin</span>
+        Comprobante Domicilio
+      </span>
+      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
+        <span>Adjunto</span>
+        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
+      </span>
+    </div>
+    <div class="flex items-center justify-between py-1">
+      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
+        <span class="material-symbols-outlined text-primary text-[16px]">badge</span>
+        INE / Identificación
+      </span>
+      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
+        <span>Adjunto</span>
+        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
+      </span>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-2 pb-safe bg-surface dark:bg-on-background border-t-2 border-surface-container-highest shadow-lg z-50 rounded-t-xl">
+  <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1 hover:text-primary transition-colors" href="dashboard_repartidor.html">
+    <span class="material-symbols-outlined" data-icon="home">home</span>
+    <span class="font-label-sm text-label-sm font-bold">Inicio</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1 hover:text-primary transition-colors" href="pedidos_disponibles.html">
+    <span class="material-symbols-outlined" data-icon="local_mall">local_mall</span>
+    <span class="font-label-sm text-label-sm font-bold">Disponibles</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline px-4 py-1 hover:text-primary transition-colors" href="pedido_en_curso.html">
+    <span class="material-symbols-outlined" data-icon="map">map</span>
+    <span class="font-label-sm text-label-sm font-bold">Mapa</span>
+  </a>
+  <a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-6 py-2 transition-transform active:scale-90" href="perfil_del_repartidor.html">
+    <span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+    <span class="font-label-sm text-label-sm font-bold">Perfil</span>
+  </a>
+</nav>
+
+<!-- Micro-interactions Script -->
+<script>
+        // 1. Verificación de sesión de usuario
+        const usuarioStr = localStorage.getItem('usuario');
+        if (!usuarioStr) {
+            window.location.href = 'inicio_de_sesion.html';
+        }
+        const usuario = JSON.parse(usuarioStr);
+
+        // Mostrar datos en pantalla
+        document.getElementById('rider-name').textContent = usuario.nombre;
+        document.getElementById('rider-phone').textContent = usuario.telefono;
+
+        // Cargar datos en el menú lateral (sidebar) y saludo
+        document.getElementById('sidebar-user-name').textContent = usuario.nombre;
+        document.getElementById('sidebar-user-email').textContent = usuario.email;
+
+        // Colocar iniciales en el avatar
+        const inicialesAvatar = usuario.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+        const avatarEl = document.getElementById('sidebar-user-avatar');
+        if (avatarEl) {
+            avatarEl.textContent = inicialesAvatar;
+        }
+
+        // Control del menú lateral (Sidebar/Drawer)
+        const btnMenu = document.getElementById('btn-menu');
+        const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+        function toggleSidebar(show) {
+            if (show) {
+                sidebarBackdrop.classList.remove('hidden');
+                setTimeout(() => {
+                    sidebarBackdrop.classList.remove('opacity-0');
+                    sidebar.classList.remove('-translate-x-full');
+                }, 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarBackdrop.classList.add('opacity-0');
+                setTimeout(() => {
+                    sidebarBackdrop.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        btnMenu.addEventListener('click', () => toggleSidebar(true));
+        btnCloseSidebar.addEventListener('click', () => toggleSidebar(false));
+        sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+
+        // Cerrar sesión
+        const btnLogout = document.getElementById('btn-logout');
+        btnLogout.addEventListener('click', () => {
+            localStorage.removeItem('usuario');
+            window.location.href = 'inicio_de_sesion.html';
+        });
+        let trackingInterval = null;
+        // Función para mostrar notificaciones flotantes (toast)
+        function mostrarToast(mensaje, esOnline) {
+            // Eliminar toast anterior si existe
+            const antiguoToast = document.getElementById('status-toast');
+            if (antiguoToast) antiguoToast.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'status-toast';
+            toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-label-bold text-xs shadow-2xl z-[9999] transition-all duration-300 ${esOnline ? 'bg-primary' : 'bg-outline'}`;
+            toast.textContent = mensaje;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Actualizar visualmente el badge de estado
+        function actualizarBadgeStatus(isOnline) {
+            const badge = document.getElementById('rider-status-badge');
+            if (isOnline) {
+                badge.textContent = "ONLINE";
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-black uppercase bg-primary text-on-primary";
+            } else {
+                badge.textContent = "OFFLINE";
+                badge.className = "px-2 py-0.5 rounded text-[10px] font-black uppercase bg-surface-container-highest text-outline border border-surface-container-high";
+            }
+        }
+
+        // 2. Control del Switch de Estado (Online / Offline)
+        const statusToggle = document.getElementById('statusToggle');
+
+        statusToggle.addEventListener('change', function() {
+            const isOnline = this.checked;
+            localStorage.setItem('tracking_active', isOnline ? 'true' : 'false');
+            actualizarBadgeStatus(isOnline);
+
+            // Efecto visual hápico
+            document.body.style.opacity = '0.9';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+
+            if (isOnline) {
+                mostrarToast("¡Estás en línea! Tu ubicación se compartirá en el mapa.", true);
+                iniciarRastreoGPS();
+            } else {
+                mostrarToast("Has cambiado tu estado a desconectado. Ya no aparecerás en el mapa.", false);
+                detenerRastreoGPS();
+                // Limpiar ubicación del servidor mandando coordenadas en cero
+                enviarUbicacion(0, 0);
+            }
+        });
+
+        // 3. Función para enviar coordenadas a la API
+        async function enviarUbicacion(latitud, longitud) {
+            try {
+                const response = await fetch('api/usuarios/location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        repartidor_id: usuario.id,
+                        latitud: latitud,
+                        longitud: longitud
+                    })
+                });
+                const res = await response.json();
+                console.log("API Ubicación respuesta:", res.message);
+            } catch (error) {
+                console.error("Error enviando ubicación GPS:", error);
+            }
+        }
+
+        // 4. Iniciar y Detener rastreo GPS
+        function iniciarRastreoGPS() {
+            if ("geolocation" in navigator) {
+                // Obtener ubicación inicial
+                navigator.geolocation.getCurrentPosition(position => {
+                    enviarUbicacion(position.coords.latitude, position.coords.longitude);
+                });
+
+                // Registrar intervalo de 30 segundos
+                trackingInterval = setInterval(() => {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        enviarUbicacion(position.coords.latitude, position.coords.longitude);
+                    }, error => {
+                        console.warn("Error al leer GPS:", error.message);
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    });
+                }, 30000);
+            } else {
+                console.error("Geolocalización no soportada por este navegador.");
+            }
+        }
+
+        function detenerRastreoGPS() {
+            if (trackingInterval) {
+                clearInterval(trackingInterval);
+                trackingInterval = null;
+            }
+        }
+
+        // Inicializar estado del switch desde localStorage (por defecto true si no existe)
+        const trackingActiveStored = localStorage.getItem('tracking_active') !== 'false';
+        statusToggle.checked = trackingActiveStored;
+        actualizarBadgeStatus(trackingActiveStored);
+        if (trackingActiveStored) {
+            iniciarRastreoGPS();
+        } else {
+            enviarUbicacion(0, 0);
+        }
+
+        let mostrarHistorialCompleto = false;
+        let todosLosPedidos = [];
+
+        // 5. Cargar Pedidos del Repartidor desde la API
+        async function cargarPedidos() {
+            const container = document.getElementById('orders-container');
+            
+            try {
+                const response = await fetch(`api/pedidos/repartidor/${usuario.id}`);
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    todosLosPedidos = result.data;
+                    
+                    // Calcular estadísticas dinámicas
+                    const todayStr = new Date().toDateString();
+                    const entregadosHoy = todosLosPedidos.filter(p => p.estado === 'entregado' && new Date(p.updated_at).toDateString() === todayStr);
+                    
+                    // Actualizar contador
+                    document.getElementById('entregas-hoy-count').textContent = entregadosHoy.length;
+                    
+                    // Actualizar barra de progreso (meta de 10 entregas diarias)
+                    const progressPercent = Math.min((entregadosHoy.length / 10) * 100, 100);
+                    document.getElementById('entregas-hoy-progress').style.width = `${progressPercent}%`;
+
+                    // Calcular tiempo promedio de entrega en minutos
+                    let totalMinutes = 0;
+                    let countDelivered = 0;
+                    todosLosPedidos.forEach(p => {
+                        if (p.estado === 'entregado') {
+                            const diffMs = new Date(p.updated_at) - new Date(p.created_at);
+                            const diffMins = Math.round(diffMs / 60000);
+                            if (diffMins > 0) {
+                                totalMinutes += diffMins;
+                                countDelivered++;
+                            }
+                        }
+                    });
+                    const avgTime = countDelivered > 0 ? Math.round(totalMinutes / countDelivered) : 0;
+                    document.getElementById('tiempo-promedio').innerHTML = avgTime > 0 ? `${avgTime} <span class="text-label-sm">min</span>` : '--';
+
+                    // Calcular Performance Score dinámico de las calificaciones reales
+                    const calificaciones = todosLosPedidos.filter(p => p.calificacion_estrellas !== null && p.calificacion_estrellas !== undefined);
+                    if (calificaciones.length > 0) {
+                        const sumEstrellas = calificaciones.reduce((sum, p) => sum + parseInt(p.calificacion_estrellas), 0);
+                        const scorePromedio = (sumEstrellas / calificaciones.length).toFixed(1);
+                        document.getElementById('performance-score-val').textContent = scorePromedio;
+                    } else {
+                        document.getElementById('performance-score-val').textContent = "5.0";
+                    }
+
+                    renderizarPedidos();
+                } else {
+                    container.innerHTML = `<p class="text-center text-error font-label-sm">${result.message || 'Error al obtener pedidos.'}</p>`;
+                }
+            } catch (error) {
+                console.error("Error obteniendo pedidos:", error);
+                container.innerHTML = '<p class="text-center text-error font-label-sm">Error de conexión al cargar pedidos.</p>';
+            }
+        }
+
+        // Renderizar pedidos en pantalla
+        function renderizarPedidos() {
+            const container = document.getElementById('orders-container');
+            
+            // Si mostrarHistorialCompleto es false, mostramos asignado, en_ruta y los entregados del día de hoy
+            const pedidosAMostrar = todosLosPedidos.filter(p => {
+                if (mostrarHistorialCompleto) return true;
+                const todayStr = new Date().toDateString();
+                const esDeHoy = new Date(p.updated_at).toDateString() === todayStr;
+                return p.estado === 'asignado' || p.estado === 'en_camino_recogida' || p.estado === 'en_ruta' || (p.estado === 'entregado' && esDeHoy);
+            });
+
+            if (pedidosAMostrar.length === 0) {
+                container.innerHTML = `<p class="text-center text-on-surface-variant font-label-sm py-4">No tienes pedidos ${mostrarHistorialCompleto ? '' : 'activos'} hoy.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            pedidosAMostrar.forEach(pedido => {
+                let icon = 'package_2';
+                if (pedido.direccion_entrega.toLowerCase().includes('plaza') || pedido.direccion_entrega.toLowerCase().includes('centro')) {
+                    icon = 'shopping_cart';
+                } else if (pedido.direccion_entrega.toLowerCase().includes('restaurante') || pedido.direccion_entrega.toLowerCase().includes('comida')) {
+                    icon = 'restaurant';
+                }
+
+                const date = new Date(pedido.created_at);
+                const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+                let statusBadgeBg = 'bg-primary/10 text-primary';
+                let labelEstado = pedido.estado.toUpperCase();
+
+                if (pedido.estado === 'pendiente') {
+                    statusBadgeBg = 'bg-error-container text-error';
+                    labelEstado = 'PENDIENTE';
+                } else if (pedido.estado === 'asignado') {
+                    statusBadgeBg = 'bg-secondary-container text-on-secondary-container';
+                    labelEstado = 'ASIGNADO';
+                } else if (pedido.estado === 'en_camino_recogida') {
+                    statusBadgeBg = 'bg-secondary-container text-on-secondary-container';
+                    labelEstado = 'EN CAMINO';
+                } else if (pedido.estado === 'en_ruta') {
+                    statusBadgeBg = 'bg-tertiary-fixed text-tertiary';
+                    labelEstado = 'EN RUTA';
+                } else if (pedido.estado === 'entregado') {
+                    statusBadgeBg = 'bg-primary/10 text-primary';
+                    labelEstado = 'ENTREGADO';
+                }
+
+                const cardHtml = `
+                    <div class="bg-surface-container-lowest rounded-xl p-md shadow-sm speed-line-accent border border-surface-container flex justify-between items-center gap-4 group active:scale-[0.98] transition-transform cursor-pointer" onclick="window.location.href='pedido_en_curso.html?id=${pedido.id}'">
+                        <div class="flex items-center gap-md min-w-0">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary">${icon}</span>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-label-bold text-on-surface">Orden #${pedido.id}</p>
+                                <p class="text-label-sm text-on-surface-variant truncate">${pedido.direccion_entrega.split(' -> ')[1] || pedido.direccion_entrega} • ${timeStr}</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <span class="${statusBadgeBg} px-3 py-1 rounded-full text-[10px] font-bold uppercase whitespace-nowrap">${labelEstado}</span>
+                            <p class="mt-1 font-label-bold text-on-surface">+$${parseFloat(pedido.precio).toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            agregarEfectosTarjetas();
+        }
+
+        function toggleHistorialCompleto() {
+            mostrarHistorialCompleto = !mostrarHistorialCompleto;
+            const btn = document.getElementById('btn-toggle-historial');
+            btn.textContent = mostrarHistorialCompleto ? 'Ver activos' : 'Ver todos';
+            renderizarPedidos();
+        }
+
+        // Animación micro-interactiva en las tarjetas
+        function agregarEfectosTarjetas() {
+            const cards = document.querySelectorAll('.speed-line-accent');
+            cards.forEach(card => {
+                card.addEventListener('mousedown', () => {
+                    card.style.transform = 'scale(0.98)';
+                });
+                card.addEventListener('mouseup', () => {
+                    card.style.transform = 'scale(1)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'scale(1)';
+                });
+            });
+        }
+
+        // Control de Modal de Edición de Perfil
+        function toggleModalEditar(show) {
+            const modal = document.getElementById('modal-editar-perfil');
+            if (show) {
+                document.getElementById('input-edit-nombre').value = usuario.nombre;
+                document.getElementById('input-edit-email').value = usuario.email;
+                document.getElementById('input-edit-telefono').value = usuario.telefono;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        async function guardarPerfil(event) {
+            event.preventDefault();
+            
+            const btnSave = document.getElementById('btn-save-profile');
+            btnSave.disabled = true;
+            btnSave.textContent = "Guardando...";
+
+            const nuevoNombre = document.getElementById('input-edit-nombre').value.trim();
+            const nuevoEmail = document.getElementById('input-edit-email').value.trim();
+            const nuevoTelefono = document.getElementById('input-edit-telefono').value.trim();
+
+            try {
+                const response = await fetch('api/usuarios/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: usuario.id,
+                        nombre: nuevoNombre,
+                        email: nuevoEmail,
+                        telefono: nuevoTelefono
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok && result.status === 'success') {
+                    // Actualizar localStorage
+                    usuario.nombre = nuevoNombre;
+                    usuario.email = nuevoEmail;
+                    usuario.telefono = nuevoTelefono;
+                    localStorage.setItem('usuario', JSON.stringify(usuario));
+
+                    // Refrescar vista
+                    document.getElementById('rider-name').textContent = nuevoNombre;
+                    document.getElementById('rider-phone').textContent = nuevoTelefono;
+                    document.getElementById('sidebar-user-name').textContent = nuevoNombre;
+                    document.getElementById('sidebar-user-email').textContent = nuevoEmail;
+
+                    alert("Perfil actualizado correctamente.");
+                    toggleModalEditar(false);
+                } else {
+                    alert("Error: " + result.message);
+                }
+            } catch (error) {
+                console.error("Error al guardar perfil:", error);
+                alert("Ocurrió un error de conexión al guardar los datos.");
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = `<span class="material-symbols-outlined">save</span> Guardar Cambios`;
+            }
+        }
+
+        // Ejecutar funciones al iniciar la página
+        iniciarRastreoGPS(); // Inicia rastreo por defecto ya que el switch está activado
+        cargarPedidos();
+    </script>
+    
+    <!-- Modal para Editar Perfil -->
+    <div id="modal-editar-perfil" class="fixed inset-0 bg-black/50 z-[10000] hidden items-center justify-center p-4">
+      <div class="bg-surface-container-lowest w-full max-w-md rounded-2xl p-6 border border-surface-container-high shadow-2xl">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="font-title-md text-title-md text-on-surface">Editar Perfil</h3>
+          <button onclick="toggleModalEditar(false)" class="p-1 rounded-full hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-on-surface-variant">close</span>
+          </button>
+        </div>
+        <form id="form-editar-perfil" onsubmit="guardarPerfil(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-label-bold text-on-surface-variant uppercase mb-1">Nombre Completo</label>
+            <input type="text" id="input-edit-nombre" required class="w-full bg-surface-container-low border border-surface-container-high rounded-xl h-12 px-4 font-body-md text-on-surface focus:ring-primary focus:border-primary" />
+          </div>
+          <div>
+            <label class="block text-xs font-label-bold text-on-surface-variant uppercase mb-1">Correo Electrónico</label>
+            <input type="email" id="input-edit-email" required class="w-full bg-surface-container-low border border-surface-container-high rounded-xl h-12 px-4 font-body-md text-on-surface focus:ring-primary focus:border-primary" />
+          </div>
+          <div>
+            <label class="block text-xs font-label-bold text-on-surface-variant uppercase mb-1">Teléfono</label>
+            <input type="tel" id="input-edit-telefono" required class="w-full bg-surface-container-low border border-surface-container-high rounded-xl h-12 px-4 font-body-md text-on-surface focus:ring-primary focus:border-primary" />
+          </div>
+          <button type="submit" id="btn-save-profile" class="w-full bg-primary text-on-primary h-14 rounded-xl font-label-bold text-label-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">save</span> Guardar Cambios
+          </button>
+        </form>
+      </div>
+    </div>
+</body></html>

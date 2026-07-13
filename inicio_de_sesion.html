@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>enMo2 - Iniciar Sesión</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<link rel="apple-touch-icon" href="images/icon-192.png"/>
+<link rel="manifest" href="manifest.json"/>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.0/build/spline-viewer.js"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-error-container": "#93000a",
+                "outline-variant": "#bdcab9",
+                "primary": "#006e25",
+                "surface-container-high": "#e8e8ea",
+                "on-tertiary-fixed-variant": "#852400",
+                "surface-tint": "#006e25",
+                "background": "#f9f9fc",
+                "on-primary-container": "#00330d",
+                "on-surface-variant": "#3e4a3c",
+                "secondary-fixed-dim": "#ffba20",
+                "primary-fixed-dim": "#66df75",
+                "on-primary-fixed": "#002106",
+                "tertiary-container": "#ff591f",
+                "surface-dim": "#dadadc",
+                "surface": "#f9f9fc",
+                "secondary-container": "#feb700",
+                "on-surface": "#1a1c1e",
+                "on-secondary-fixed-variant": "#5e4200",
+                "surface-bright": "#f9f9fc",
+                "surface-container": "#eeeef0",
+                "secondary": "#7c5800",
+                "on-secondary-fixed": "#271900",
+                "surface-variant": "#e2e2e5",
+                "on-primary": "#ffffff",
+                "tertiary": "#ae3200",
+                "surface-container-low": "#f3f3f6",
+                "primary-container": "#28a745",
+                "on-error": "#ffffff",
+                "on-tertiary-fixed": "#3a0b00",
+                "primary-fixed": "#83fc8e",
+                "secondary-fixed": "#ffdea8",
+                "surface-container-highest": "#e2e2e5",
+                "on-background": "#1a1c1e",
+                "tertiary-fixed-dim": "#ffb59e",
+                "error": "#ba1a1a",
+                "outline": "#6e7b6b",
+                "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "md": "24px",
+                "lg": "48px",
+                "base": "8px",
+                "sm": "12px",
+                "margin-mobile": "16px",
+                "margin-desktop": "32px",
+                "gutter": "16px",
+                "xs": "4px"
+            },
+            "fontFamily": {
+                "headline-lg-mobile": ["Hanken Grotesk"],
+                "display-lg": ["Hanken Grotesk"],
+                "label-sm": ["Plus Jakarta Sans"],
+                "headline-lg": ["Hanken Grotesk"],
+                "label-bold": ["Hanken Grotesk"],
+                "title-md": ["Hanken Grotesk"],
+                "body-md": ["Plus Jakarta Sans"],
+                "body-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .speed-line-gradient {
+            background: linear-gradient(90deg, #28a745 0%, #feb700 50%, #ff591f 100%);
+        }
+        
+        .kinetic-bg {
+            background: radial-gradient(circle at top right, rgba(40, 167, 69, 0.05), transparent),
+                        radial-gradient(circle at bottom left, rgba(254, 183, 0, 0.05), transparent);
+        }
+
+        .input-focus-border:focus-within {
+            border-bottom: 2px solid #006e25;
+        }
+
+        .shadow-soft {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .logo-long-shadow {
+            filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.05));
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex flex-col kinetic-bg">
+<header class="w-full flex items-center px-margin-mobile h-16 fixed top-0 z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">speed</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">enMo2</span>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center px-margin-mobile py-24">
+<div class="w-full max-w-md bg-white/70 dark:bg-black/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20 dark:border-white/10 transition-all duration-300 hover:shadow-primary/5">
+<div class="flex flex-col items-center mb-8">
+<div class="w-24 h-24 mb-4 relative flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/10 rounded-2xl blur-md scale-90"></div>
+<img class="w-20 h-20 object-contain rounded-2xl relative z-10 shadow-lg hover:scale-105 transition-transform duration-300" src="images/icon-512.png" alt="enMo2 Logo"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-xs font-black tracking-tight">Bienvenido de nuevo</h1>
+<p class="font-body-md text-on-surface-variant text-center opacity-80">Inicia sesión para gestionar tus entregas en tiempo real.</p>
+</div>
+<form class="space-y-sm" id="login-form">
+<div class="space-y-1">
+<label class="font-label-bold text-label-bold text-on-surface-variant px-1 opacity-70">Correo electrónico o Teléfono</label>
+<div class="relative flex items-center border border-outline-variant bg-white/40 dark:bg-black/20 rounded-xl px-sm py-3 transition-all focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+<span class="material-symbols-outlined text-outline mr-sm">person</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline-variant p-0" id="email" placeholder="nombre@ejemplo.com" type="text" required/>
+</div>
+</div>
+<div class="space-y-1 pt-2">
+<label class="font-label-bold text-label-bold text-on-surface-variant px-1 opacity-70">Contraseña</label>
+<div class="relative flex items-center border border-outline-variant bg-white/40 dark:bg-black/20 rounded-xl px-sm py-3 transition-all focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
+<span class="material-symbols-outlined text-outline mr-sm">lock</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline-variant p-0" id="password" placeholder="••••••••" type="password" required/>
+<button class="text-outline hover:text-primary transition-colors" type="button" id="toggle-password">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex justify-between items-center pt-1">
+<div id="error-message" class="text-error font-label-sm text-xs hidden"></div>
+<a class="font-label-bold text-label-bold text-primary hover:underline ml-auto" href="#">¿Olvidaste tu contraseña?</a>
+</div>
+<button id="btn-login" class="w-full bg-primary text-on-primary font-headline-lg-mobile text-lg py-4 rounded-xl shadow-lg hover:shadow-primary/10 hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-md" type="submit">
+<span>Iniciar Sesión</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+<div class="relative my-lg">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant"></div>
+</div>
+<div class="relative flex justify-center text-label-sm">
+<span class="bg-surface-container-lowest px-4 text-on-surface-variant font-medium">O inicia sesión con</span>
+</div>
+</div>
+<div class="flex justify-center w-full">
+<button id="btn-google-login" class="w-full flex items-center justify-center gap-2 py-3 px-4 border border-outline-variant rounded-lg font-label-bold text-on-surface hover:bg-surface-container transition-colors">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span>Google</span>
+</button>
+</div>
+<div class="mt-lg text-center">
+<p class="font-body-md text-on-surface-variant">
+                    ¿No tienes una cuenta? 
+                    <a class="font-label-bold text-primary hover:underline ml-1" href="registro_cliente.html">Regístrate gratis</a>
+</p>
+</div>
+</div>
+</main>
+<footer class="mt-auto py-sm text-center px-margin-mobile">
+<div class="h-[4px] w-48 speed-line-gradient mx-auto rounded-full mb-4 opacity-30"></div>
+<p class="font-label-sm text-outline text-xs">© 2024 enMo2 Logística de Velocidad. Todos los derechos reservados.</p>
+</footer>
+<div class="fixed bottom-0 left-0 w-full overflow-hidden pointer-events-none h-2">
+<div class="flex h-full w-full">
+<div class="h-full flex-grow speed-line-gradient opacity-20"></div>
+</div>
+</div>
+<script>
+        // Snappy Micro-interactions
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'scale(0.96)';
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'scale(1)';
+            });
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'scale(1)';
+            });
+        });
+
+        // Floating label logic (if inputs had specific classes, but kept simple for now)
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('shadow-md');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('shadow-md');
+            });
+        });
+
+        // Alternar visibilidad de contraseña
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', () => {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                togglePassword.querySelector('span').textContent = isPassword ? 'visibility_off' : 'visibility';
+            });
+        }
+
+        // Manejo del formulario de inicio de sesión
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        if (loginForm) {
+            const btnLogin = document.getElementById('btn-login');
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorMessage.classList.add('hidden');
+                errorMessage.textContent = '';
+
+                // Evitar doble clic deshabilitando el botón y mostrando carga
+                btnLogin.disabled = true;
+                const originalBtnContent = btnLogin.innerHTML;
+                btnLogin.innerHTML = `<span>Procesando...</span><span class="material-symbols-outlined animate-spin">sync</span>`;
+
+                const email = document.getElementById('email').value.trim();
+                const password = passwordInput.value;
+
+                try {
+                    const response = await fetch('api/usuarios/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.status === 'success') {
+                        // Guardar datos de sesión en localStorage
+                        localStorage.setItem('usuario', JSON.stringify(result.usuario));
+
+                        // Redirección según el rol del usuario
+                        if (result.usuario.rol === 'repartidor') {
+                            window.location.href = 'dashboard_repartidor.html';
+                        } else if (result.usuario.rol === 'administrador') {
+                            window.location.href = 'dashboard_principal.html';
+                        } else {
+                            window.location.href = 'inicio_cliente.html';
+                        }
+                    } else {
+                        errorMessage.textContent = result.message || 'Credenciales incorrectas.';
+                        errorMessage.classList.remove('hidden');
+                        btnLogin.disabled = false;
+                        btnLogin.innerHTML = originalBtnContent;
+                    }
+                } catch (error) {
+                    console.error('Error al iniciar sesión:', error);
+                    errorMessage.textContent = 'Error de conexión con el servidor.';
+                    errorMessage.classList.remove('hidden');
+                    btnLogin.disabled = false;
+                    btnLogin.innerHTML = originalBtnContent;
+                }
+            });
+        }
+
+        // 🔗 Inicio de Sesión de Google REAL usando Google Identity Services (GSI)
+        
+        // 1. Decodificador local de JWT (Token de Google)
+        function parseJwt(token) {
+            try {
+                var base64Url = token.split('.')[1];
+                var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                console.error("Error al decodificar JWT de Google:", e);
+                return null;
+            }
+        }
+
+        // 2. Callback cuando Google devuelve las credenciales del usuario
+        async function handleCredentialResponse(response) {
+            errorMessage.classList.add('hidden');
+            
+            // Extraer y decodificar el ID Token
+            const payload = parseJwt(response.credential);
+            if (!payload) {
+                errorMessage.textContent = 'No se pudo decodificar el token de Google.';
+                errorMessage.classList.remove('hidden');
+                return;
+            }
+
+            const email = payload.email;
+            const nombre = payload.name;
+            const google_id = payload.sub; // Identificador único de Google
+
+            try {
+                const apiRes = await fetch('api/usuarios/google-oauth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, nombre, google_id })
+                });
+                const result = await apiRes.json();
+
+                if (apiRes.ok && result.status === 'success') {
+                    localStorage.setItem('usuario', JSON.stringify(result.usuario));
+                    window.location.href = 'inicio_cliente.html';
+                } else {
+                    errorMessage.textContent = result.message || 'Error al validar la cuenta con el servidor.';
+                    errorMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error de comunicación:", error);
+                errorMessage.textContent = 'Error de conexión con el servidor al autenticar con Google.';
+                errorMessage.classList.remove('hidden');
+            }
+        }
+
+        // 3. Inicializar e inyectar el botón oficial de Google
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: "1041922961177-a55ssg1jaqoq01e2tcrecnvngg3strlh.apps.googleusercontent.com", // REEMPLAZAR CON TU CLIENT ID
+                callback: handleCredentialResponse,
+                auto_select: false // Habilita One-Tap automático si se desea (true)
+            });
+
+            // Vincular el botón personalizado inyectado
+            const btnGoogle = document.getElementById('btn-google-login');
+            if (btnGoogle) {
+                btnGoogle.addEventListener('click', () => {
+                    // Lanza el selector nativo de cuentas de Google
+                    google.accounts.id.prompt(); 
+                });
+            }
+        };
+
+        // 🛡️ Registrar Service Worker de PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+                    .catch(err => console.error('Error registrando Service Worker:', err));
+            });
+        }
+    </script>
+</body></html>

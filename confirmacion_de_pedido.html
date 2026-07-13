@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Confirmación de Pedido | enMo2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-container": "#28a745",
+                        "outline-variant": "#bdcab9",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f3f3f6",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary-container": "#ff591f",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "on-background": "#1a1c1e",
+                        "on-secondary-container": "#6b4b00",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e8e8ea",
+                        "primary-fixed-dim": "#66df75",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "secondary-fixed": "#ffdea8",
+                        "on-surface-variant": "#3e4a3c",
+                        "surface-container": "#eeeef0",
+                        "secondary-container": "#feb700",
+                        "on-error": "#ffffff",
+                        "secondary": "#7c5800",
+                        "outline": "#6e7b6b",
+                        "surface-container-highest": "#e2e2e5",
+                        "on-tertiary-container": "#541300",
+                        "tertiary": "#ae3200",
+                        "surface-tint": "#006e25",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#006e25",
+                        "surface": "#f9f9fc",
+                        "surface-bright": "#f9f9fc",
+                        "primary-fixed": "#83fc8e",
+                        "on-primary-container": "#00330d",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#00531a",
+                        "secondary-fixed-dim": "#ffba20",
+                        "on-secondary-fixed": "#271900",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e2e2e5",
+                        "inverse-primary": "#66df75",
+                        "on-surface": "#1a1c1e",
+                        "background": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#852400",
+                        "on-primary-fixed": "#002106",
+                        "surface-dim": "#dadadc",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "inverse-surface": "#2f3133"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "title-md": ["Hanken Grotesk"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .speed-line-gradient {
+            background: linear-gradient(90deg, #28a745 0%, #feb700 50%, #ae3200 100%);
+            height: 2px;
+            width: 100%;
+        }
+        .kinetic-shadow {
+            box-shadow: 4px 4px 0px 0px rgba(0, 110, 37, 0.1);
+        }
+        .success-overlay {
+            display: none;
+            backdrop-filter: blur(8px);
+        }
+        .success-active .success-overlay {
+            display: flex;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen pb-40 overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-on-background border-b-2 border-surface-container-highest dark:border-outline-variant">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full max-w-screen-xl mx-auto">
+<div class="flex items-center gap-4">
+<button id="btn-back" class="text-primary dark:text-primary-fixed active:scale-95 duration-150 p-2 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-display-lg text-display-lg font-black tracking-tighter text-primary dark:text-primary-fixed">enMo2</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant dark:text-outline p-2 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="mt-20 px-margin-mobile max-w-lg mx-auto">
+<!-- Order Progress Header -->
+<div class="mb-md">
+<div class="flex items-baseline justify-between mb-xs">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Confirmar Entrega</h2>
+<span class="font-label-bold text-label-bold text-primary bg-primary-fixed px-3 py-1 rounded-full uppercase">PASO 3 de 3</span>
+</div>
+<div class="speed-line-gradient rounded-full opacity-30"></div>
+</div>
+<!-- Map Snippet Bento Style -->
+<div class="bg-surface-container-lowest rounded-xl border-2 border-surface-container-highest overflow-hidden mb-md kinetic-shadow">
+<div class="h-48 w-full relative">
+<div class="bg-cover bg-center w-full h-full grayscale-[0.2]" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBQc4CM-Dn0EagtMtBxTW3_2BtZl3uScrx19SOFTmkYnxmeGEX0ayba17pfjMaSjyNNOgbE5d8owLwYmuaIH2KZELj_1g7MgxTP45e5h8LKWy09ELpPKqK2wpFsI9R-TQD2WuWID5bpz5e20cg-lA9TrhR6W_50LcuZEJ5wLae6sam6DpOrnu6tJDCz6D2tE9-U8YfR2OSDWP1wBBvtE6WZ86St7wxDG4iCLJapkH4vfUthQU8qIVPo2pQ5W6sANSdOMAEm64Z-qSEb')"></div>
+        <div class="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-md p-3 rounded-lg border border-primary/20 flex items-center gap-3">
+          <div class="bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center">
+            <span class="material-symbols-outlined">schedule</span>
+          </div>
+          <div>
+            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">DISTANCIA ESTIMADA</p>
+            <p class="font-title-md text-title-md text-on-surface" id="txt-eta-distancia">Calculando...</p>
+          </div>
+        </div>
+</div>
+</div>
+<!-- Details Grid -->
+<div class="grid grid-cols-1 gap-4 mb-lg">
+<!-- Locations Card -->
+<div class="bg-white p-md rounded-xl border-2 border-surface-container-highest kinetic-shadow relative overflow-hidden">
+<div class="absolute left-0 top-0 h-full w-1.5 bg-primary"></div>
+<div class="flex flex-col gap-6">
+<div class="flex gap-4">
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<div class="w-0.5 h-8 border-l-2 border-dashed border-outline-variant"></div>
+<span class="material-symbols-outlined text-tertiary">sports_motorsports</span>
+</div>
+<div class="flex-1 space-y-4">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">RECOGIDA</p>
+<p class="font-body-md text-body-md font-bold text-on-surface leading-tight" id="txt-recogida-1">Cargando...</p>
+<p class="font-label-sm text-label-sm text-outline" id="txt-recogida-2"></p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">ENTREGA</p>
+<p class="font-body-md text-body-md font-bold text-on-surface leading-tight" id="txt-entrega-1">Cargando...</p>
+<p class="font-label-sm text-label-sm text-outline" id="txt-entrega-2"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Client & Rider Info (Asymmetric Bento) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white p-sm rounded-xl border-2 border-surface-container-highest kinetic-shadow">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">CLIENTE</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-surface-container-high">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD37gN8ZxU20tP920vltW0FNCZI7xZDHMwrJnpQn9DuDEWa32bWwOAjvrdIwp4h3DhOQY6oIcFV0-3DXZqqSwbWEVZ9J0IoSzL-oYMDAmW7t69handtW0qKNMA217awnLzY6dl-DtdQQ-cp4tAazZtIgS5vAMRghhF6AWIiQSN698xzLPKwvIpDs59--PL220oNuUBL9vGO2Kxt-46AplsnO_ad-Ua0KsjVwNv7lkgKoP7XxYEgV1fHpTB27UouIYxBk7vQ46lOmQEk"/>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface truncate" id="txt-cliente-nombre">...</p>
+</div>
+</div>
+<div class="bg-white p-sm rounded-xl border-2 border-surface-container-highest kinetic-shadow">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2">REPARTIDOR ASIGNADO</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden border border-primary/20">
+<img class="w-full h-full object-cover" id="img-repartidor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAibJWykW5ynJhZOfRWyKu-CFMfdSjE7bRdjavRRsU4JdinP5plJ8LcvecrGAEmhiA0MFFrELmfqfQuGFpgZYPW2O0CYG7laXYoV1cHnWGPk5n7PvIk69YPGBBmlCroVRZ6qSagNk0VMksnzH1LpfvUJyabcdAoEjPkoSKSnWQOZNzHxBM61mCJgB6gGs2yZ2yQ6t-iEnEGjA4DARAJuH2SGY2sb1AtxkQ9POKju7QleaL7RkN53kPJcOgB_1bQA5ycJOLaTpwxOZBo"/>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface truncate" id="txt-repartidor-nombre">Pendiente</p>
+</div>
+</div>
+</div>
+<!-- Cost Summary -->
+<div class="bg-on-background p-md rounded-xl text-white shadow-xl relative">
+<div class="flex justify-between items-center mb-4">
+<p class="font-title-md text-title-md">Costo Total</p>
+<p class="font-display-lg text-[24px] font-black text-primary-fixed" id="txt-costo-total">$0.00 MXN</p>
+</div>
+<div class="space-y-2 border-t border-white/10 pt-4">
+<div class="flex justify-between text-white/60 font-label-sm">
+<span>Tarifa Base</span>
+<span id="txt-tarifa-base">$0.00 MXN</span>
+</div>
+<div class="flex justify-between text-white/60 font-label-sm">
+<span>Tarifa por Distancia</span>
+<span id="txt-tarifa-distancia">$0.00 MXN</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full bg-white px-margin-mobile pt-4 pb-10 border-t-2 border-surface-container-highest z-40">
+<div class="max-w-lg mx-auto flex flex-col gap-2">
+<button class="w-full bg-primary text-on-primary py-4 rounded-xl font-label-bold text-lg flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-primary/20" id="btn-confirmar-pedido">
+                Ir al Seguimiento en Vivo
+                <span class="material-symbols-outlined">near_me</span>
+</button>
+<button class="w-full bg-surface-container-high text-on-surface-variant py-3 rounded-xl font-label-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all" onclick="regresarAEditar()">
+                <span class="material-symbols-outlined text-sm">edit</span>
+                Regresar y Editar Datos
+</button>
+<p class="text-center font-label-sm text-outline">Al confirmar, aceptas nuestros Términos de Servicio</p>
+</div>
+</div>
+<!-- Success State Overlay -->
+<div class="success-overlay fixed inset-0 z-[100] bg-surface/95 flex-col items-center justify-center p-md text-center" id="successState">
+<div class="w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-md scale-0 animate-[bounce_0.5s_ease-out_forwards]">
+<span class="material-symbols-outlined text-white text-5xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h3 class="font-display-lg text-display-lg text-on-surface mb-xs">Pedido Activado</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xs mx-auto mb-lg" id="success-message">El repartidor se dirigirá al lugar de recogida. Puedes rastrearlo en tiempo real.</p>
+<div class="w-full max-w-sm space-y-4">
+<button class="w-full bg-on-background text-white py-4 rounded-xl font-label-bold flex items-center justify-center gap-2" id="btn-live-tracking">
+                Ir al Seguimiento en Vivo
+                <span class="material-symbols-outlined">near_me</span>
+</button>
+<button class="w-full bg-surface-container-highest text-on-surface py-4 rounded-xl font-label-bold" onclick="hideSuccess()">
+                Cerrar
+            </button>
+</div>
+<!-- Atmospheric Speed Lines -->
+<div class="absolute inset-0 pointer-events-none opacity-10 overflow-hidden">
+<div class="absolute top-1/4 -left-10 w-48 h-1 bg-primary rounded-full animate-[slide_3s_infinite]"></div>
+<div class="absolute top-1/2 -right-10 w-64 h-1 bg-secondary-container rounded-full animate-[slide_4s_infinite_reverse]"></div>
+<div class="absolute bottom-1/4 -left-20 w-32 h-1 bg-tertiary-container rounded-full animate-[slide_5s_infinite]"></div>
+</div>
+</div>
+<style>
+        @keyframes slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(500%); }
+        }
+    </style>
+<script>
+        // Obtener el ID del pedido desde la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const pedidoId = urlParams.get('pedido_id');
+
+        // Función para mostrar notificaciones flotantes (toast)
+        function mostrarToast(mensaje, esExito = true) {
+            const antiguoToast = document.getElementById('status-toast');
+            if (antiguoToast) antiguoToast.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'status-toast';
+            toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-label-bold text-xs shadow-2xl z-[99999] transition-all duration-300 ${esExito ? 'bg-primary' : 'bg-error'}`;
+            toast.textContent = mensaje;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        if (!pedidoId) {
+            mostrarToast("No se especificó un ID de pedido.", false);
+            setTimeout(() => {
+                window.location.href = "nuevo_pedido_detalles.html";
+            }, 1500);
+        }
+
+        let pedido = null;
+
+        async function cargarDetallesPedido() {
+            try {
+                const response = await fetch(`api/pedidos/${pedidoId}`);
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    pedido = result.data;
+                    
+                    // Separar dirección de recogida y entrega (separados por -> en el input)
+                    const partesDireccion = pedido.direccion_entrega.split(' -> ');
+                    const recogidaDir = partesDireccion[0] || 'Dirección de Recogida';
+                    const entregaDir = partesDireccion[1] || pedido.direccion_entrega;
+
+                    // Formatear textos
+                    document.getElementById('txt-recogida-1').textContent = recogidaDir.split(',')[0];
+                    document.getElementById('txt-recogida-2').textContent = recogidaDir.split(',').slice(1).join(',') || 'Villahermosa, Tabasco';
+                    
+                    document.getElementById('txt-entrega-1').textContent = entregaDir.split(',')[0];
+                    document.getElementById('txt-entrega-2').textContent = entregaDir.split(',').slice(1).join(',') || 'Villahermosa, Tabasco';
+
+                    // ETA via OSRM usando coords recogida→entrega
+                    if (pedido.latitud_recogida && pedido.latitud_entrega) {
+                        try {
+                            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${pedido.longitud_recogida},${pedido.latitud_recogida};${pedido.longitud_entrega},${pedido.latitud_entrega}?overview=false`;
+                            const osrmRes = await fetch(osrmUrl);
+                            const osrmData = await osrmRes.json();
+                            if (osrmData.code === 'Ok' && osrmData.routes?.length > 0) {
+                                const km = (osrmData.routes[0].distance / 1000).toFixed(1);
+                                const mins = Math.ceil(osrmData.routes[0].duration / 60);
+                                document.getElementById('txt-eta-distancia').textContent = `${km} km · ~${mins} min`;
+                            } else {
+                                document.getElementById('txt-eta-distancia').textContent = 'Calculando ruta...';
+                            }
+                        } catch { document.getElementById('txt-eta-distancia').textContent = 'Sin datos de ruta'; }
+                    }
+
+                    document.getElementById('txt-cliente-nombre').textContent = pedido.cliente_nombre || 'Cliente';
+                    
+                    // Costos
+                    const costoTotal = parseFloat(pedido.precio);
+                    document.getElementById('txt-costo-total').textContent = `$${costoTotal.toFixed(2)} MXN`;
+                    document.getElementById('txt-tarifa-base').textContent = `$35.00 MXN`;
+                    document.getElementById('txt-tarifa-distancia').textContent = `$${Math.max(0, costoTotal - 35).toFixed(2)} MXN`;
+
+                    // Si hay repartidor asignado
+                    if (pedido.repartidor_nombre) {
+                        document.getElementById('txt-repartidor-nombre').textContent = pedido.repartidor_nombre;
+                        document.getElementById('success-message').textContent = `${pedido.repartidor_nombre} se dirige al lugar de recogida. Puedes rastrearlo en tiempo real.`;
+                    } else {
+                        document.getElementById('txt-repartidor-nombre').textContent = 'Pendiente';
+                        document.getElementById('img-repartidor').parentElement.style.opacity = '0.5';
+                        document.getElementById('success-message').textContent = 'El pedido se ha registrado en el sistema. Puedes rastrearlo en vivo mientras se asigna un repartidor.';
+                    }
+
+                    // Configurar el enlace del botón de tracking en vivo
+                    document.getElementById('btn-live-tracking').onclick = () => {
+                        window.location.href = `pedido_en_curso.html?id=${pedidoId}`;
+                    };
+
+                } else {
+                    mostrarToast("Error al cargar la información del pedido: " + (result.message || 'Desconocido'), false);
+                }
+            } catch (error) {
+                console.error("Error cargando pedido:", error);
+                mostrarToast("Error de conexión al cargar la información del pedido.", false);
+            }
+        }
+
+        function triggerSuccess() {
+            // Ir directamente al seguimiento
+            window.location.href = `pedido_en_curso.html?id=${pedidoId}`;
+        }
+
+        function hideSuccess() {
+            document.body.classList.remove('success-active');
+            document.getElementById('successState').style.display = 'none';
+        }
+
+        function regresarAEditar() {
+            window.location.href = `nuevo_pedido_detalles.html?pedido_id=${pedidoId}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnBack = document.getElementById('btn-back');
+            if (btnBack) btnBack.addEventListener('click', regresarAEditar);
+
+            const btnConfirmar = document.getElementById('btn-confirmar-pedido');
+            if (btnConfirmar) btnConfirmar.addEventListener('click', triggerSuccess);
+        });
+
+        cargarDetallesPedido();
+    </script>
+</body></html>

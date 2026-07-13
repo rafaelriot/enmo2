@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>enMo2 - Admin Dashboard</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#66df75",
+                        "surface-variant": "#e2e2e5",
+                        "secondary": "#7c5800",
+                        "on-secondary-fixed": "#271900",
+                        "surface-tint": "#006e25",
+                        "background": "#f9f9fc",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "surface-container-highest": "#e2e2e5",
+                        "secondary-fixed-dim": "#ffba20",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#541300",
+                        "on-surface": "#1a1c1e",
+                        "on-primary-fixed-variant": "#00531a",
+                        "surface": "#f9f9fc",
+                        "surface-container": "#eeeef0",
+                        "on-secondary-container": "#6b4b00",
+                        "on-tertiary-fixed-variant": "#852400",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#00330d",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#83fc8e",
+                        "primary": "#006e25",
+                        "tertiary-container": "#ff591f",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2f3133",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#feb700",
+                        "outline-variant": "#bdcab9",
+                        "on-surface-variant": "#3e4a3c",
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary": "#ae3200",
+                        "primary-fixed-dim": "#66df75",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-background": "#1a1c1e",
+                        "surface-container-low": "#f3f3f6",
+                        "on-primary-fixed": "#002106",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e8e8ea",
+                        "primary-container": "#28a745",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "outline": "#6e7b6b",
+                        "secondary-fixed": "#ffdea8",
+                        "surface-dim": "#dadadc",
+                        "surface-bright": "#f9f9fc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-mobile": "16px",
+                        "lg": "48px",
+                        "base": "8px",
+                        "margin-desktop": "32px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "title-md": ["Hanken Grotesk"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-bold": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .kinetic-speed-line {
+            height: 4px;
+            background: linear-gradient(90deg, #006e25 0%, #feb700 50%, #ae3200 100%);
+        }
+        .rider-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .animate-speed {
+            animation: speed-swipe 2s infinite linear;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            background-size: 200% 100%;
+        }
+        @keyframes speed-swipe {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary selection:text-white">
+<!-- Top Navigation Anchor -->
+<header class="bg-background sticky top-0 z-40 w-full">
+<div class="flex items-center px-margin-mobile md:px-margin-desktop h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">speed</span>
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary tracking-tight">enMo2</span>
+</div>
+<nav class="hidden md:flex ml-12 gap-8 items-center h-full">
+<a class="font-label-bold text-label-bold text-primary border-b-2 border-primary h-full flex items-center" href="#">Inicio</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Envios</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Perfil</a>
+</nav>
+<div class="ml-auto flex items-center gap-4">
+<div class="hidden sm:flex items-center bg-surface-container px-4 py-2 rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-48" placeholder="Buscar pedido o rider..." type="text"/>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container hover:opacity-80 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+<div class="kinetic-speed-line w-full"></div>
+</header>
+<main class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-8 pb-32 md:pb-8">
+<!-- Summary Stats Section -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-8">
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-primary group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Solicitudes Activas</span>
+<span class="material-symbols-outlined text-primary bg-primary-fixed/20 p-2 rounded-lg">assignment</span>
+</div>
+<div class="text-display-lg font-display-lg text-primary">24</div>
+<div class="mt-2 flex items-center text-label-sm font-label-sm text-primary">
+<span class="material-symbols-outlined text-[16px] mr-1">trending_up</span>
+<span>+12% vs ayer</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-secondary group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Riders Online</span>
+<span class="material-symbols-outlined text-secondary bg-secondary-container/20 p-2 rounded-lg">motorcycle</span>
+</div>
+<div class="text-display-lg font-display-lg text-secondary">158</div>
+<div class="mt-2 flex items-center text-label-sm font-label-sm text-secondary">
+<span class="material-symbols-outlined text-[16px] mr-1">check_circle</span>
+<span>92% de la flota</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-tertiary group hover:translate-y-[-4px] transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Tiempo Promedio</span>
+<span class="material-symbols-outlined text-tertiary bg-tertiary-fixed/20 p-2 rounded-lg">timer</span>
+</div>
+<div class="text-display-lg font-display-lg text-tertiary">14m</div>
+<div class="mt-2 flex items-center text-label-sm font-label-sm text-tertiary">
+<span class="material-symbols-outlined text-[16px] mr-1">bolt</span>
+<span>Velocidad óptima</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-outline-variant group hover:translate-y-[-4px] transition-transform duration-300 overflow-hidden relative">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase tracking-wider">Entregas Hoy</span>
+<span class="material-symbols-outlined text-on-surface-variant bg-surface-container/50 p-2 rounded-lg">shopping_bag</span>
+</div>
+<div class="text-display-lg font-display-lg text-on-surface">1,240</div>
+<div class="mt-2 flex items-center text-label-sm font-label-sm text-on-surface-variant">
+<span>99.8% efectividad</span>
+</div>
+<div class="absolute bottom-0 left-0 w-full h-1 bg-surface-container-high">
+<div class="h-full bg-primary" style="width: 85%"></div>
+</div>
+</div>
+</section>
+<!-- Main Dashboard Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Delivery Requests -->
+<section class="lg:col-span-7">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface flex items-center gap-2">
+                        Solicitudes de Envío
+                        <span class="bg-primary text-white text-[12px] px-2 py-0.5 rounded-full">En Vivo</span>
+</h2>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:underline">
+                        Ver Todo <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Order Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 hover:shadow-md transition-all relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[32px]">local_shipping</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-title-md text-title-md">#48291</span>
+<span class="px-2 py-1 rounded bg-secondary-container text-on-secondary-container font-label-bold text-[10px] uppercase">Buscando Repartidor</span>
+</div>
+<div class="flex items-center text-on-surface-variant text-body-md gap-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">location_on</span> Zona Norte</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">schedule</span> Hace 4m</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden md:block">
+<div class="text-label-bold font-label-bold text-on-surface-variant">Prioridad</div>
+<div class="text-secondary font-bold">Alta</div>
+</div>
+<button class="bg-primary text-white font-label-bold text-label-bold px-6 py-2 rounded-full hover:bg-on-primary-fixed-variant transition-colors">Asignar Manual</button>
+</div>
+</div>
+</div>
+<!-- Order Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 hover:shadow-md transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-primary-fixed/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">check_circle</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-title-md text-title-md">#48288</span>
+<span class="px-2 py-1 rounded bg-primary-container text-on-primary-container font-label-bold text-[10px] uppercase">Asignado</span>
+</div>
+<div class="flex items-center text-on-surface-variant text-body-md gap-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">location_on</span> Microcentro</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">person</span> Juan Pérez</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden md:block">
+<div class="text-label-bold font-label-bold text-on-surface-variant">Recogida en</div>
+<div class="text-on-surface font-bold">3 mins</div>
+</div>
+<button class="text-on-surface-variant border border-outline-variant p-2 rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Order Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 hover:shadow-md transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-lg bg-tertiary-fixed/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[32px]">warning</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-title-md text-title-md">#48285</span>
+<span class="px-2 py-1 rounded bg-tertiary-container text-on-tertiary-container font-label-bold text-[10px] uppercase">Retrasado</span>
+</div>
+<div class="flex items-center text-on-surface-variant text-body-md gap-4">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">location_on</span> Palermo</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">priority_high</span> Tráfico pesado</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="bg-tertiary text-white font-label-bold text-label-bold px-6 py-2 rounded-full hover:opacity-90 transition-all">Alertar Rider</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Active Riders -->
+<aside class="lg:col-span-5">
+<div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant">
+<div class="flex items-center justify-between mb-6">
+<h2 class="font-title-md text-title-md text-on-surface">Repartidores en Turno</h2>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+</div>
+<div class="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+<!-- Rider 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white transition-all shadow-sm hover:shadow-md">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of a professional Latin delivery driver wearing a clean grey polo shirt with a green and orange helmet logo, smiling confidently. The lighting is bright and outdoor, with a modern urban background blurred in the distance. The overall aesthetic is energetic and professional, matching the brand colors of green, orange, and yellow." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXy4lpfKIRNi9qAFrnOPYWHXz0uTyoJD_BB9vFFHF8ZwHqntyLAPfYOlrUmJblAmUVll-drDcygLBGOZ6f6fzFXDqBKZBYoP6bbytf75dweBsjbciL9GS9iSAQuMzzUHiOo8jucZKzqoYBSChjLjTSzuGa0jxwl1MNY3l0bgwXkOl59ivSTyMJbIWcASEI6PiPPXrExiQ-85_axWKobyVt-1zyKe_ShEDP0_v7Lgdh_MgLQVGaewh2Zg7XviY3Lrnea8LDl1QwgdYR"/>
+<span class="absolute bottom-0 right-0 rider-status-dot bg-primary border-2 border-white"></span>
+</div>
+<div>
+<div class="font-label-bold text-label-bold text-on-surface">Carlos Mendoza</div>
+<div class="text-[12px] text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">bolt</span> Disponible
+                                    </div>
+</div>
+</div>
+<div class="text-right">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Rating: 4.9 ★</span>
+</div>
+</div>
+<!-- Rider 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white transition-all shadow-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of a young female courier holding a smartphone, wearing a stylish branded cap and a grey uniform. The background shows a modern street with bright daylight. Her expression is focused and ready for action. The image has a clean, high-contrast look consistent with a premium logistics service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc0cDQz3BrtzB5u4GMQT_jARdtpC4tHhaAK3JextdefNkl_zPGTZXnu2yKxV4Y1M7DhgV7snjQJrvRQe2rR1JXA4pzV_M_hRD7Uwy9x9TYZIKbs3bJRO2CbS6nYAxz1HqDL0aEFAiPsTH7pkiwPUQJvKzaDwn1wLh_BqjEQOAyO4RNy_tb7gPWyFl-uAHcHDKxK-DUgjmMdp8xvXTuPqvkMQNkOfISYjxO_syne0hUD8h7cWQUZWrmAa1qt-NHJ9QP_bTIOm1V-cyM"/>
+<span class="absolute bottom-0 right-0 rider-status-dot bg-secondary border-2 border-white"></span>
+</div>
+<div>
+<div class="font-label-bold text-label-bold text-on-surface">Elena Torres</div>
+<div class="text-[12px] text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">local_shipping</span> En servicio (#48288)
+                                    </div>
+</div>
+</div>
+<div class="text-right">
+<span class="text-on-surface-variant font-label-sm text-label-sm">6m para entrega</span>
+</div>
+</div>
+<!-- Rider 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white transition-all shadow-sm">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A medium shot of a delivery rider in a professional grey uniform with a minimalist logo, standing next to a sleek green and orange motorcycle. The rider is looking at their smartwatch in a busy but clean urban environment. The lighting is crisp morning sun, creating sharp highlights and professional depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9MCeJ26b5leaAV73WA9ktZVrnK7a7S0-4vdGa5JRZV7_OstR_adB_iwasw7skD79UeW_5JJsPSDU_CoQSLwagPXdzaaapRWaD5zKKmGls0v696icGS7R0gW7TopU2Cs-A8jjn9fivZ5hJ5oRCUUhy_PUaJu9XDFXP6kDxPceZDA6WHGoBtwYFW0DmKeiUOpDPU-_pd2uaX0BuSe-_jM33oOMO-yO3OsspTNTS5w-FkUhcZWfQv5fQUKLrnDpGIXTrvgHtim7X_LS0"/>
+<span class="absolute bottom-0 right-0 rider-status-dot bg-primary border-2 border-white"></span>
+</div>
+<div>
+<div class="font-label-bold text-label-bold text-on-surface">Roberto G.</div>
+<div class="text-[12px] text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">bolt</span> Disponible
+                                    </div>
+</div>
+</div>
+<div class="text-right">
+<span class="text-on-surface-variant font-label-sm text-label-sm">Rating: 4.8 ★</span>
+</div>
+</div>
+<!-- Map Integration Placeholder -->
+<div class="relative h-48 w-full rounded-xl overflow-hidden border border-outline-variant mt-6">
+<div class="bg-cover bg-center w-full h-full grayscale opacity-50" data-location="Buenos Aires" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDahq5a2ADesdXIvb0Pc0fKo0jZ0mTCWafXt--N7_TumwkTFg-Rhb3UpCBklSNoV4Is8D7ouhvo1vu1V-ZgyFkQnqD16f-YgkdyXGJAa5A_6z1MwN8XFhwuX0FAkwJB1PNkSbp8rMyAeG4JFpoy8dbiKmV3miEXgnkcBxk84HmUjvZVVhI6nzLvfGzlN1CkJwTdzCMBorV5NToXTO46VVyBDOzBkXSjYIH-kTyece_NGBj0S4gK8TRBauaEpfC587EURBKODg-SzZWw')"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="glass-card px-4 py-2 rounded-full flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">my_location</span>
+<span class="font-label-bold text-label-bold text-on-surface">Rastreo en Tiempo Real</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 bg-on-surface text-white rounded-xl font-label-bold text-label-bold hover:opacity-90 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">map</span> Abrir Mapa de Flota
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest border-t border-outline-variant shadow-md flex justify-around items-center py-3 px-margin-mobile rounded-t-xl">
+<a href="dashboard_principal.html" class="flex flex-col items-center justify-center text-on-surface-variant snappy-transition scale-95 active:scale-90 p-2 rounded-xl cursor-pointer">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-bold text-[10px] mt-0.5">Inicio</span>
+</a>
+<a href="administracion_de_pedidos_y_flota.html" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-1.5 transition-all cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="font-label-bold text-[10px] mt-0.5">Envíos</span>
+</a>
+</nav>
+
+<!-- Floating Action Button for Emergency / Quick Add -->
+<button class="fixed bottom-24 right-6 md:bottom-10 md:right-10 w-16 h-16 bg-tertiary text-white rounded-full shadow-lg flex items-center justify-center group hover:scale-110 active:scale-95 transition-all z-30">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">add</span>
+<div class="absolute right-20 bg-on-surface text-white px-4 py-2 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap">
+            Nueva Orden
+        </div>
+</button>
+<script>
+        // Simple interactivity for demonstration
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const badge = card.querySelector('.animate-speed');
+                if (badge) badge.classList.add('opacity-100');
+            });
+        });
+
+        // Search Bar Focus Effect
+        const searchInput = document.querySelector('input[type="text"]');
+        const searchContainer = searchInput?.parentElement;
+        if (searchInput && searchContainer) {
+            searchInput.addEventListener('focus', () => {
+                searchContainer.classList.add('ring-2', 'ring-primary', 'border-primary');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchContainer.classList.remove('ring-2', 'ring-primary', 'border-primary');
+            });
+        }
+    </script>
+</body></html>

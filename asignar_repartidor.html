@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>enMo2 - Asignar Repartidor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .speed-line-accent {
+            position: relative;
+        }
+        .speed-line-accent::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 4px;
+            background: linear-gradient(to bottom, #28a745, #feb700, #ff591f);
+            border-radius: 0 4px 4px 0;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #bdcab9;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-container": "#28a745",
+                        "outline-variant": "#bdcab9",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f3f3f6",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary-container": "#ff591f",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "on-background": "#1a1c1e",
+                        "on-secondary-container": "#6b4b00",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#e8e8ea",
+                        "primary-fixed-dim": "#66df75",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "secondary-fixed": "#ffdea8",
+                        "on-surface-variant": "#3e4a3c",
+                        "surface-container": "#eeeef0",
+                        "secondary-container": "#feb700",
+                        "on-error": "#ffffff",
+                        "secondary": "#7c5800",
+                        "outline": "#6e7b6b",
+                        "surface-container-highest": "#e2e2e5",
+                        "on-tertiary-container": "#541300",
+                        "tertiary": "#ae3200",
+                        "surface-tint": "#006e25",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#006e25",
+                        "surface": "#f9f9fc",
+                        "surface-bright": "#f9f9fc",
+                        "primary-fixed": "#83fc8e",
+                        "on-primary-container": "#00330d",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#00531a",
+                        "secondary-fixed-dim": "#ffba20",
+                        "on-secondary-fixed": "#271900",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e2e2e5",
+                        "inverse-primary": "#66df75",
+                        "on-surface": "#1a1c1e",
+                        "background": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#852400",
+                        "on-primary-fixed": "#002106",
+                        "surface-dim": "#dadadc",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "inverse-surface": "#2f3133"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "title-md": ["Hanken Grotesk"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "label-bold": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b-2 border-surface-container-highest flex justify-between items-center px-margin-mobile h-16 w-full max-w-screen-xl mx-auto">
+<div class="flex items-center gap-4">
+<button id="btn-back-header" class="active:scale-95 duration-150 p-2 hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Asignar Repartidor</h1>
+</div>
+<div class="flex gap-2">
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-low transition-colors rounded-full active:scale-95 duration-150">search</button>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-low transition-colors rounded-full active:scale-95 duration-150">more_vert</button>
+</div>
+</header>
+<main class="pt-20 pb-40 px-margin-mobile max-w-screen-xl mx-auto min-h-screen">
+<!-- Progress Stepper -->
+<div class="mb-md">
+<div class="flex items-center justify-between gap-2 px-1 mb-2">
+<span class="font-label-bold text-label-bold text-primary">01 Detalles</span>
+<span class="font-label-bold text-label-bold text-primary">02 Asignación</span>
+<span class="font-label-bold text-label-bold text-outline">03 Entrega</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded-full flex overflow-hidden">
+<div class="h-full bg-primary w-1/3 border-r border-background"></div>
+<div class="h-full bg-primary w-1/3 animate-pulse border-r border-background"></div>
+<div class="h-full bg-surface-container-highest w-1/3"></div>
+</div>
+</div>
+<!-- Sticky Search & Broadcast -->
+<div class="mb-md sticky top-16 bg-background/90 backdrop-blur-md pt-2 pb-4 z-40">
+<div class="relative flex items-center mb-4">
+<span class="material-symbols-outlined absolute left-4 text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface border-2 border-surface-container-highest rounded-xl focus:border-primary focus:ring-0 transition-all font-body-md text-on-surface placeholder:text-outline" placeholder="Buscar repartidor por nombre o ID..." type="text"/>
+</div>
+<!-- Broadcast Section -->
+<div class="bg-primary-container/10 border-2 border-primary-container/20 rounded-xl p-md flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="bg-primary-container text-on-primary-container p-3 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-on-primary-container leading-tight">Difundir Tarea</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Publicar en grupo de WhatsApp de repartidores</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-14 h-8 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Available Riders List -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="font-title-md text-title-md text-on-surface">Repartidores Disponibles (<span id="riders-count">0</span>)</h2>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                    ORDENAR POR ETA
+                </button>
+</div>
+<!-- Rider Cards -->
+<div class="space-y-4" id="riders-container">
+<!-- Card 1: Selected -->
+<div class="rider-card speed-line-accent group relative bg-surface border-2 border-primary rounded-xl p-md flex items-center gap-md transition-all active:scale-[0.98]" onclick="selectRider(this)">
+<div class="relative">
+<div class="w-16 h-16 rounded-full bg-cover bg-center border-2 border-primary" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDpe910pYlI0IUxZZ3dew6O6RJj96nqbJBLTMyfBl-iJjYuGyCY3AG3jWa8tD3B95EfdWNCcxDAKVEdk2AlETpkKNr1WymPRFyTmFpwFIn8rgE1Thc_IF_F3GycyyuVRZatLFnpmObDG_tv4718UXet1DyYl6wgDNJA4-EnlfGIljl0N6G5Bek1RdZYDe32Sn9t_crIOerBGZHqgNmQgU7E1GKlvyVzH7L8s28sOyADqJI8BsJ_rD9W-1Wgot703If-athRIZCFp6w4')"></div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center text-[14px]">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Carlos Mendoza</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-bold tracking-wider">MOTO: #MX-9021</p>
+</div>
+<div class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">speed</span>
+<span class="font-label-bold text-label-bold">4 MIN</span>
+</div>
+</div>
+<div class="mt-2 flex items-center gap-4">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">near_me</span>
+<span class="font-label-sm text-label-sm">0.8 km de distancia</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">star</span>
+<span class="font-label-sm text-label-sm">4.9 (240)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="rider-card group relative bg-surface border-2 border-surface-container-highest rounded-xl p-md flex items-center gap-md transition-all hover:border-outline-variant active:scale-[0.98]" onclick="selectRider(this)">
+<div class="relative">
+<div class="w-16 h-16 rounded-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDNpI9OP9VFeNSf0DjBCrgTowC4gxM3njNhKM4RfMLJcrLa-jn3jZYVixpNIqNItf_ZtaD-s4RUPlAm4yVn9ZCh3XatyQewRjP5ErNV4_LzSff1QdKru6e5sIM5WauYNTqMDZrdWiY0V4SLkJK4CxmJCENhJ7wRhWTTheN23HYn5YEFxgHYz1T0VWCZZ7Hsw-V45CwK7P7qpVdlvAb25GkTpFyWqBAcAfgVqcevIYDWLgLJiqT64hvPs4UX6PwdrNCjWuPqT5jir9C')"></div>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Elena Rodriguez</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-bold tracking-wider">MOTO: #MX-4412</p>
+</div>
+<div class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">speed</span>
+<span class="font-label-bold text-label-bold">7 MIN</span>
+</div>
+</div>
+<div class="mt-2 flex items-center gap-4">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">near_me</span>
+<span class="font-label-sm text-label-sm">1.5 km de distancia</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">star</span>
+<span class="font-label-sm text-label-sm">4.8 (112)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="rider-card group relative bg-surface border-2 border-surface-container-highest rounded-xl p-md flex items-center gap-md transition-all hover:border-outline-variant active:scale-[0.98]" onclick="selectRider(this)">
+<div class="relative">
+<div class="w-16 h-16 rounded-full bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAvqncctyN0K0pq9OMYSroRisEIFPYPDiDQckOKTegisTvQSiPyHTdzMG5YW-XuHjYAJLVtp0vv4Zpx7wksl9TKBRUfBB6yQ8Du-oK7okteXRsw1qkBgGHH66c0UL69w78cEBYvzgiKWsFAIqGTkyv3zRpk6d9Sn4gQsbzFaFLtKA4pq50ZhGwcM4tywcy0o7hzR2LWbDCngOlCUiwpl09VIwA7sQ_xOEpGFLEvTzwvF-Ep-V_fWtb0QWKPd7YW299IeKrio2q7Lft7')"></div>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-title-md text-title-md text-on-surface">Jorge Silva</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-bold tracking-wider">MOTO: #MX-1108</p>
+</div>
+<div class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">speed</span>
+<span class="font-label-bold text-label-bold">12 MIN</span>
+</div>
+</div>
+<div class="mt-2 flex items-center gap-4">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">near_me</span>
+<span class="font-label-sm text-label-sm">3.2 km de distancia</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">star</span>
+<span class="font-label-sm text-label-sm">4.7 (89)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Info Box -->
+<div class="mt-lg relative h-40 w-full overflow-hidden rounded-2xl bg-surface-container">
+<div class="absolute inset-0 opacity-10">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary-container to-tertiary-container"></div>
+<div class="absolute top-8 left-[-10%] w-full h-[1px] bg-outline-variant rotate-[-2deg]"></div>
+<div class="absolute top-16 left-[-10%] w-full h-[2px] bg-outline-variant rotate-[-2deg]"></div>
+<div class="absolute top-24 left-[-10%] w-full h-[1px] bg-outline-variant rotate-[-2deg]"></div>
+</div>
+<div class="relative z-10 p-md flex items-center h-full gap-4">
+<span class="material-symbols-outlined text-outline text-[48px]">info</span>
+<p class="font-body-md text-on-surface-variant max-w-[280px]">Asignar un repartidor con mejores calificaciones aumenta el éxito de la entrega en un <span class="text-primary font-bold">15%</span> en promedio.</p>
+</div>
+</div>
+</main>
+<!-- Bottom Actions Layer -->
+<div class="fixed bottom-0 left-0 w-full bg-surface border-t-2 border-surface-container-highest z-50 shadow-lg">
+<div class="p-4 max-w-screen-xl mx-auto">
+<button id="confirm-btn" class="w-full py-4 bg-primary text-white rounded-xl font-display-lg text-title-md flex items-center justify-center gap-2 active:scale-95 transition-transform duration-200 shadow-lg shadow-primary/20">
+<span>Confirmar Asignación</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Bottom Navigation -->
+<nav class="flex justify-around items-center h-16 border-t border-surface-container-highest bg-surface px-4 pb-1">
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-label-bold uppercase">Inicio</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-label-bold uppercase">Mapa</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">list_alt</span>
+<span class="text-[10px] font-label-bold uppercase">Pedidos</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-label-bold uppercase">Perfil</span>
+</div>
+</nav>
+</div>
+<script>
+        // Obtener pedido_id desde los parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const pedidoId = urlParams.get('pedido_id');
+
+        let selectedRiderId = null;
+
+        // Cargar los repartidores desde la API
+        async function cargarRepartidores() {
+            const container = document.getElementById('riders-container');
+            container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm">Buscando repartidores activos...</p>';
+
+            try {
+                const response = await fetch('api/usuarios/repartidores');
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    const repartidores = result.data;
+                    document.getElementById('riders-count').textContent = repartidores.length;
+                    
+                    if (repartidores.length === 0) {
+                        container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm py-4">No hay repartidores disponibles en este momento.</p>';
+                        return;
+                    }
+
+                    container.innerHTML = ''; // Limpiar mocks estáticos
+                    
+                    repartidores.forEach((repartidor, index) => {
+                        // Simular ETA y distancia si no hay datos espaciales complejos aún
+                        const etaSimulado = Math.floor(Math.random() * 15) + 2;
+                        const distanciaSimulada = (Math.random() * 4 + 0.5).toFixed(1);
+                        
+                        const cardHtml = `
+                            <div class="rider-card group relative bg-surface border-2 border-surface-container-highest rounded-xl p-md flex items-center gap-md transition-all active:scale-[0.98] cursor-pointer" 
+                                 data-rider-id="${repartidor.id}" 
+                                 onclick="selectRider(this, ${repartidor.id})">
+                                <div class="relative">
+                                    <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-black text-xl border border-surface-container-highest">${repartidor.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase()}</div>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h4 class="font-title-md text-title-md text-on-surface">${repartidor.nombre}</h4>
+                                            <p class="font-label-sm text-label-sm text-on-surface-variant font-bold tracking-wider">TEL: ${repartidor.telefono}</p>
+                                        </div>
+                                        <div class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full flex items-center gap-1 eta-badge">
+                                            <span class="material-symbols-outlined text-[16px]">speed</span>
+                                            <span class="font-label-bold text-label-bold">${etaSimulado} MIN</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 flex items-center gap-4">
+                                        <div class="flex items-center gap-1 text-on-surface-variant">
+                                            <span class="material-symbols-outlined text-[18px]">near_me</span>
+                                            <span class="font-label-sm text-label-sm">${distanciaSimulada} km de distancia</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-on-surface-variant">
+                                            <span class="material-symbols-outlined text-[18px] text-secondary">star</span>
+                                            <span class="font-label-sm text-label-sm">4.9 (Activo)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', cardHtml);
+                    });
+
+                } else {
+                    container.innerHTML = `<p class="text-center text-error font-label-sm">${result.message || 'Error al obtener repartidores.'}</p>`;
+                }
+            } catch (error) {
+                console.error("Error obteniendo repartidores:", error);
+                container.innerHTML = '<p class="text-center text-error font-label-sm">Error de conexión al cargar repartidores.</p>';
+            }
+        }
+
+        // Selección de Repartidor
+        function selectRider(element, riderId) {
+            selectedRiderId = riderId;
+
+            document.querySelectorAll('.rider-card').forEach(card => {
+                card.classList.remove('border-primary', 'speed-line-accent');
+                card.classList.add('border-surface-container-highest');
+                
+                const checkUI = card.querySelector('.absolute.-bottom-1.-right-1');
+                if (checkUI) checkUI.remove();
+                
+                const avatar = card.querySelector('.w-16.h-16');
+                if(avatar) avatar.classList.remove('border-2', 'border-primary');
+
+                const etaBadge = card.querySelector('.eta-badge');
+                if(etaBadge) {
+                    etaBadge.classList.remove('bg-primary-container', 'text-on-primary-container');
+                    etaBadge.classList.add('bg-surface-container-highest', 'text-on-surface-variant');
+                }
+            });
+
+            element.classList.add('border-primary', 'speed-line-accent');
+            element.classList.remove('border-surface-container-highest');
+            
+            const avatar = element.querySelector('.w-16.h-16');
+            if(avatar) avatar.classList.add('border-2', 'border-primary');
+
+            const etaBadge = element.querySelector('.eta-badge');
+            if(etaBadge) {
+                etaBadge.classList.add('bg-primary-container', 'text-on-primary-container');
+                etaBadge.classList.remove('bg-surface-container-highest', 'text-on-surface-variant');
+            }
+
+            const checkIcon = document.createElement('div');
+            checkIcon.className = 'absolute -bottom-1 -right-1 bg-primary text-white w-6 h-6 rounded-full flex items-center justify-center text-[14px]';
+            checkIcon.innerHTML = '<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: \'FILL\' 1;">check</span>';
+            element.querySelector('.relative').appendChild(checkIcon);
+        }
+
+        // Confirmar Asignación
+        const confirmBtn = document.getElementById('confirm-btn');
+        confirmBtn.addEventListener('click', async () => {
+            if (!pedidoId) {
+                alert('No se detectó un pedido válido en la URL.');
+                return;
+            }
+            if (!selectedRiderId) {
+                alert('Por favor selecciona un repartidor disponible.');
+                return;
+            }
+
+            // Deshabilitar botón para evitar doble clic
+            confirmBtn.disabled = true;
+            const originalText = confirmBtn.innerHTML;
+            confirmBtn.innerHTML = `<span>Procesando...</span><span class="material-symbols-outlined animate-spin">sync</span>`;
+
+            try {
+                const response = await fetch('api/pedidos/actualizar-estado', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pedido_id: parseInt(pedidoId),
+                        repartidor_id: selectedRiderId,
+                        estado: 'asignado'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    // Redirigir al flujo de entrega o detalles del pedido en curso
+                    window.location.href = `pedido_en_curso.html?id=${pedidoId}`;
+                } else {
+                    alert('Error en la asignación: ' + (result.message || 'Error desconocido'));
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error('Error al enviar asignación:', error);
+                alert('Error de red al intentar asignar el repartidor.');
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = originalText;
+            }
+        });
+
+        // Eventos del buscador
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+
+        // Evento botón regresar
+        document.getElementById('btn-back-header').addEventListener('click', () => {
+            window.location.href = 'dashboard_principal.html';
+        });
+
+        // Ejecutar carga inicial
+        cargarRepartidores();
+    </script>
+</body></html>

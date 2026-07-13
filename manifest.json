@@ -1,0 +1,28 @@
+{
+  "short_name": "enMo2",
+  "name": "enMo2 - Logística de Velocidad",
+  "description": "Plataforma premium e instantánea para la gestión de envíos y logística en tiempo real.",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "images/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "images/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "inicio_de_sesion.html",
+  "background_color": "#ffffff",
+  "theme_color": "#006e25",
+  "display": "standalone",
+  "orientation": "portrait"
+}

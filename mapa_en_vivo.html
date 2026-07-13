@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>enMo2 - Mapa en Vivo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#ff591f",
+                        "surface-container": "#eeeef0",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#3e4a3c",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2f3133",
+                        "surface-bright": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "background": "#f9f9fc",
+                        "surface-tint": "#006e25",
+                        "surface": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#852400",
+                        "primary-fixed": "#83fc8e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#541300",
+                        "secondary-container": "#feb700",
+                        "on-background": "#1a1c1e",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#28a745",
+                        "outline-variant": "#bdcab9",
+                        "surface-container-high": "#e8e8ea",
+                        "on-primary-fixed": "#002106",
+                        "primary-fixed-dim": "#66df75",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-secondary-fixed": "#271900",
+                        "outline": "#6e7b6b",
+                        "on-surface": "#1a1c1e",
+                        "inverse-primary": "#66df75",
+                        "on-secondary-container": "#6b4b00",
+                        "inverse-on-surface": "#f0f0f3",
+                        "surface-container-low": "#f3f3f6",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "surface-container-highest": "#e2e2e5",
+                        "secondary": "#7c5800",
+                        "on-primary-container": "#00330d",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#ffdea8",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "tertiary": "#ae3200",
+                        "secondary-fixed-dim": "#ffba20",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "primary": "#006e25",
+                        "surface-dim": "#dadadc",
+                        "surface-variant": "#e2e2e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "48px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "title-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .map-canvas {
+            background-color: #f0f4f0;
+            background-image: radial-gradient(#d1dbd1 1px, transparent 1px);
+            background-size: 20px 20px;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .marker-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        .speed-line {
+            height: 2px;
+            background: linear-gradient(90deg, #28a745, #feb700, #ae3200);
+            width: 100%;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .drawer-visible {
+            transform: translateY(0) !important;
+        }
+
+        .marker-shadow {
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden select-none">
+<!-- Full Screen Map Background Container -->
+<div id="map" class="map-canvas"></div>
+<!-- Top App Bar / Search Container -->
+<header class="fixed top-0 w-full z-50 px-margin-mobile pt-sm">
+<div class="max-w-screen-xl mx-auto flex flex-col gap-sm">
+<!-- Search Bar (Floating) -->
+<div class="glass-panel flex items-center h-14 w-full rounded-xl shadow-lg border border-white/50 px-md gap-sm transition-all focus-within:ring-2 focus-within:ring-primary">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline" placeholder="Buscar dirección o zona..." type="text"/>
+<button class="w-10 h-10 flex items-center justify-center bg-surface-container-high rounded-lg hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface">tune</span>
+</button>
+</div>
+</div>
+</header>
+<!-- UI Overlay Controls -->
+<div class="fixed right-margin-mobile top-1/4 flex flex-col gap-sm z-40">
+<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
+<span class="material-symbols-outlined text-primary">my_location</span>
+</button>
+<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
+<span class="material-symbols-outlined text-on-surface">layers</span>
+</button>
+<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
+<span class="material-symbols-outlined text-on-surface">add</span>
+</button>
+<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
+<span class="material-symbols-outlined text-on-surface">remove</span>
+</button>
+</div>
+<!-- Bottom Rider Detail Drawer -->
+<div class="fixed bottom-20 left-0 w-full z-40 translate-y-full transition-transform duration-500 ease-out px-sm pb-sm" id="riderDrawer">
+<div class="bg-surface shadow-2xl rounded-t-3xl overflow-hidden max-w-lg mx-auto border-x border-t border-surface-container-highest">
+  <!-- Brand Speed Line Divider -->
+  <div class="speed-line"></div>
+  <div class="p-md">
+    <div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mb-md"></div>
+
+    <!-- ── ESTADO: Buscando repartidor (skeleton) ── -->
+    <div id="drawer-buscando" class="hidden">
+      <div class="flex items-center gap-4 mb-4">
+        <!-- Avatar skeleton con pulso -->
+        <div class="w-16 h-16 rounded-2xl bg-surface-container-high flex-shrink-0 flex items-center justify-center relative overflow-hidden border-2 border-dashed border-outline/30">
+          <div class="absolute inset-0 bg-gradient-to-r from-surface-container via-surface-container-highest to-surface-container animate-pulse"></div>
+          <span class="material-symbols-outlined text-outline/40 text-3xl z-10" style="font-variation-settings:'FILL' 1;">person_search</span>
+        </div>
+        <div class="flex-grow space-y-2">
+          <!-- Nombre skeleton -->
+          <div class="h-5 bg-surface-container-highest rounded-lg animate-pulse w-3/4"></div>
+          <!-- Subtítulo skeleton -->
+          <div class="h-3 bg-surface-container-high rounded-lg animate-pulse w-1/2"></div>
+        </div>
+        <!-- Rating skeleton -->
+        <div class="w-14 h-7 bg-surface-container-high rounded-full animate-pulse"></div>
+      </div>
+      <!-- Mensaje de espera con spinner -->
+      <div class="flex items-center gap-3 p-3 bg-secondary-container/20 rounded-xl mb-4">
+        <div class="flex gap-1 flex-shrink-0">
+          <span class="w-2 h-2 rounded-full bg-secondary animate-bounce" style="animation-delay:0ms"></span>
+          <span class="w-2 h-2 rounded-full bg-secondary animate-bounce" style="animation-delay:150ms"></span>
+          <span class="w-2 h-2 rounded-full bg-secondary animate-bounce" style="animation-delay:300ms"></span>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-on-surface">Buscando repartidor disponible...</p>
+          <p class="text-[10px] text-on-surface-variant mt-0.5" id="drawer-orden-info">Orden #EM-0 · $0.00 MXN</p>
+        </div>
+      </div>
+      <!-- Botones skeleton -->
+      <div class="flex gap-3">
+        <div class="flex-1 h-14 bg-surface-container-high rounded-xl animate-pulse"></div>
+        <div class="flex-1 h-14 bg-surface-container-high rounded-xl animate-pulse"></div>
+      </div>
+    </div>
+
+    <!-- ── ESTADO: Repartidor asignado (datos reales) ── -->
+    <div id="drawer-asignado" class="hidden">
+      <div class="flex items-center gap-md">
+        <div class="w-16 h-16 rounded-2xl bg-surface-container-high flex-shrink-0 overflow-hidden border-2 border-primary/20">
+          <img id="rider-foto" class="w-full h-full object-cover" src="" alt="Foto del repartidor"/>
+        </div>
+        <div class="flex-grow">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface leading-tight" id="riderName">—</h3>
+              <p class="font-label-bold text-label-bold text-outline tracking-wider uppercase" id="riderMoto">MOTO</p>
+            </div>
+            <div class="flex items-center gap-xs bg-primary-container px-sm py-1 rounded-full">
+              <span class="material-symbols-outlined text-[16px] text-on-primary-container" style="font-variation-settings:'FILL' 1;">star</span>
+              <span class="font-label-bold text-label-bold text-on-primary-container" id="rider-rating">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-md space-y-sm">
+        <div class="flex justify-between items-center p-sm bg-surface-container-low rounded-xl">
+          <div class="flex items-center gap-sm">
+            <span class="material-symbols-outlined text-primary">sensors</span>
+            <span class="font-body-md text-on-surface">Estado:</span>
+          </div>
+          <span class="font-label-bold text-label-bold px-sm py-1 rounded-lg" id="riderStatus">—</span>
+        </div>
+        <div class="flex gap-sm">
+          <a id="btn-msg-rider" target="_blank" href="#" class="flex-1 bg-primary text-on-primary h-14 rounded-xl font-label-bold text-label-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-sm">
+            <span class="material-symbols-outlined">chat</span> Mensaje
+          </a>
+          <a id="btn-call-rider" href="#" class="flex-1 border-2 border-primary text-primary h-14 rounded-xl font-label-bold text-label-bold active:scale-95 transition-all flex items-center justify-center gap-sm">
+            <span class="material-symbols-outlined">call</span> Llamar
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ESTADO: Sin pedidos activos ── -->
+    <div id="drawer-vacio" class="hidden py-4 text-center">
+      <span class="material-symbols-outlined text-4xl text-outline mb-2">local_shipping</span>
+      <p class="text-sm font-bold text-on-surface" id="drawer-empty-title">Sin envíos activos</p>
+      <p class="text-xs text-on-surface-variant mt-1" id="drawer-empty-sub">Solicita un envío desde Inicio</p>
+    </div>
+
+  </div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-2 pb-safe bg-surface border-t-2 border-surface-container-highest shadow-lg z-50 rounded-t-xl">
+  <a id="btn-nav-home" href="#" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary px-4 py-1 transition-colors active:scale-90 duration-200">
+    <span class="material-symbols-outlined">home</span>
+    <span class="font-label-sm text-label-sm">Inicio</span>
+  </a>
+  <a href="mapa_en_vivo.html" class="flex flex-col items-center justify-center text-primary px-4 py-1 transition-colors active:scale-90 duration-200">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">map</span>
+    <span class="font-label-sm text-label-sm font-bold">Mapa</span>
+  </a>
+  <a id="btn-nav-pedidos" href="gestion_de_pedidos.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary px-4 py-1 transition-colors active:scale-90 duration-200">
+    <span class="material-symbols-outlined">list_alt</span>
+    <span class="font-label-sm text-label-sm">Pedidos</span>
+  </a>
+</nav>
+
+<script>
+    // ─── Sesión y rol ────────────────────────────────────────────────────
+    const usuarioStr = localStorage.getItem('usuario');
+    if (!usuarioStr) window.location.href = 'inicio_de_sesion.html';
+    const usuario = JSON.parse(usuarioStr);
+
+    // Configurar botones de navegación según el rol
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnHome = document.getElementById('btn-nav-home');
+
+        if (usuario.rol === 'administrador') {
+            btnHome.href = 'dashboard_principal.html';
+        } else if (usuario.rol === 'repartidor') {
+            btnHome.href = 'perfil_del_repartidor.html';
+        } else {
+            // Cliente
+            btnHome.href = 'inicio_cliente.html';
+        }
+    });
+
+    // ─── Mapa Leaflet ────────────────────────────────────────────────────
+    const map = L.map('map').setView([17.9895, -92.9475], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let riderMarkers = {};
+
+    // ─── Mapa para ADMINISTRADOR / REPARTIDOR: muestra todos los repartidores online ───
+    async function actualizarMapaRepartidores() {
+        try {
+            const response = await fetch('api/admin/repartidores-online');
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                result.data.forEach(rep => {
+                    const lat = parseFloat(rep.latitud);
+                    const lng = parseFloat(rep.longitud);
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        const color = rep.ocupado ? '#feb700' : '#006e25';
+                        if (riderMarkers[rep.id]) {
+                            riderMarkers[rep.id].setLatLng([lat, lng]);
+                            riderMarkers[rep.id].setStyle({ color });
+                        } else {
+                            const marker = L.circleMarker([lat, lng], { color, radius: 10, fillOpacity: 0.9 }).addTo(map);
+                            marker.on('click', e => { L.DomEvent.stopPropagation(e); toggleDrawer(rep); });
+                            riderMarkers[rep.id] = marker;
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('Error al actualizar mapa:', e);
+        }
+    }
+
+    // ─── Mapa para CLIENTE: muestra solo los puntos de su pedido activo ──
+    async function actualizarMapaCliente() {
+        try {
+            const res = await fetch(`api/pedidos?usuario_id=${usuario.id}`);
+            const result = await res.json();
+            if (!res.ok || result.status !== 'success') return;
+
+            const activos = result.data.filter(p => p.estado !== 'entregado' && p.estado !== 'cancelado');
+
+            if (activos.length === 0) {
+                // Sin pedidos activos
+                mostrarDrawerVacio('Sin envíos activos', 'Solicita un envío desde Inicio');
+                return;
+            }
+
+            // Limpiar marcadores anteriores
+            Object.values(riderMarkers).forEach(m => {
+                try { map.removeLayer(m); } catch(e) {}
+            });
+            riderMarkers = {};
+
+            const pedido = activos[0];
+
+            const latR = parseFloat(pedido.latitud_recogida);
+            const lngR = parseFloat(pedido.longitud_recogida);
+            const latE = parseFloat(pedido.latitud_entrega);
+            const lngE = parseFloat(pedido.longitud_entrega);
+
+            const markers = [];
+
+            if (!isNaN(latR) && !isNaN(lngR)) {
+                const m = L.circleMarker([latR, lngR], { color: '#006e25', radius: 10, fillOpacity: 0.85, fillColor: '#006e25' })
+                    .addTo(map).bindPopup(`<b>Punto de Recogida</b><br>Orden #EM-${pedido.id}`);
+                markers.push(m);
+                riderMarkers['recogida'] = m;
+            }
+
+            if (!isNaN(latE) && !isNaN(lngE)) {
+                const m = L.circleMarker([latE, lngE], { color: '#ae3200', radius: 10, fillOpacity: 0.85, fillColor: '#ae3200' })
+                    .addTo(map).bindPopup(`<b>Destino de Entrega</b><br>Orden #EM-${pedido.id}`);
+                markers.push(m);
+                riderMarkers['entrega'] = m;
+            }
+
+            if (markers.length === 2) {
+                const linea = L.polyline([[latR, lngR], [latE, lngE]], { color: '#006e25', weight: 3, opacity: 0.5, dashArray: '8, 8' }).addTo(map);
+                riderMarkers['linea'] = linea;
+                map.fitBounds(L.featureGroup(markers).getBounds().pad(0.3));
+            }
+
+            // ─── Actualizar el drawer según el estado ───────────────────
+            if (pedido.estado === 'pendiente') {
+                // Buscando repartidor → esqueleto animado
+                mostrarDrawerBuscando(pedido);
+            } else {
+                // Repartidor asignado → datos reales
+                mostrarDrawerAsignado(pedido);
+            }
+
+        } catch (e) {
+            console.error('Error al cargar pedido del cliente:', e);
+        }
+    }
+
+    // ─── Funciones para cambiar el estado del drawer ────────────────────
+    function ocultarTodosDrawerStates() {
+        ['drawer-buscando', 'drawer-asignado', 'drawer-vacio'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+    }
+
+    function mostrarDrawerBuscando(pedido) {
+        ocultarTodosDrawerStates();
+        document.getElementById('drawer-buscando').classList.remove('hidden');
+        document.getElementById('drawer-orden-info').textContent =
+            `Orden #EM-${pedido.id} · $${parseFloat(pedido.precio).toFixed(2)} MXN`;
+        document.getElementById('riderDrawer').classList.add('drawer-visible');
+    }
+
+    function mostrarDrawerAsignado(pedido) {
+        ocultarTodosDrawerStates();
+        document.getElementById('drawer-asignado').classList.remove('hidden');
+
+        const estadoLabels = {
+            'asignado': 'En camino a recoger',
+            'en_ruta': 'En camino a entrega',
+            'entregado': 'Entregado'
+        };
+        const estadoClasses = {
+            'asignado': 'bg-secondary-container text-on-secondary-container',
+            'en_ruta': 'bg-primary-container text-on-primary-container',
+            'entregado': 'bg-surface-container-high text-outline'
+        };
+
+        document.getElementById('riderName').textContent = pedido.repartidor_nombre || 'Repartidor';
+        document.getElementById('riderMoto').textContent = `MOTO-${pedido.repartidor_id || '—'} · #EM-${pedido.id}`;
+        document.getElementById('rider-rating').textContent = pedido.repartidor_calificacion || '—';
+
+        // Foto del repartidor (fallback a icono si no hay foto)
+        const foto = document.getElementById('rider-foto');
+        if (pedido.repartidor_foto) {
+            foto.src = pedido.repartidor_foto;
+            foto.style.display = 'block';
+        } else {
+            foto.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(pedido.repartidor_nombre || 'R')}&background=006e25&color=fff&size=128`;
+        }
+
+        const statusEl = document.getElementById('riderStatus');
+        statusEl.textContent = estadoLabels[pedido.estado] || pedido.estado;
+        statusEl.className = `font-label-bold text-label-bold px-sm py-1 rounded-lg ${estadoClasses[pedido.estado] || 'bg-surface-container text-on-surface-variant'}`;
+
+        // Botones de contacto reales
+        if (pedido.repartidor_telefono) {
+            document.getElementById('btn-call-rider').href = `tel:${pedido.repartidor_telefono}`;
+            document.getElementById('btn-msg-rider').href = `https://wa.me/52${pedido.repartidor_telefono}`;
+        }
+
+        document.getElementById('riderDrawer').classList.add('drawer-visible');
+    }
+
+    function mostrarDrawerVacio(titulo, subtitulo) {
+        ocultarTodosDrawerStates();
+        document.getElementById('drawer-vacio').classList.remove('hidden');
+        document.getElementById('drawer-empty-title').textContent = titulo;
+        document.getElementById('drawer-empty-sub').textContent = subtitulo;
+        document.getElementById('riderDrawer').classList.add('drawer-visible');
+    }
+
+    // ─── Control del Cajón Inferior (para admin/repartidor) ─────────────
+    function toggleDrawer(rep) {
+        ocultarTodosDrawerStates();
+        document.getElementById('drawer-asignado').classList.remove('hidden');
+        document.getElementById('riderName').textContent = rep.nombre;
+        document.getElementById('riderMoto').textContent = `MOTO-${rep.id}`;
+        document.getElementById('rider-rating').textContent = rep.calificacion || '—';
+
+        const foto = document.getElementById('rider-foto');
+        foto.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(rep.nombre)}&background=006e25&color=fff&size=128`;
+
+        const statusEl = document.getElementById('riderStatus');
+        statusEl.textContent = rep.ocupado ? 'En entrega / Ocupado' : 'Disponible';
+        statusEl.className = rep.ocupado
+            ? 'font-label-bold text-label-bold px-sm py-1 rounded-lg bg-secondary-container text-on-secondary-container'
+            : 'font-label-bold text-label-bold px-sm py-1 rounded-lg bg-primary-container text-on-primary-container';
+
+        document.getElementById('btn-call-rider').href = `tel:${rep.telefono}`;
+        document.getElementById('btn-msg-rider').href = `https://wa.me/52${rep.telefono}`;
+        document.getElementById('riderDrawer').classList.add('drawer-visible');
+    }
+
+    map.on('click', () => {
+        document.getElementById('riderDrawer').classList.remove('drawer-visible');
+    });
+
+    // ─── Arrancar el mapa según el rol ───────────────────────────────────
+    if (usuario.rol === 'administrador' || usuario.rol === 'repartidor') {
+        actualizarMapaRepartidores();
+        setInterval(actualizarMapaRepartidores, 8000);
+    } else {
+        actualizarMapaCliente();
+        setInterval(actualizarMapaCliente, 10000);
+    }
+</script>
+</body></html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>enMo2 - Orders Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#ff591f",
+                        "surface-container": "#eeeef0",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#3e4a3c",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#2f3133",
+                        "surface-bright": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "background": "#f9f9fc",
+                        "surface-tint": "#006e25",
+                        "surface": "#f9f9fc",
+                        "on-tertiary-fixed-variant": "#852400",
+                        "primary-fixed": "#83fc8e",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#541300",
+                        "secondary-container": "#feb700",
+                        "on-background": "#1a1c1e",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#28a745",
+                        "outline-variant": "#bdcab9",
+                        "surface-container-high": "#e8e8ea",
+                        "on-primary-fixed": "#002106",
+                        "primary-fixed-dim": "#66df75",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-secondary-fixed": "#271900",
+                        "outline": "#6e7b6b",
+                        "on-surface": "#1a1c1e",
+                        "inverse-primary": "#66df75",
+                        "on-secondary-container": "#6b4b00",
+                        "inverse-on-surface": "#f0f0f3",
+                        "surface-container-low": "#f3f3f6",
+                        "tertiary-fixed-dim": "#ffb59e",
+                        "surface-container-highest": "#e2e2e5",
+                        "secondary": "#7c5800",
+                        "on-primary-container": "#00330d",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#ffdea8",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "tertiary": "#ae3200",
+                        "secondary-fixed-dim": "#ffba20",
+                        "on-tertiary-fixed": "#3a0b00",
+                        "primary": "#006e25",
+                        "surface-dim": "#dadadc",
+                        "surface-variant": "#e2e2e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "lg": "48px",
+                        "sm": "12px",
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "title-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .speed-line {
+            height: 4px;
+            background: linear-gradient(90deg, #006e25 0%, #feb700 50%, #ae3200 100%);
+            border-radius: 99px;
+        }
+        .kinetic-card {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .kinetic-card:active { transform: scale(0.98) translateX(4px); }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container pb-32">
+<!-- Navigation Drawer / Sidebar -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-[9998] hidden opacity-0 transition-opacity duration-300"></div>
+<aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-surface-container-lowest border-r border-surface-container-highest z-[9999] -translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-2xl">
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center gap-2">
+      <h3 class="font-display-lg text-headline-lg-mobile font-black tracking-tighter text-primary">enMo2</h3>
+    </div>
+    <button id="btn-close-sidebar" class="p-2 rounded-full hover:bg-surface-container transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+  </div>
+  
+  <!-- User Profile Info in Sidebar -->
+  <div class="flex items-center gap-3 p-4 bg-surface-container rounded-xl mb-6">
+    <div class="w-12 h-12 rounded-full bg-primary-container overflow-hidden">
+      <img class="w-full h-full object-cover" id="sidebar-user-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf_9m_bXPKukWlpM339Fq5KuW00pqX1x-XUTIxDd56a2hkTNnuyoA-U6pn-1ApH5OhgkDBd4u6jbmsb5CwG7qUR4WqurjF-cI9Zjd4CGIykptbziBGOn9D7lWkcyxZDT2_c_K31MsMPWrIsWYJp3JDnC3XShEUP3KOlBYECA3anXQdyEHSH_XON5UUgaQnDcg-g-Rr4XB9EUnzhOcvoI0sVKfu4Ut8hJb0Ywfa_6k5bN3tOnV8p9t5C1lYo82Rcclx50LB9Baywipm"/>
+    </div>
+    <div class="min-w-0 flex-grow">
+      <h4 class="font-title-md text-sm text-on-surface truncate" id="sidebar-user-name">Usuario</h4>
+      <p class="text-xs text-on-surface-variant truncate" id="sidebar-user-email">email@enmo2.com</p>
+    </div>
+  </div>
+
+  <nav class="flex-grow space-y-2">
+    <a id="link-menu-perfil" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-container/10 text-primary transition-colors font-label-bold" href="#">
+      <span class="material-symbols-outlined">person</span>
+      <span>Mi Perfil</span>
+    </a>
+    <a id="link-menu-admin" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold hidden" href="panel_de_administracion_repartidores.html">
+      <span class="material-symbols-outlined">shield</span>
+      <span>Administración</span>
+    </a>
+  </nav>
+
+  <div class="pt-6 border-t border-surface-container">
+    <button id="btn-logout" class="w-full py-3 rounded-xl bg-error-container text-on-error-container font-label-bold text-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">logout</span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b-2 border-surface-container-highest">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full max-w-screen-xl mx-auto">
+<div class="flex items-center gap-4">
+<button id="btn-menu" class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150">menu</button>
+<h1 class="font-display-lg text-[24px] font-black tracking-tighter text-primary">enMo2</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95 duration-150">notifications</button>
+</div>
+</div>
+</header>
+<main class="pt-16 pb-32 max-w-screen-xl mx-auto min-h-screen px-margin-mobile">
+<!-- Filter Tabs -->
+<section class="sticky top-16 z-40 bg-surface/95 backdrop-blur-md py-4 -mx-margin-mobile px-margin-mobile">
+<div class="flex gap-2 overflow-x-auto scroll-hide pb-2">
+<button class="px-6 py-2.5 rounded-full font-label-bold text-label-bold bg-primary text-on-primary shadow-md shrink-0">Todos</button>
+<button class="px-6 py-2.5 rounded-full font-label-bold text-label-bold bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors shrink-0">Pendientes</button>
+<button class="px-6 py-2.5 rounded-full font-label-bold text-label-bold bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors shrink-0">En Curso</button>
+<button class="px-6 py-2.5 rounded-full font-label-bold text-label-bold bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors shrink-0">Entregados</button>
+</div>
+</section>
+<!-- Dynamic Header Info -->
+<div class="mt-4 mb-6">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Mis Pedidos</h2>
+<p id="txt-resumen-entregas" class="font-body-md text-body-md text-on-surface-variant">Cargando entregas...</p>
+</div>
+<!-- Orders List -->
+<div id="lista-pedidos" class="space-y-4">
+<!-- Card 1: Pending -->
+<article class="kinetic-card bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-surface-container-highest relative group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary-container"></div>
+<div class="p-md pl-6">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-outline uppercase tracking-wider">Order #EM-8821</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[20px] text-[#25D366]">chat</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Via WhatsApp</span>
+</div>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-bold uppercase">Pendiente</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1">location_on</span>
+<div>
+<p class="text-label-sm text-outline">Recogida</p>
+<p class="font-title-md text-on-surface">Av. Central 123, Zona 10</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary mt-1">flag</span>
+<div>
+<p class="text-label-sm text-outline">Entrega</p>
+<p class="font-title-md text-on-surface">Calle Mariscal 45-20, Zona 11</p>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container-high flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="text-display-lg text-[24px] font-black text-primary">Q 45.00</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold text-label-bold active:scale-95 transition-transform">Ver Detalles</button>
+</div>
+</div>
+</article>
+<!-- Card 2: Assigned/En Curso -->
+<article class="kinetic-card bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-surface-container-highest relative group">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary-container"></div>
+<div class="p-md pl-6">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-outline uppercase tracking-wider">Order #EM-8845</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[20px] text-[#25D366]">chat</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Via WhatsApp</span>
+</div>
+</div>
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-label-sm font-label-bold uppercase">En Curso</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1">location_on</span>
+<div>
+<p class="text-label-sm text-outline">Recogida</p>
+<p class="font-title-md text-on-surface">Restaurante "El Sabor", Z.9</p>
+</div>
+</div>
+<div class="flex items-start gap-3 relative pb-2">
+<span class="material-symbols-outlined text-tertiary mt-1">flag</span>
+<div>
+<p class="text-label-sm text-outline">Entrega</p>
+<p class="font-title-md text-on-surface">Condominio Las Brisas, Apto 4</p>
+</div>
+</div>
+</div>
+<div class="speed-line w-full mb-4"></div>
+<div class="flex justify-between items-center">
+<div>
+<span class="text-display-lg text-[24px] font-black text-primary">Q 65.00</span>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-container-high text-on-surface-variant p-2 rounded-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined">call</span>
+</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold text-label-bold active:scale-95 transition-transform">Rastrear</button>
+</div>
+</div>
+</div>
+</article>
+<!-- Card 3: Delivered -->
+<article class="kinetic-card bg-surface-container-lowest/70 rounded-xl overflow-hidden shadow-sm border border-surface-container-highest relative group opacity-80">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-outline"></div>
+<div class="p-md pl-6">
+<div class="flex justify-between items-start mb-4">
+<div class="flex flex-col">
+<span class="font-label-bold text-label-bold text-outline uppercase tracking-wider">Order #EM-8790</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[20px] text-outline">shopping_bag</span>
+<span class="text-label-sm font-label-sm text-outline">App Source</span>
+</div>
+</div>
+<span class="bg-surface-container-highest text-outline px-3 py-1 rounded-full text-label-sm font-label-bold uppercase">Entregado</span>
+</div>
+<div class="space-y-2">
+<p class="text-body-md text-on-surface-variant">Entrega completada a las 14:30 PM</p>
+<p class="font-label-bold text-label-bold text-primary">Calificación: ⭐ 5.0</p>
+</div>
+<div class="mt-4 pt-4 border-t border-surface-container-high flex justify-between items-center">
+<span class="text-title-md font-bold text-outline">Q 35.00</span>
+<button class="text-primary font-label-bold text-label-bold hover:underline">Ver Historial</button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button onclick="window.location.href='nuevo_pedido_detalles.html'" class="fixed bottom-24 right-margin-mobile w-14 h-14 bg-tertiary-container text-on-primary rounded-2xl shadow-xl flex items-center justify-center active:scale-90 transition-transform duration-200 z-50">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-2 pb-safe bg-surface border-t-2 border-surface-container-highest shadow-lg z-50 rounded-t-xl">
+<a id="btn-nav-home" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary px-4 py-1 transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Inicio</span>
+</a>
+<a href="mapa_en_vivo.html" class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary px-4 py-1 transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-sm text-label-sm">Mapa</span>
+</a>
+<a href="gestion_de_pedidos.html" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-6 py-2 transition-transform active:scale-90 duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">list_alt</span>
+<span class="font-label-sm text-label-sm font-bold">Pedidos</span>
+</a>
+</nav>
+<script>
+        // Obtener usuario de la sesión
+        const usuarioStr = localStorage.getItem('usuario');
+        if (!usuarioStr) {
+            window.location.href = 'inicio_de_sesion.html';
+        }
+        const usuario = JSON.parse(usuarioStr);
+
+        // Inicializar Drawer e información de usuario en DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Rellenar información del usuario en el sidebar
+            document.getElementById('sidebar-user-name').textContent = usuario.nombre;
+            document.getElementById('sidebar-user-email').textContent = usuario.email;
+            
+            // Lógica para abrir/cerrar sidebar
+            const btnMenu = document.getElementById('btn-menu');
+            const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            const btnLogout = document.getElementById('btn-logout');
+
+            function toggleSidebar(open) {
+                if (open) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebarBackdrop.classList.remove('hidden');
+                    setTimeout(() => sidebarBackdrop.classList.add('opacity-100'), 50);
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                    sidebarBackdrop.classList.remove('opacity-100');
+                    setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300);
+                }
+            }
+
+            if (btnMenu) btnMenu.addEventListener('click', () => toggleSidebar(true));
+            if (btnCloseSidebar) btnCloseSidebar.addEventListener('click', () => toggleSidebar(false));
+            if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+            if (btnLogout) {
+                btnLogout.addEventListener('click', () => {
+                    localStorage.removeItem('usuario');
+                    window.location.href = 'inicio_de_sesion.html';
+                });
+            }
+
+            // Cambiar enlace Mi Perfil en base al rol
+            const linkPerfil = document.getElementById('link-menu-perfil');
+            if (linkPerfil) {
+                if (usuario.rol === 'repartidor') {
+                    linkPerfil.href = 'perfil_del_repartidor.html';
+                } else {
+                    linkPerfil.href = '#';
+                    linkPerfil.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        toggleSidebar(false);
+                        toggleModalEditar(true);
+                    });
+                }
+            }
+
+            // Mostrar botón de administración solo a administradores
+            if (usuario.rol === 'administrador') {
+                const linkAdmin = document.getElementById('link-menu-admin');
+                if (linkAdmin) linkAdmin.classList.remove('hidden');
+            }
+
+
+            // Configurar botón "Inicio" en la barra de navegación inferior según el rol
+            const btnNavHome = document.getElementById('btn-nav-home');
+            if (btnNavHome) {
+                if (usuario.rol === 'administrador') {
+                    btnNavHome.href = 'dashboard_principal.html';
+                } else if (usuario.rol === 'repartidor') {
+                    btnNavHome.href = 'perfil_del_repartidor.html';
+                } else {
+                    btnNavHome.href = 'inicio_cliente.html';
+                }
+            }
+        });
+
+        // Función para mostrar notificaciones flotantes (toast)
+        function mostrarToast(mensaje, esExito = true) {
+            const antiguoToast = document.getElementById('status-toast');
+            if (antiguoToast) antiguoToast.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'status-toast';
+            toast.className = `fixed top-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-label-bold text-xs shadow-2xl z-[99999] transition-all duration-300 ${esExito ? 'bg-primary' : 'bg-error'}`;
+            toast.textContent = mensaje;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Control de Modal de Perfil para Cliente (Ver / Editar)
+        function toggleModalEditar(show) {
+            const modal = document.getElementById('modal-editar-perfil');
+            if (show) {
+                // Rellenar información visual del perfil
+                document.getElementById('perfil-txt-nombre').textContent = usuario.nombre;
+                document.getElementById('perfil-txt-rol').textContent = usuario.rol || 'Cliente';
+                document.getElementById('perfil-txt-email').textContent = usuario.email;
+                document.getElementById('perfil-txt-telefono').textContent = usuario.telefono || 'Sin teléfono';
+                document.getElementById('perfil-iniciales').textContent = usuario.nombre.charAt(0).toUpperCase();
+
+                // Asegurar que comience en modo visualización
+                toggleModoEdicion(false);
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function toggleModoEdicion(editMode) {
+            const vista = document.getElementById('perfil-vista-container');
+            const edicion = document.getElementById('perfil-edicion-container');
+            if (editMode) {
+                // Rellenar campos de edición con datos actuales
+                document.getElementById('input-edit-nombre').value = usuario.nombre;
+                document.getElementById('input-edit-email').value = usuario.email;
+                document.getElementById('input-edit-telefono').value = usuario.telefono || '';
+                
+                vista.classList.add('hidden');
+                edicion.classList.remove('hidden');
+            } else {
+                vista.classList.remove('hidden');
+                edicion.classList.add('hidden');
+            }
+        }
+
+        async function guardarPerfil(event) {
+            event.preventDefault();
+            
+            const btnSave = document.getElementById('btn-save-profile');
+            btnSave.disabled = true;
+            btnSave.textContent = "Guardando...";
+
+            const nuevoNombre = document.getElementById('input-edit-nombre').value.trim();
+            const nuevoEmail = document.getElementById('input-edit-email').value.trim();
+            const nuevoTelefono = document.getElementById('input-edit-telefono').value.trim();
+
+            try {
+                const response = await fetch('api/usuarios/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: usuario.id,
+                        nombre: nuevoNombre,
+                        email: nuevoEmail,
+                        telefono: nuevoTelefono
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok && result.status === 'success') {
+                    // Actualizar localStorage
+                    usuario.nombre = nuevoNombre;
+                    usuario.email = nuevoEmail;
+                    usuario.telefono = nuevoTelefono;
+                    localStorage.setItem('usuario', JSON.stringify(usuario));
+
+                    // Refrescar vista
+                    document.getElementById('sidebar-user-name').textContent = nuevoNombre;
+                    document.getElementById('sidebar-user-email').textContent = nuevoEmail;
+
+                    mostrarToast("Perfil actualizado correctamente.", true);
+                    toggleModalEditar(false);
+                } else {
+                    mostrarToast("Error: " + result.message, false);
+                }
+            } catch (error) {
+                console.error("Error al guardar perfil:", error);
+                mostrarToast("Ocurrió un error de conexión al guardar los datos.", false);
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = `<span class="material-symbols-outlined">save</span> Guardar Cambios`;
+            }
+        }
+
+        let pedidosOriginales = [];
+        let filtroActivo = 'todos';
+
+        async function cargarPedidos() {
+            try {
+                let url = `api/pedidos?usuario_id=${usuario.id}`;
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                if (response.ok && result.status === 'success') {
+                    pedidosOriginales = result.data;
+                    filtrarYMostrarPedidos();
+                } else {
+                    mostrarToast("Error al obtener pedidos.", false);
+                }
+            } catch (e) {
+                console.error("Error al obtener pedidos:", e);
+                mostrarToast("Error de conexión al obtener pedidos.", false);
+            }
+        }
+
+        function filtrarYMostrarPedidos() {
+            const container = document.getElementById('lista-pedidos');
+            if (!container) return;
+
+            let pedidosFiltrados = [];
+            if (filtroActivo === 'todos') {
+                pedidosFiltrados = pedidosOriginales;
+            } else if (filtroActivo === 'pendientes') {
+                pedidosFiltrados = pedidosOriginales.filter(p => p.estado === 'pendiente');
+            } else if (filtroActivo === 'en_curso') {
+                pedidosFiltrados = pedidosOriginales.filter(p => p.estado === 'asignado' || p.estado === 'en_camino_recogida' || p.estado === 'en_ruta');
+            } else if (filtroActivo === 'entregados') {
+                pedidosFiltrados = pedidosOriginales.filter(p => p.estado === 'entregado');
+            }
+
+            // Actualizar contador del header
+            const txtResumen = document.getElementById('txt-resumen-entregas');
+            if (txtResumen) {
+                const totalActivos = pedidosOriginales.filter(p => p.estado !== 'entregado' && p.estado !== 'cancelado').length;
+                if (usuario.rol !== 'administrador' && usuario.rol !== 'repartidor') {
+                    txtResumen.textContent = totalActivos === 1 ? 'Tienes 1 entrega activa hoy.' : `Tienes ${totalActivos} entregas activas hoy.`;
+                } else {
+                    txtResumen.textContent = `Hay ${totalActivos} entregas activas en la plataforma hoy.`;
+                }
+            }
+
+            if (pedidosFiltrados.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 px-4 text-center">
+                        <span class="material-symbols-outlined text-5xl text-outline mb-3">local_shipping</span>
+                        <h3 class="font-title-md text-on-surface mb-1">Sin Pedidos</h3>
+                        <p class="text-xs text-on-surface-variant">No hay pedidos registrados en este estado.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            pedidosFiltrados.forEach(p => {
+                // Separar dirección de recogida y entrega (separados por -> en el input)
+                const partesDireccion = p.direccion_entrega.split(' -> ');
+                const recogidaDir = partesDireccion[0] || 'Dirección de Recogida';
+                const entregaDir = partesDireccion[1] || p.direccion_entrega;
+
+                // Estilo del badge según estado
+                let badgeClass = '';
+                let estadoLegible = '';
+                let borderClass = 'border-surface-container-highest';
+                let indicatorColor = 'bg-surface-container-highest';
+
+                if (p.estado === 'pendiente') {
+                    badgeClass = 'bg-secondary-container text-on-secondary-container';
+                    estadoLegible = 'Pendiente';
+                    borderClass = 'border-secondary-container/30';
+                    indicatorColor = 'bg-secondary-container';
+                } else if (p.estado === 'asignado') {
+                    badgeClass = 'bg-primary-container text-on-primary-container';
+                    estadoLegible = 'Asignado';
+                    borderClass = 'border-primary/30';
+                    indicatorColor = 'bg-primary';
+                } else if (p.estado === 'en_camino_recogida') {
+                    badgeClass = 'bg-secondary-container text-on-secondary-container';
+                    estadoLegible = 'A Recoger';
+                    borderClass = 'border-secondary-container/30';
+                    indicatorColor = 'bg-secondary-container';
+                } else if (p.estado === 'en_ruta') {
+                    badgeClass = 'bg-primary text-on-primary';
+                    estadoLegible = 'En Ruta';
+                    borderClass = 'border-primary/50';
+                    indicatorColor = 'bg-primary';
+                } else if (p.estado === 'entregado') {
+                    badgeClass = 'bg-surface-container-high text-outline';
+                    estadoLegible = 'Entregado';
+                    borderClass = 'border-surface-container-highest';
+                    indicatorColor = 'bg-outline';
+                } else if (p.estado === 'cancelado') {
+                    badgeClass = 'bg-error-container text-on-error-container';
+                    estadoLegible = 'Cancelado';
+                    borderClass = 'border-error/30';
+                    indicatorColor = 'bg-error';
+                } else {
+                    badgeClass = 'bg-error-container text-on-error-container';
+                    estadoLegible = p.estado;
+                    borderClass = 'border-error/30';
+                    indicatorColor = 'bg-error';
+                }
+
+                const card = document.createElement('article');
+                card.className = `kinetic-card bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border ${borderClass} relative group`;
+                card.innerHTML = `
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${indicatorColor}"></div>
+                    <div class="p-md pl-6 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex flex-col">
+                                    <span class="font-label-bold text-label-bold text-outline uppercase tracking-wider">Orden #EM-${p.id}</span>
+                                    <div class="flex items-center gap-1 mt-1">
+                                        <span class="material-symbols-outlined text-[16px] text-outline">person</span>
+                                        <span class="text-label-sm font-label-sm text-on-surface-variant">${p.cliente_nombre}</span>
+                                    </div>
+                                </div>
+                                <span class="${badgeClass} px-3 py-1 rounded-full text-[10px] font-label-bold uppercase">${estadoLegible}</span>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="material-symbols-outlined text-primary mt-0.5 text-lg">location_on</span>
+                                    <div class="min-w-0">
+                                        <p class="text-[10px] text-outline font-label-bold uppercase">Recogida</p>
+                                        <p class="font-title-md text-on-surface text-xs truncate">${recogidaDir}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="material-symbols-outlined text-tertiary mt-0.5 text-lg">near_me</span>
+                                    <div class="min-w-0">
+                                        <p class="text-[10px] text-outline font-label-bold uppercase">Entrega</p>
+                                        <p class="font-title-md text-on-surface text-xs truncate">${entregaDir}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-surface-container-high flex justify-between items-center">
+                            <span class="text-sm font-bold text-primary">$${parseFloat(p.precio).toFixed(2)} MXN</span>
+                            <button onclick="verPedido(${p.id})" class="bg-primary text-on-primary px-3 py-1.5 rounded-lg text-label-bold font-label-bold text-[10px] hover:shadow-md active:scale-95 transition-all">Ver Detalles</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function verPedido(id) {
+            window.location.href = `pedido_en_curso.html?id=${id}`;
+        }
+
+        // Configurar los botones de filtro
+        const tabs = document.querySelectorAll('section button');
+        const filterMappings = ['todos', 'pendientes', 'en_curso', 'entregados'];
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
+                    b.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+                });
+                tab.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
+                tab.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+                
+                filtroActivo = filterMappings[index];
+                filtrarYMostrarPedidos();
+            });
+        });
+
+        // Add haptic feedback simulation on interactions
+        document.querySelectorAll('button, article').forEach(el => {
+            el.addEventListener('touchstart', () => {
+                if (window.navigator.vibrate) window.navigator.vibrate(10);
+            });
+        });
+
+        // Cargar los pedidos al iniciar
+        cargarPedidos();
+    </script>
+    
+    <!-- Modal para Perfil de Usuario (Ver / Editar) -->
+    <div id="modal-editar-perfil" class="fixed inset-0 bg-black/50 z-[10000] hidden items-center justify-center p-4">
+      <div class="bg-surface-container-lowest w-full max-w-md rounded-2xl p-6 border border-surface-container-high shadow-2xl">
+        
+        <!-- Estado 1: Visualizar Perfil -->
+        <div id="perfil-vista-container">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="font-title-md text-title-md text-on-surface">Mi Perfil</h3>
+            <button onclick="toggleModalEditar(false)" class="p-1 rounded-full hover:bg-surface-container transition-colors">
+              <span class="material-symbols-outlined text-on-surface-variant">close</span>
+            </button>
+          </div>
+          
+          <div class="flex flex-col items-center text-center space-y-4 mb-6">
+            <div class="w-20 h-20 rounded-full bg-primary-container text-primary flex items-center justify-center text-3xl font-bold uppercase" id="perfil-iniciales">
+              -
+            </div>
+            <div>
+              <h4 class="font-headline-lg-mobile text-lg font-bold text-on-surface" id="perfil-txt-nombre">-</h4>
+              <p class="text-xs text-on-surface-variant capitalize" id="perfil-txt-rol">-</p>
+            </div>
+          </div>
+          
+          <div class="space-y-3 mb-6 bg-surface-container-low p-4 rounded-xl">
+            <div class="flex justify-between text-xs">
+              <span class="text-on-surface-variant font-label-bold">CORREO:</span>
+              <span class="text-on-surface font-semibold truncate max-w-[200px]" id="perfil-txt-email">-</span>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span class="text-on-surface-variant font-label-bold">TELÉFONO:</span>
+              <span class="text-on-surface font-semibold" id="perfil-txt-telefono">-</span>
+            </div>
+          </div>
+          
+          <button onclick="toggleModoEdicion(true)" class="w-full bg-primary text-on-primary h-12 rounded-xl font-label-bold text-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-sm">edit</span> Editar Perfil
+          </button>
+        </div>
+
+        <!-- Estado 2: Editar Perfil (Oculto inicialmente) -->
+        <div id="perfil-edicion-container" class="hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="font-title-md text-title-md text-on-surface">Editar Perfil</h3>
+            <button onclick="toggleModoEdicion(false)" class="p-1 rounded-full hover:bg-surface-container transition-colors">
+              <span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+            </button>
+          </div>
+          <form id="form-editar-perfil" onsubmit="guardarPerfil(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-label-bold text-on-surface-variant uppercase mb-1">Nombre Completo</label>
+              <input type="text" id="input-edit-nombre" required class="w-full bg-surface-container-low border border-surface-container-high rounded-xl h-12 px-4 font-body-md text-on-surface focus:ring-primary focus:border-primary" />
+            </div>
+            <div>
+              <label class="block text-xs font-label-bold text-on-surface-variant uppercase mb-1">Correo Electrónico</label>
+              <input type="email" id="input-edit-email" required class="w-full bg-surface-container-low border border-surface-container-high rounded-xl h-12 px-4 font-body-md text-on-surface focus:ring-primary focus:border-primary" />
+            </div>
+            <div>
+              <label class="block text-xs font-label-bold text-on-surface-variant uppercase mb-1">Teléfono</label>
+              <input type="tel" id="input-edit-telefono" required class="w-full bg-surface-container-low border border-surface-container-high rounded-xl h-12 px-4 font-body-md text-on-surface focus:ring-primary focus:border-primary" />
+            </div>
+            <button type="submit" id="btn-save-profile" class="w-full bg-primary text-on-primary h-14 rounded-xl font-label-bold text-label-bold shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined">save</span> Guardar Cambios
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+</body></html>

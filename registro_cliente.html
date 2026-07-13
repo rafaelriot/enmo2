@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>enMo2 - Crear Cuenta</title>
+<meta name="description" content="Regístrate en enMo2 y empieza a enviar paquetes de forma rápida y segura en Villahermosa."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-primary": "#ffffff",
+          "primary-container": "#28a745",
+          "outline-variant": "#bdcab9",
+          "error": "#ba1a1a",
+          "error-container": "#ffdad6",
+          "on-error-container": "#93000a",
+          "surface-container-low": "#f3f3f6",
+          "surface-container": "#eeeef0",
+          "surface-container-high": "#e8e8ea",
+          "surface-container-highest": "#e2e2e5",
+          "surface-container-lowest": "#ffffff",
+          "on-surface-variant": "#3e4a3c",
+          "secondary-container": "#feb700",
+          "on-secondary": "#ffffff",
+          "secondary": "#7c5800",
+          "on-background": "#1a1c1e",
+          "surface-bright": "#f9f9fc",
+          "surface": "#f9f9fc",
+          "outline": "#6e7b6b",
+          "on-surface": "#1a1c1e",
+          "tertiary": "#ae3200",
+          "primary": "#006e25",
+          "surface-dim": "#dadadc",
+          "background": "#f9f9fc",
+        },
+        fontFamily: {
+          "display-lg": ["Hanken Grotesk"],
+          "body-lg": ["Plus Jakarta Sans"],
+          "headline-lg": ["Hanken Grotesk"],
+          "body-md": ["Plus Jakarta Sans"],
+          "label-sm": ["Plus Jakarta Sans"],
+          "title-md": ["Hanken Grotesk"],
+          "headline-lg-mobile": ["Hanken Grotesk"],
+          "label-bold": ["Hanken Grotesk"],
+        },
+        fontSize: {
+          "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+          "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+          "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+          "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+          "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+          "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+          "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+        },
+        spacing: {
+          "xs": "4px", "sm": "12px", "md": "24px", "lg": "48px",
+          "margin-mobile": "16px", "margin-desktop": "32px", "gutter": "16px", "base": "8px"
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { font-family: 'Plus Jakarta Sans', sans-serif; min-height: max(884px, 100dvh); }
+
+  .speed-line-gradient {
+    background: linear-gradient(90deg, #28a745 0%, #feb700 50%, #ff591f 100%);
+  }
+
+  .hero-gradient {
+    background: linear-gradient(145deg, #004a19 0%, #006e25 50%, #008c30 100%);
+  }
+
+  .input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #bdcab9;
+    background: #f3f3f6;
+    padding: 12px 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    border-radius: 12px 12px 0 0;
+  }
+  .input-group:focus-within {
+    border-bottom-color: #006e25;
+    box-shadow: 0 4px 12px rgba(0,110,37,0.08);
+  }
+  .input-group.has-error {
+    border-bottom-color: #ba1a1a;
+  }
+
+  .field-error {
+    color: #ba1a1a;
+    font-size: 11px;
+    margin-top: 4px;
+    padding-left: 4px;
+    display: none;
+  }
+  .field-error.visible { display: block; }
+
+  .strength-bar { height: 4px; border-radius: 2px; transition: width 0.4s, background 0.4s; }
+
+  /* Animación de entrada */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-slide-up { animation: slideUp 0.5s ease forwards; }
+  .delay-100 { animation-delay: 0.1s; opacity: 0; }
+  .delay-200 { animation-delay: 0.2s; opacity: 0; }
+  .delay-300 { animation-delay: 0.3s; opacity: 0; }
+  .delay-400 { animation-delay: 0.4s; opacity: 0; }
+
+  .btn-register {
+    background: linear-gradient(135deg, #006e25 0%, #28a745 100%);
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(0,110,37,0.3);
+  }
+  .btn-register:hover { filter: brightness(1.08); box-shadow: 0 6px 24px rgba(0,110,37,0.4); }
+  .btn-register:active { transform: scale(0.97); }
+
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #6e7b6b; transition: color 0.2s; }
+  .check-item.valid { color: #006e25; }
+  .check-item .dot { width: 6px; height: 6px; border-radius: 50%; background: #bdcab9; transition: background 0.2s; flex-shrink: 0; }
+  .check-item.valid .dot { background: #006e25; }
+</style>
+</head>
+<body class="bg-background text-on-surface">
+
+<!-- ── Header ── -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-surface-container-highest">
+  <div class="flex items-center justify-between px-4 h-16 max-w-lg mx-auto">
+    <a href="inicio_de_sesion.html" id="btn-back" class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors p-2 -ml-2 rounded-full">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <span class="font-display-lg font-black text-primary text-xl tracking-tight">enMo2</span>
+    <div class="w-10"></div><!-- spacer -->
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero-gradient pt-20 pb-8 px-4 relative overflow-hidden">
+  <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5"></div>
+  <div class="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5"></div>
+  <div class="relative z-10 max-w-lg mx-auto animate-slide-up">
+    <p class="text-white/60 text-xs font-label-bold uppercase tracking-widest mb-1">¡Bienvenido!</p>
+    <h1 class="text-white text-2xl font-black tracking-tight leading-tight mb-1">Crea tu cuenta<br>en segundos</h1>
+    <p class="text-white/70 text-sm">Envía paquetes rápido y rastréalos en tiempo real.</p>
+    <!-- Perks strip -->
+    <div class="flex gap-4 mt-4 text-white/80 text-xs">
+      <div class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">check_circle</span> Gratis</div>
+      <div class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">bolt</span> Instantáneo</div>
+      <div class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" style="font-variation-settings:'FILL' 1;">lock</span> Seguro</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Formulario ── -->
+<main class="px-4 pt-6 pb-32 max-w-lg mx-auto">
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed top-20 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full text-white font-label-bold text-xs shadow-2xl z-[99999] transition-all duration-300 bg-primary"></div>
+
+  <form id="registro-form" class="space-y-5" novalidate>
+
+    <!-- Nombre completo -->
+    <div class="animate-slide-up delay-100">
+      <label class="block text-xs font-label-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Nombre Completo</label>
+      <div class="input-group" id="group-nombre">
+        <span class="material-symbols-outlined text-outline mr-3 text-xl">person</span>
+        <input id="input-nombre" type="text" placeholder="Ej. María García López" autocomplete="name"
+          class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline p-0" required/>
+      </div>
+      <p class="field-error" id="err-nombre">Ingresa tu nombre completo.</p>
+    </div>
+
+    <!-- Email -->
+    <div class="animate-slide-up delay-200">
+      <label class="block text-xs font-label-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Correo Electrónico</label>
+      <div class="input-group" id="group-email">
+        <span class="material-symbols-outlined text-outline mr-3 text-xl">email</span>
+        <input id="input-email" type="email" placeholder="tu@correo.com" autocomplete="email"
+          class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline p-0" required/>
+      </div>
+      <p class="field-error" id="err-email">Ingresa un correo electrónico válido.</p>
+    </div>
+
+    <!-- Teléfono -->
+    <div class="animate-slide-up delay-200">
+      <label class="block text-xs font-label-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Teléfono / WhatsApp</label>
+      <div class="input-group" id="group-telefono">
+        <span class="material-symbols-outlined text-outline mr-3 text-xl">phone</span>
+        <span class="text-on-surface-variant font-label-bold mr-2 text-sm">+52</span>
+        <input id="input-telefono" type="tel" placeholder="999 123 4567" autocomplete="tel"
+          maxlength="10"
+          class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline p-0" required/>
+      </div>
+      <p class="field-error" id="err-telefono">Ingresa tu número de 10 dígitos.</p>
+    </div>
+
+    <!-- Contraseña -->
+    <div class="animate-slide-up delay-300">
+      <label class="block text-xs font-label-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Contraseña</label>
+      <div class="input-group" id="group-password">
+        <span class="material-symbols-outlined text-outline mr-3 text-xl">lock</span>
+        <input id="input-password" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"
+          class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline p-0" required/>
+        <button type="button" id="btn-toggle-pass" class="ml-2 text-outline hover:text-primary transition-colors">
+          <span class="material-symbols-outlined text-xl" id="icon-toggle-pass">visibility</span>
+        </button>
+      </div>
+      <!-- Botón sugerir contraseña -->
+      <div class="flex items-center justify-between mt-1.5">
+        <button type="button" id="btn-sugerir-pass"
+          class="flex items-center gap-1.5 text-primary text-xs font-label-bold hover:opacity-80 active:scale-95 transition-all group">
+          <span class="material-symbols-outlined text-base group-hover:rotate-12 transition-transform" style="font-variation-settings:'FILL' 1;">auto_fix_high</span>
+          Sugerir contraseña segura
+        </button>
+        <!-- Badge con la contraseña sugerida (aparece al generar) -->
+        <div id="badge-pass-sugerida" class="hidden items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-3 py-1">
+          <span class="material-symbols-outlined text-primary text-sm">key</span>
+          <span id="txt-pass-sugerida" class="text-primary font-bold text-xs tracking-widest font-mono"></span>
+          <button type="button" id="btn-copiar-pass" class="ml-1 text-primary hover:opacity-70 transition-opacity" title="Copiar">
+            <span class="material-symbols-outlined text-sm" id="icon-copiar">content_copy</span>
+          </button>
+        </div>
+      </div>
+      <!-- Barra de seguridad -->
+      <div class="mt-2 flex gap-1">
+        <div class="flex-1 h-1 rounded-full bg-surface-container-highest overflow-hidden"><div id="bar1" class="strength-bar w-0 bg-error"></div></div>
+        <div class="flex-1 h-1 rounded-full bg-surface-container-highest overflow-hidden"><div id="bar2" class="strength-bar w-0 bg-secondary-container"></div></div>
+        <div class="flex-1 h-1 rounded-full bg-surface-container-highest overflow-hidden"><div id="bar3" class="strength-bar w-0 bg-primary-container"></div></div>
+        <div class="flex-1 h-1 rounded-full bg-surface-container-highest overflow-hidden"><div id="bar4" class="strength-bar w-0 bg-primary"></div></div>
+      </div>
+      <div class="mt-2 grid grid-cols-2 gap-1">
+        <div class="check-item" id="chk-len"><div class="dot"></div>Mínimo 6 caracteres</div>
+        <div class="check-item" id="chk-upper"><div class="dot"></div>Una mayúscula</div>
+        <div class="check-item" id="chk-num"><div class="dot"></div>Un número</div>
+        <div class="check-item" id="chk-special"><div class="dot"></div>Un carácter especial</div>
+      </div>
+      <p class="field-error" id="err-password">La contraseña debe tener al menos 6 caracteres.</p>
+    </div>
+
+    <!-- Confirmar contraseña -->
+    <div class="animate-slide-up delay-400">
+      <label class="block text-xs font-label-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Confirmar Contraseña</label>
+      <div class="input-group" id="group-confirm">
+        <span class="material-symbols-outlined text-outline mr-3 text-xl">lock_reset</span>
+        <input id="input-confirm" type="password" placeholder="Repite tu contraseña" autocomplete="new-password"
+          class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline p-0" required/>
+      </div>
+      <p class="field-error" id="err-confirm">Las contraseñas no coinciden.</p>
+    </div>
+
+    <!-- Términos -->
+    <div class="animate-slide-up delay-400 flex items-start gap-3 p-4 bg-surface-container-low rounded-xl border border-surface-container-highest">
+      <input type="checkbox" id="chk-terminos" class="mt-0.5 w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary flex-shrink-0"/>
+      <label for="chk-terminos" class="text-xs text-on-surface-variant leading-relaxed">
+        Al crear tu cuenta, aceptas nuestros
+        <a href="#" class="text-primary font-label-bold hover:underline">Términos de Servicio</a>
+        y nuestra
+        <a href="#" class="text-primary font-label-bold hover:underline">Política de Privacidad</a>.
+      </label>
+    </div>
+    <p class="field-error" id="err-terminos">Debes aceptar los términos para continuar.</p>
+
+    <!-- Botón principal -->
+    <button type="submit" id="btn-registrar"
+      class="btn-register w-full text-on-primary font-label-bold text-base py-4 rounded-xl flex items-center justify-center gap-2 mt-2">
+      <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">rocket_launch</span>
+      Crear mi cuenta gratis
+    </button>
+
+  </form>
+
+  <!-- Divisor -->
+  <div class="relative my-6">
+    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-surface-container-highest"></div></div>
+    <div class="relative flex justify-center">
+      <span class="bg-background px-4 text-xs text-on-surface-variant font-label-bold">¿Ya tienes cuenta?</span>
+    </div>
+  </div>
+
+  <!-- Link a login -->
+  <a href="inicio_de_sesion.html"
+    class="w-full py-3.5 rounded-xl border-2 border-primary text-primary font-label-bold text-sm flex items-center justify-center gap-2 hover:bg-primary/5 active:scale-[0.98] transition-all">
+    <span class="material-symbols-outlined text-lg">login</span>
+    Iniciar Sesión
+  </a>
+
+</main>
+
+<script>
+  // ── Referencias globales a campos de contraseña ──────────────────────
+  const passInput  = document.getElementById('input-password');
+  const toggleBtn  = document.getElementById('btn-toggle-pass');
+  const toggleIcon = document.getElementById('icon-toggle-pass');
+
+  // ── Generador de contraseña segura ─────────────────────────────────
+  function generarPasswordSegura() {
+    const mayus   = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const minus   = 'abcdefghjkmnpqrstuvwxyz';
+    const nums    = '23456789';
+    const special = '@#$%!&*';
+    const all     = mayus + minus + nums + special;
+
+    // Garantizar al menos uno de cada categoría
+    let pass = [
+      mayus  [Math.floor(Math.random() * mayus.length)],
+      minus  [Math.floor(Math.random() * minus.length)],
+      nums   [Math.floor(Math.random() * nums.length)],
+      special[Math.floor(Math.random() * special.length)],
+    ];
+    // Completar hasta 12 caracteres
+    for (let i = 4; i < 12; i++) {
+      pass.push(all[Math.floor(Math.random() * all.length)]);
+    }
+    // Mezclar
+    return pass.sort(() => Math.random() - 0.5).join('');
+  }
+
+  const btnSugerir    = document.getElementById('btn-sugerir-pass');
+  const badgeSugerida = document.getElementById('badge-pass-sugerida');
+  const txtSugerida   = document.getElementById('txt-pass-sugerida');
+  const btnCopiar     = document.getElementById('btn-copiar-pass');
+  const iconCopiar    = document.getElementById('icon-copiar');
+
+  btnSugerir.addEventListener('click', () => {
+    const nueva = generarPasswordSegura();
+
+    // Rellenar ambos campos
+    passInput.value = nueva;
+    passInput.type  = 'text'; // mostrar la contraseña para que la vean
+    toggleIcon.textContent = 'visibility_off';
+    document.getElementById('input-confirm').value = nueva;
+
+    // Mostrar badge con la contraseña
+    txtSugerida.textContent = nueva;
+    badgeSugerida.classList.remove('hidden');
+    badgeSugerida.classList.add('flex');
+
+    // Disparar el indicador de seguridad
+    passInput.dispatchEvent(new Event('input'));
+    clearErr('err-password', 'group-password');
+    clearErr('err-confirm', 'group-confirm');
+
+    mostrarToast('✅ Contraseña segura aplicada. ¡Guárdala!');
+  });
+
+  btnCopiar.addEventListener('click', () => {
+    navigator.clipboard.writeText(txtSugerida.textContent).then(() => {
+      iconCopiar.textContent = 'check';
+      setTimeout(() => { iconCopiar.textContent = 'content_copy'; }, 1800);
+    });
+  });
+
+  // ── Visibilidad de contraseña ─────────────────────────────────────────
+  toggleBtn.addEventListener('click', () => {
+    const isPass = passInput.type === 'password';
+    passInput.type = isPass ? 'text' : 'password';
+    toggleIcon.textContent = isPass ? 'visibility_off' : 'visibility';
+  });
+
+  // ── Indicador de seguridad de contraseña ─────────────────────────────
+  passInput.addEventListener('input', () => {
+    const v = passInput.value;
+    const hasLen     = v.length >= 6;
+    const hasUpper   = /[A-Z]/.test(v);
+    const hasNum     = /[0-9]/.test(v);
+    const hasSpecial = /[^A-Za-z0-9]/.test(v);
+
+    const setCheck = (id, valid) => {
+      document.getElementById(id).classList.toggle('valid', valid);
+    };
+    setCheck('chk-len',     hasLen);
+    setCheck('chk-upper',   hasUpper);
+    setCheck('chk-num',     hasNum);
+    setCheck('chk-special', hasSpecial);
+
+    const score = [hasLen, hasUpper, hasNum, hasSpecial].filter(Boolean).length;
+    const colors = ['', '#ba1a1a', '#feb700', '#28a745', '#006e25'];
+    for (let i = 1; i <= 4; i++) {
+      const bar = document.getElementById(`bar${i}`);
+      bar.style.width = i <= score ? '100%' : '0%';
+      bar.style.background = colors[score];
+    }
+  });
+
+  // ── Validación en tiempo real ─────────────────────────────────────────
+  const showErr = (errId, groupId, msg) => {
+    const el = document.getElementById(errId);
+    const grp = document.getElementById(groupId);
+    el.textContent = msg;
+    el.classList.add('visible');
+    grp.classList.add('has-error');
+  };
+  const clearErr = (errId, groupId) => {
+    document.getElementById(errId).classList.remove('visible');
+    document.getElementById(groupId).classList.remove('has-error');
+  };
+
+  document.getElementById('input-nombre').addEventListener('blur', () => {
+    const v = document.getElementById('input-nombre').value.trim();
+    v.length < 2 ? showErr('err-nombre','group-nombre','Ingresa tu nombre completo.') : clearErr('err-nombre','group-nombre');
+  });
+  document.getElementById('input-email').addEventListener('blur', () => {
+    const v = document.getElementById('input-email').value.trim();
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? showErr('err-email','group-email','Ingresa un correo electrónico válido.') : clearErr('err-email','group-email');
+  });
+  document.getElementById('input-telefono').addEventListener('input', () => {
+    const v = document.getElementById('input-telefono').value.replace(/\D/g,'');
+    document.getElementById('input-telefono').value = v;
+  });
+  document.getElementById('input-telefono').addEventListener('blur', () => {
+    const v = document.getElementById('input-telefono').value.replace(/\D/g,'');
+    v.length !== 10 ? showErr('err-telefono','group-telefono','Ingresa tu número de 10 dígitos.') : clearErr('err-telefono','group-telefono');
+  });
+  document.getElementById('input-confirm').addEventListener('blur', () => {
+    const p1 = passInput.value;
+    const p2 = document.getElementById('input-confirm').value;
+    p1 !== p2 ? showErr('err-confirm','group-confirm','Las contraseñas no coinciden.') : clearErr('err-confirm','group-confirm');
+  });
+
+  // ── Toast helper ─────────────────────────────────────────────────────
+  function mostrarToast(msg, ok = true) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `fixed top-20 left-1/2 -translate-x-1/2 px-5 py-3 rounded-full text-white font-label-bold text-xs shadow-2xl z-[99999] transition-all duration-300 ${ok ? 'bg-primary' : 'bg-error'}`;
+    t.classList.remove('hidden');
+    setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => { t.classList.add('hidden'); t.classList.remove('opacity-0'); }, 300); }, 3500);
+  }
+
+  // ── Envío del formulario ──────────────────────────────────────────────
+  document.getElementById('registro-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const nombre   = document.getElementById('input-nombre').value.trim();
+    const email    = document.getElementById('input-email').value.trim();
+    const telefono = document.getElementById('input-telefono').value.replace(/\D/g,'');
+    const password = passInput.value;
+    const confirm  = document.getElementById('input-confirm').value;
+    const terminos = document.getElementById('chk-terminos').checked;
+
+    // Validaciones locales
+    let valid = true;
+    if (nombre.length < 2)                          { showErr('err-nombre','group-nombre','Ingresa tu nombre completo.'); valid=false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('err-email','group-email','Correo inválido.'); valid=false; }
+    if (telefono.length !== 10)                     { showErr('err-telefono','group-telefono','Número de 10 dígitos requerido.'); valid=false; }
+    if (password.length < 6)                        { showErr('err-password','group-password','Mínimo 6 caracteres.'); valid=false; }
+    if (password !== confirm)                       { showErr('err-confirm','group-confirm','Las contraseñas no coinciden.'); valid=false; }
+    if (!terminos)                                  { showErr('err-terminos','group-confirm','Debes aceptar los términos.'); document.getElementById('err-terminos').classList.add('visible'); valid=false; }
+
+    if (!valid) return;
+
+    // Estado cargando
+    const btn = document.getElementById('btn-registrar');
+    const orig = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Creando cuenta...`;
+
+    try {
+      const res = await fetch('api/usuarios/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, email, telefono, password, rol: 'cliente' })
+      });
+      const result = await res.json();
+
+      if (res.ok && result.status === 'success') {
+        // Guardar sesión automáticamente
+        localStorage.setItem('usuario', JSON.stringify(result.usuario));
+        mostrarToast('¡Cuenta creada! Redirigiendo...');
+        setTimeout(() => window.location.href = 'inicio_cliente.html', 1200);
+      } else {
+        mostrarToast(result.message || 'No se pudo crear la cuenta.', false);
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    } catch (err) {
+      mostrarToast('Error de conexión con el servidor.', false);
+      btn.disabled = false;
+      btn.innerHTML = orig;
+    }
+  });
+</script>
+</body>
+</html>
