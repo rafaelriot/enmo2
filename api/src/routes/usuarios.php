@@ -386,33 +386,7 @@ $app->group('/api/usuarios', function ($group) {
         }
     });
 
-    // Listar Repartidores Disponibles (GET /api/usuarios/repartidores)
-    $group->get('/repartidores', function (Request $request, Response $response) {
-        try {
-            $dbObj = new Db();
-            $db = $dbObj->connect();
 
-            $sql = "SELECT id, nombre, email, telefono, latitud_actual, longitud_actual, estado, ultima_conexion 
-                    FROM usuarios 
-                    WHERE rol = 'repartidor' AND estado = 'activo'";
-            
-            $stmt = $db->query($sql);
-            $repartidores = $stmt->fetchAll();
-
-            $response->getBody()->write(json_encode([
-                "status" => "success",
-                "data" => $repartidores
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-
-        } catch (PDOException $e) {
-            $response->getBody()->write(json_encode([
-                "status" => "error",
-                "message" => "Error al obtener repartidores: " . $e->getMessage()
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
-        }
-    });
 
     // Actualizar datos del usuario (POST /api/usuarios/update)
     $group->post('/update', function (Request $request, Response $response) {
