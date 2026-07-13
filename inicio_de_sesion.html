@@ -163,7 +163,7 @@
 </div>
 <div class="flex justify-between items-center pt-1">
 <div id="error-message" class="text-error font-label-sm text-xs hidden"></div>
-<a class="font-label-bold text-label-bold text-primary hover:underline ml-auto" href="#">¿Olvidaste tu contraseña?</a>
+<a id="btn-olvidaste-pass" class="font-label-bold text-label-bold text-primary hover:underline ml-auto" href="#">¿Olvidaste tu contraseña?</a>
 </div>
 <button id="btn-login" class="w-full bg-primary text-on-primary font-headline-lg-mobile text-lg py-4 rounded-xl shadow-lg hover:shadow-primary/10 hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-md" type="submit">
 <span>Iniciar Sesión</span>
@@ -199,6 +199,68 @@
 </div>
 </div>
 </main>
+<!-- Modal de Recuperación de Contraseña -->
+<div id="modal-recuperar" class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+  <div class="w-full max-w-md mx-4 bg-white/90 dark:bg-black/80 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-[28px] p-6 shadow-2xl space-y-4">
+    <div class="flex items-center justify-between">
+      <h3 class="font-title-md text-title-md text-primary" id="recuperar-titulo">Recuperar Contraseña</h3>
+      <button id="btn-cerrar-recuperar" class="p-1 rounded-full hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant">close</span>
+      </button>
+    </div>
+
+    <!-- Paso 1: Solicitar Correo -->
+    <div id="paso-1" class="space-y-4">
+      <p class="text-sm text-on-surface-variant">Ingresa el correo electrónico asociado a tu cuenta para enviarte un código de recuperación.</p>
+      <div class="space-y-1">
+        <label class="font-label-bold text-label-bold text-on-surface-variant px-1 opacity-70">Correo Electrónico</label>
+        <div class="flex items-center border border-outline-variant bg-white/40 dark:bg-black/20 rounded-xl px-sm py-3 transition-all">
+          <span class="material-symbols-outlined text-outline mr-sm">mail</span>
+          <input id="recuperar-email" class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface p-0" placeholder="tu@correo.com" type="email"/>
+        </div>
+      </div>
+      <button id="btn-solicitar-codigo" class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label-bold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+        <span>Solicitar Código</span>
+        <span class="material-symbols-outlined">send</span>
+      </button>
+    </div>
+
+    <!-- Paso 2: Ingresar Código y Nueva Contraseña -->
+    <div id="paso-2" class="space-y-4 hidden">
+      <p class="text-sm text-on-surface-variant">Ingresa el código temporal de 6 dígitos que te enviamos y escribe tu nueva contraseña.</p>
+      
+      <div class="space-y-1">
+        <label class="font-label-bold text-label-bold text-on-surface-variant px-1 opacity-70">Código de Verificación</label>
+        <div class="flex items-center border border-outline-variant bg-white/40 dark:bg-black/20 rounded-xl px-sm py-3 transition-all">
+          <span class="material-symbols-outlined text-outline mr-sm">pin</span>
+          <input id="recuperar-codigo" class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface p-0 tracking-widest font-mono text-center" placeholder="123456" maxlength="6" type="text"/>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="font-label-bold text-label-bold text-on-surface-variant px-1 opacity-70">Nueva Contraseña</label>
+        <div class="flex items-center border border-outline-variant bg-white/40 dark:bg-black/20 rounded-xl px-sm py-3 transition-all">
+          <span class="material-symbols-outlined text-outline mr-sm">lock</span>
+          <input id="recuperar-pass" class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface p-0" placeholder="Mínimo 6 caracteres" type="password"/>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="font-label-bold text-label-bold text-on-surface-variant px-1 opacity-70">Confirmar Nueva Contraseña</label>
+        <div class="flex items-center border border-outline-variant bg-white/40 dark:bg-black/20 rounded-xl px-sm py-3 transition-all">
+          <span class="material-symbols-outlined text-outline mr-sm">lock</span>
+          <input id="recuperar-confirm" class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface p-0" placeholder="Repite tu contraseña" type="password"/>
+        </div>
+      </div>
+
+      <button id="btn-restablecer" class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label-bold hover:shadow-lg transition-all flex items-center justify-center gap-2">
+        <span>Restablecer Contraseña</span>
+        <span class="material-symbols-outlined">check_circle</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <footer class="mt-auto py-sm text-center px-margin-mobile">
 <div class="h-[4px] w-48 speed-line-gradient mx-auto rounded-full mb-4 opacity-30"></div>
 <p class="font-label-sm text-outline text-xs">© 2024 enMo2 Logística de Velocidad. Todos los derechos reservados.</p>
@@ -376,6 +438,133 @@
                 });
             }
         };
+
+        // 🔑 Lógica del Modal de Recuperación de Contraseña
+        const btnOlvidaste = document.getElementById('btn-olvidaste-pass');
+        const modalRecuperar = document.getElementById('modal-recuperar');
+        const btnCerrarRecuperar = document.getElementById('btn-cerrar-recuperar');
+
+        const paso1 = document.getElementById('paso-1');
+        const paso2 = document.getElementById('paso-2');
+        const inputRecuperarEmail = document.getElementById('recuperar-email');
+        const btnSolicitarCodigo = document.getElementById('btn-solicitar-codigo');
+
+        const inputRecuperarCodigo = document.getElementById('recuperar-codigo');
+        const inputRecuperarPass = document.getElementById('recuperar-pass');
+        const inputRecuperarConfirm = document.getElementById('recuperar-confirm');
+        const btnRestablecer = document.getElementById('btn-restablecer');
+
+        if (btnOlvidaste && modalRecuperar && btnCerrarRecuperar) {
+            // Abrir Modal
+            btnOlvidaste.addEventListener('click', (e) => {
+                e.preventDefault();
+                modalRecuperar.classList.remove('hidden');
+                setTimeout(() => {
+                    modalRecuperar.classList.remove('opacity-0');
+                }, 50);
+                // Resetear pasos
+                paso1.classList.remove('hidden');
+                paso2.classList.add('hidden');
+                inputRecuperarEmail.value = '';
+                inputRecuperarCodigo.value = '';
+                inputRecuperarPass.value = '';
+                inputRecuperarConfirm.value = '';
+            });
+
+            // Cerrar Modal
+            btnCerrarRecuperar.addEventListener('click', () => {
+                modalRecuperar.classList.add('opacity-0');
+                setTimeout(() => {
+                    modalRecuperar.classList.add('hidden');
+                }, 300);
+            });
+        }
+
+        // Paso 1: Solicitar Código
+        if (btnSolicitarCodigo) {
+            btnSolicitarCodigo.addEventListener('click', async () => {
+                const email = inputRecuperarEmail.value.trim();
+                if (!email) {
+                    alert('Por favor ingresa tu correo electrónico.');
+                    return;
+                }
+
+                btnSolicitarCodigo.disabled = true;
+                btnSolicitarCodigo.innerHTML = `<span>Solicitando...</span><span class="material-symbols-outlined animate-spin">sync</span>`;
+
+                try {
+                    const response = await fetch('api/usuarios/recuperar-solicitar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const result = await response.json();
+
+                    if (response.ok && result.status === 'success') {
+                        alert(result.message + `\n\n[CÓDIGO DE PRUEBA: ${result.codigo_simulado}]`);
+                        paso1.classList.add('hidden');
+                        paso2.classList.remove('hidden');
+                    } else {
+                        alert(result.message || 'El correo electrónico no existe en el sistema.');
+                    }
+                } catch (error) {
+                    console.error('Error al solicitar código:', error);
+                    alert('Error al conectar con el servidor.');
+                } finally {
+                    btnSolicitarCodigo.disabled = false;
+                    btnSolicitarCodigo.innerHTML = `<span>Solicitar Código</span><span class="material-symbols-outlined">send</span>`;
+                }
+            });
+        }
+
+        // Paso 2: Restablecer
+        if (btnRestablecer) {
+            btnRestablecer.addEventListener('click', async () => {
+                const email = inputRecuperarEmail.value.trim();
+                const codigo = inputRecuperarCodigo.value.trim();
+                const password = inputRecuperarPass.value;
+                const confirm = inputRecuperarConfirm.value;
+
+                if (!codigo || !password || !confirm) {
+                    alert('Por favor completa todos los campos.');
+                    return;
+                }
+                if (password.length < 6) {
+                    alert('La nueva contraseña debe tener al menos 6 caracteres.');
+                    return;
+                }
+                if (password !== confirm) {
+                    alert('Las contraseñas no coinciden.');
+                    return;
+                }
+
+                btnRestablecer.disabled = true;
+                btnRestablecer.innerHTML = `<span>Procesando...</span><span class="material-symbols-outlined animate-spin">sync</span>`;
+
+                try {
+                    const response = await fetch('api/usuarios/recuperar-restablecer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, codigo, password })
+                    });
+                    const result = await response.json();
+
+                    if (response.ok && result.status === 'success') {
+                        alert('¡Contraseña actualizada con éxito! Ya puedes iniciar sesión con tu nueva contraseña.');
+                        // Cerrar modal
+                        btnCerrarRecuperar.click();
+                    } else {
+                        alert(result.message || 'Código de seguridad incorrecto.');
+                    }
+                } catch (error) {
+                    console.error('Error al restablecer contraseña:', error);
+                    alert('Error al conectar con el servidor.');
+                } finally {
+                    btnRestablecer.disabled = false;
+                    btnRestablecer.innerHTML = `<span>Restablecer Contraseña</span><span class="material-symbols-outlined">check_circle</span>`;
+                }
+            });
+        }
 
         // 🛡️ Registrar Service Worker de PWA
         if ('serviceWorker' in navigator) {

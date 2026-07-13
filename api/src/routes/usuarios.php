@@ -384,5 +384,112 @@ $app->group('/api/usuarios', function ($group) {
         }
     });
 
-});
+    // Solicitar Código de Recuperación (POST /api/usuarios/recuperar-solicitar)
+    $group->post('/recuperar-solicitar', function (Request $request, Response $response) {
+        $data = json_decode($request->getBody()->getContents(), true);
+        $email = trim($data['email'] ?? '');
 
+        if (empty($email)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "El correo electrónico es obligatorio."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // Buscar si el usuario existe
+            $sql = "SELECT id FROM usuarios WHERE email = :email LIMIT 1";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':email' => $email]);
+            $user = $stmt->fetch();
+
+            if (!$user) {
+                $response->getBody()->write(json_encode([
+                    "status" => "error",
+                    "message" => "El correo electrónico no se encuentra registrado."
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            // Simulamos el envío de un código temporal de recuperación '123456'
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Se ha enviado un código de recuperación a su correo.",
+                "codigo_simulado" => "123456"
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error de base de datos: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Cambiar la Contraseña con el Código (POST /api/usuarios/recuperar-restablecer)
+    $group->post('/recuperar-restablecer', function (Request $request, Response $response) {
+        $data = json_decode($request->getBody()->getContents(), true);
+        $email = trim($data['email'] ?? '');
+        $codigo = trim($data['codigo'] ?? '');
+        $newPassword = $data['password'] ?? '';
+
+        if (empty($email) || empty($codigo) || empty($newPassword)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Todos los campos (correo, código y contraseña) son obligatorios."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // Validación simple de código simulado
+        if ($codigo !== '123456') {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "El código de verificación ingresado no es válido."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        if (strlen($newPassword) < 6) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "La nueva contraseña debe tener al menos 6 caracteres."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // Actualizar la contraseña en la base de datos
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $sql = "UPDATE usuarios SET password = :password WHERE email = :email";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([
+                ':password' => $hashedPassword,
+                ':email' => $email
+            ]);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Contraseña restablecida exitosamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al actualizar contraseña: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+});
