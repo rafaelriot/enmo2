@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -265,6 +266,32 @@
     <p class="text-center text-on-surface-variant font-label-sm py-4">Cargando listado de pedidos...</p>
   </div>
 </section>
+
+<!-- Analytics and Statistics Charts Section -->
+<section class="mb-md grid grid-cols-1 md:grid-cols-2 gap-gutter">
+  <!-- Chart 1: Semana Ingresos -->
+  <div class="bg-surface-container-lowest p-md rounded-2xl custom-shadow border border-surface-container-high">
+    <h3 class="font-title-md text-title-md text-on-surface mb-sm flex items-center gap-xs">
+      <span class="material-symbols-outlined text-primary">trending_up</span>
+      Ingresos de la Semana
+    </h3>
+    <div class="relative h-64">
+      <canvas id="chart-ganancias-semana"></canvas>
+    </div>
+  </div>
+
+  <!-- Chart 2: Pedidos por Estado -->
+  <div class="bg-surface-container-lowest p-md rounded-2xl custom-shadow border border-surface-container-high">
+    <h3 class="font-title-md text-title-md text-on-surface mb-sm flex items-center gap-xs">
+      <span class="material-symbols-outlined text-secondary">pie_chart</span>
+      Distribución de Pedidos
+    </h3>
+    <div class="relative h-64 flex justify-center">
+      <canvas id="chart-pedidos-estados"></canvas>
+    </div>
+  </div>
+</section>
+
 <!-- Dynamic Map Preview (Real Leaflet Map) -->
 <section class="mb-md">
 <h2 class="font-title-md text-title-md text-on-surface mb-sm">Mapa de Operaciones</h2>
@@ -308,6 +335,123 @@
     let todosLosPedidos = [];
     let filtroEstado = 'todos';
     let busquedaTexto = '';
+
+    // Variables globales para instancias de gráficos
+    let chartGanancias = null;
+    let chartEstados = null;
+
+    // Función para inicializar y actualizar gráficos de Chart.js
+    async function cargarGraficos() {
+        try {
+            const response = await fetch('api/admin/chart-stats');
+            const result = await response.json();
+            
+            if (response.ok && result.status === 'success') {
+                const data = result.data;
+
+                // 1. Gráfico de Ingresos de la Semana (Línea)
+                const ctxGanancias = document.getElementById('chart-ganancias-semana').getContext('2d');
+                if (chartGanancias) {
+                    chartGanancias.data.labels = data.semana_fechas.map(f => {
+                        const partes = f.split('-');
+                        return `${partes[2]}/${partes[1]}`; // Formato DD/MM
+                    });
+                    chartGanancias.data.datasets[0].data = data.semana_ganancias;
+                    chartGanancias.update();
+                } else {
+                    chartGanancias = new Chart(ctxGanancias, {
+                        type: 'line',
+                        data: {
+                            labels: data.semana_fechas.map(f => {
+                                const partes = f.split('-');
+                                return `${partes[2]}/${partes[1]}`;
+                            }),
+                            datasets: [{
+                                label: 'Ingresos ($)',
+                                data: data.semana_ganancias,
+                                borderColor: '#006e25',
+                                backgroundColor: 'rgba(0, 110, 37, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#feb700',
+                                pointBorderColor: '#006e25',
+                                pointHoverRadius: 7
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                                },
+                                x: {
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Gráfico de Distribución de Pedidos (Dona)
+                const ctxEstados = document.getElementById('chart-pedidos-estados').getContext('2d');
+                const labelsEstados = data.estados.map(e => e.estado.toUpperCase());
+                const valoresEstados = data.estados.map(e => parseInt(e.cantidad));
+
+                // Definir colores Premium basados en el sistema de diseño enMo2
+                const mapColores = {
+                    'PENDIENTE': '#ba1a1a',  // Rojo Error
+                    'ASIGNADO': '#7c5800',   // Amarillo/Dorado
+                    'EN_CAMINO_RECOGIDA': '#ff591f', // Naranja
+                    'EN_RUTA': '#ff591f',     // Naranja
+                    'ENTREGADO': '#006e25',   // Verde Exito
+                    'CANCELADO': '#6e7b6b'    // Gris
+                };
+                const coloresEstados = labelsEstados.map(label => mapColores[label] || '#6e7b6b');
+
+                if (chartEstados) {
+                    chartEstados.data.labels = labelsEstados;
+                    chartEstados.data.datasets[0].data = valoresEstados;
+                    chartEstados.data.datasets[0].backgroundColor = coloresEstados;
+                    chartEstados.update();
+                } else {
+                    chartEstados = new Chart(ctxEstados, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labelsEstados,
+                            datasets: [{
+                                data: valoresEstados,
+                                backgroundColor: coloresEstados,
+                                borderWidth: 2,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        boxWidth: 12,
+                                        font: { family: 'Plus Jakarta Sans', size: 11 }
+                                    }
+                                }
+                            },
+                            cutout: '65%'
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error("Error al cargar gráficos analíticos:", error);
+        }
+    }
 
     // 2. Función para cargar métricas Bento Grid (8 KPIs)
     async function cargarEstadisticas() {
@@ -509,10 +653,12 @@
         cargarEstadisticas();
         cargarListadoPedidos();
         actualizarMiniMapa();
+        cargarGraficos();
 
         setInterval(cargarEstadisticas, 8000);
         setInterval(cargarListadoPedidos, 8000);
         setInterval(actualizarMiniMapa, 8000);
+        setInterval(cargarGraficos, 16000); // Gráficos se actualizan cada 16 segundos
     }
 
     inicializarDashboard();

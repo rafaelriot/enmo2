@@ -170,4 +170,58 @@ $app->group('/api/admin', function ($group) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     });
+
+    // Obtener estadísticas analíticas para gráficos (GET /api/admin/chart-stats)
+    $group->get('/chart-stats', function (Request $request, Response $response) {
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // 1. Ganancias diarias de la última semana (últimos 7 días)
+            $semanaSql = "
+                SELECT DATE(updated_at) as fecha, SUM(precio) as total 
+                FROM pedidos 
+                WHERE estado = 'entregado' 
+                  AND updated_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                GROUP BY DATE(updated_at)
+                ORDER BY DATE(updated_at) ASC
+            ";
+            $semanaStmt = $db->query($semanaSql);
+            $semanaRaw = $semanaStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Poblar días vacíos para asegurar 7 días en el gráfico
+            $ingresosSemana = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $fechaStr = date('Y-m-d', strtotime("-$i days"));
+                $ingresosSemana[$fechaStr] = 0.0;
+            }
+            foreach ($semanaRaw as $row) {
+                if (isset($ingresosSemana[$row['fecha']])) {
+                    $ingresosSemana[$row['fecha']] = (float)$row['total'];
+                }
+            }
+
+            // 2. Conteo de pedidos agrupados por estado (todos los históricos)
+            $estadosSql = "SELECT estado, COUNT(*) as cantidad FROM pedidos GROUP BY estado";
+            $estadosStmt = $db->query($estadosSql);
+            $estadosRaw = $estadosStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => [
+                    "semana_fechas" => array_keys($ingresosSemana),
+                    "semana_ganancias" => array_values($ingresosSemana),
+                    "estados" => $estadosRaw
+                ]
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error de base de datos analítica: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
 });
