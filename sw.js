@@ -1,11 +1,19 @@
-const CACHE_NAME = 'enmo2-cache-v1';
+const CACHE_NAME = 'enmo2-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   './inicio_de_sesion.html',
   './inicio_cliente.html',
   './dashboard_repartidor.html',
+  './dashboard_principal.html',
   './pedido_en_curso.html',
+  './pedidos_disponibles.html',
+  './perfil_del_repartidor.html',
+  './gestion_de_pedidos.html',
+  './historial_pedidos.html',
   './manifest.json',
+  './tailwind-config.js',
+  './app.js',
+  './offline.html',
   './images/icon-192.png',
   './images/icon-512.png',
   './images/branding.png'
@@ -46,7 +54,12 @@ self.addEventListener('fetch', (event) => {
       if (cachedResponse) {
         return cachedResponse;
       }
-      return fetch(event.request);
+      return fetch(event.request).catch(() => {
+        // Si falla la red (offline) y se solicita una página HTML, servir offline.html
+        if (event.request.headers.get('accept').includes('text/html')) {
+          return caches.match('./offline.html');
+        }
+      });
     })
   );
 });

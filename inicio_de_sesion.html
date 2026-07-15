@@ -14,90 +14,8 @@
 <link rel="manifest" href="manifest.json"/>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.0/build/spline-viewer.js"></script>
-<script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            "colors": {
-                "on-error-container": "#93000a",
-                "outline-variant": "#bdcab9",
-                "primary": "#006e25",
-                "surface-container-high": "#e8e8ea",
-                "on-tertiary-fixed-variant": "#852400",
-                "surface-tint": "#006e25",
-                "background": "#f9f9fc",
-                "on-primary-container": "#00330d",
-                "on-surface-variant": "#3e4a3c",
-                "secondary-fixed-dim": "#ffba20",
-                "primary-fixed-dim": "#66df75",
-                "on-primary-fixed": "#002106",
-                "tertiary-container": "#ff591f",
-                "surface-dim": "#dadadc",
-                "surface": "#f9f9fc",
-                "secondary-container": "#feb700",
-                "on-surface": "#1a1c1e",
-                "on-secondary-fixed-variant": "#5e4200",
-                "surface-bright": "#f9f9fc",
-                "surface-container": "#eeeef0",
-                "secondary": "#7c5800",
-                "on-secondary-fixed": "#271900",
-                "surface-variant": "#e2e2e5",
-                "on-primary": "#ffffff",
-                "tertiary": "#ae3200",
-                "surface-container-low": "#f3f3f6",
-                "primary-container": "#28a745",
-                "on-error": "#ffffff",
-                "on-tertiary-fixed": "#3a0b00",
-                "primary-fixed": "#83fc8e",
-                "secondary-fixed": "#ffdea8",
-                "surface-container-highest": "#e2e2e5",
-                "on-background": "#1a1c1e",
-                "tertiary-fixed-dim": "#ffb59e",
-                "error": "#ba1a1a",
-                "outline": "#6e7b6b",
-                "error-container": "#ffdad6"
-            },
-            "borderRadius": {
-                "DEFAULT": "0.25rem",
-                "lg": "0.5rem",
-                "xl": "0.75rem",
-                "full": "9999px"
-            },
-            "spacing": {
-                "md": "24px",
-                "lg": "48px",
-                "base": "8px",
-                "sm": "12px",
-                "margin-mobile": "16px",
-                "margin-desktop": "32px",
-                "gutter": "16px",
-                "xs": "4px"
-            },
-            "fontFamily": {
-                "headline-lg-mobile": ["Hanken Grotesk"],
-                "display-lg": ["Hanken Grotesk"],
-                "label-sm": ["Plus Jakarta Sans"],
-                "headline-lg": ["Hanken Grotesk"],
-                "label-bold": ["Hanken Grotesk"],
-                "title-md": ["Hanken Grotesk"],
-                "body-md": ["Plus Jakarta Sans"],
-                "body-lg": ["Plus Jakarta Sans"]
-            },
-            "fontSize": {
-                "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
-                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
-                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
-                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
-                "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700"}],
-                "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
-            }
-          },
-        },
-      }
-    </script>
+<script src="tailwind-config.js"></script>
+<script src="app.js"></script>
 <style>
         .speed-line-gradient {
             background: linear-gradient(90deg, #28a745 0%, #feb700 50%, #ff591f 100%);
@@ -127,11 +45,12 @@
   </style>
   </head>
 <body class="bg-background font-body-md text-on-background min-h-screen flex flex-col kinetic-bg">
-<header class="w-full flex items-center px-margin-mobile h-16 fixed top-0 z-50">
+<header class="w-full flex items-center justify-between px-margin-mobile h-16 fixed top-0 z-50">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">speed</span>
 <span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">enMo2</span>
 </div>
+<button onclick="toggleDarkMode()" class="material-symbols-outlined text-primary p-2 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 duration-150" title="Cambiar Tema">dark_mode</button>
 </header>
 <main class="flex-grow flex items-center justify-center px-margin-mobile py-24">
 <div class="w-full max-w-md bg-white/70 dark:bg-black/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-white/20 dark:border-white/10 transition-all duration-300 hover:shadow-primary/5">
@@ -341,6 +260,9 @@
                     if (response.ok && result.status === 'success') {
                         // Guardar datos de sesión en localStorage
                         localStorage.setItem('usuario', JSON.stringify(result.usuario));
+                        if (result.token) {
+                            localStorage.setItem('token', result.token);
+                        }
 
                         // Redirección según el rol del usuario
                         if (result.usuario.rol === 'repartidor') {
@@ -409,6 +331,9 @@
 
                 if (apiRes.ok && result.status === 'success') {
                     localStorage.setItem('usuario', JSON.stringify(result.usuario));
+                    if (result.token) {
+                        localStorage.setItem('token', result.token);
+                    }
                     window.location.href = 'inicio_cliente.html';
                 } else {
                     errorMessage.textContent = result.message || 'Error al validar la cuenta con el servidor.';
@@ -485,7 +410,7 @@
             btnSolicitarCodigo.addEventListener('click', async () => {
                 const email = inputRecuperarEmail.value.trim();
                 if (!email) {
-                    alert('Por favor ingresa tu correo electrónico.');
+                    mostrarToast('Por favor ingresa tu correo electrónico.', false);
                     return;
                 }
 
@@ -501,15 +426,15 @@
                     const result = await response.json();
 
                     if (response.ok && result.status === 'success') {
-                        alert(result.message + `\n\n[CÓDIGO DE PRUEBA: ${result.codigo_simulado}]`);
+                        mostrarToast(result.message);
                         paso1.classList.add('hidden');
                         paso2.classList.remove('hidden');
                     } else {
-                        alert(result.message || 'El correo electrónico no existe en el sistema.');
+                        mostrarToast(result.message || 'El correo electrónico no existe en el sistema.', false);
                     }
                 } catch (error) {
                     console.error('Error al solicitar código:', error);
-                    alert('Error al conectar con el servidor.');
+                    mostrarToast('Error al conectar con el servidor.', false);
                 } finally {
                     btnSolicitarCodigo.disabled = false;
                     btnSolicitarCodigo.innerHTML = `<span>Solicitar Código</span><span class="material-symbols-outlined">send</span>`;
@@ -526,15 +451,15 @@
                 const confirm = inputRecuperarConfirm.value;
 
                 if (!codigo || !password || !confirm) {
-                    alert('Por favor completa todos los campos.');
+                    mostrarToast('Por favor completa todos los campos.', false);
                     return;
                 }
                 if (password.length < 6) {
-                    alert('La nueva contraseña debe tener al menos 6 caracteres.');
+                    mostrarToast('La nueva contraseña debe tener al menos 6 caracteres.', false);
                     return;
                 }
                 if (password !== confirm) {
-                    alert('Las contraseñas no coinciden.');
+                    mostrarToast('Las contraseñas no coinciden.', false);
                     return;
                 }
 
@@ -550,15 +475,15 @@
                     const result = await response.json();
 
                     if (response.ok && result.status === 'success') {
-                        alert('¡Contraseña actualizada con éxito! Ya puedes iniciar sesión con tu nueva contraseña.');
+                        mostrarToast('¡Contraseña actualizada con éxito! Inicia sesión.');
                         // Cerrar modal
                         btnCerrarRecuperar.click();
                     } else {
-                        alert(result.message || 'Código de seguridad incorrecto.');
+                        mostrarToast(result.message || 'Código de seguridad incorrecto.', false);
                     }
                 } catch (error) {
                     console.error('Error al restablecer contraseña:', error);
-                    alert('Error al conectar con el servidor.');
+                    mostrarToast('Error al conectar con el servidor.', false);
                 } finally {
                     btnRestablecer.disabled = false;
                     btnRestablecer.innerHTML = `<span>Restablecer Contraseña</span><span class="material-symbols-outlined">check_circle</span>`;

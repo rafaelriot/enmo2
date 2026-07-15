@@ -11,16 +11,16 @@ class Mail {
         try {
             // Configuración del Servidor SMTP (Hostinger)
             $mail->isSMTP();
-            $mail->Host       = 'smtp.hostinger.com';
+            $mail->Host       = $_ENV['SMTP_HOST'] ?? 'smtp.hostinger.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'recuperacion@enmo2.com'; // REEMPLAZAR CON TU CORREO DE HOSTINGER
-            $mail->Password   = 'S$vTGIfnu1';           // REEMPLAZAR CON TU CONTRASEÑA DE CORREO DE HOSTINGER
+            $mail->Username   = $_ENV['SMTP_USER'] ?? 'recuperacion@enmo2.com'; 
+            $mail->Password   = $_ENV['SMTP_PASS'] ?? '';           
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // SSL
-            $mail->Port       = 465;
+            $mail->Port       = (int)($_ENV['SMTP_PORT'] ?? 465);
             $mail->CharSet    = 'UTF-8';
 
             // Destinatarios
-            $mail->setFrom('recuperacion@enmo2.com', 'enMo2 Logística');
+            $mail->setFrom($_ENV['SMTP_USER'] ?? 'recuperacion@enmo2.com', 'enMo2 Logística');
             $mail->addAddress($toEmail, $toName);
 
             // Contenido del Correo

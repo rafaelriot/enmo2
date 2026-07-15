@@ -20,7 +20,7 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "inicio_de_sesion.html",
+  "start_url": "./inicio_de_sesion.html",
   "background_color": "#ffffff",
   "theme_color": "#006e25",
   "display": "standalone",

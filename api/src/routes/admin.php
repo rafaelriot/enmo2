@@ -134,27 +134,23 @@ $app->group('/api/admin', function ($group) {
         }
     });
 
-    // Obtener todos los repartidores activos/online y sus ubicaciones
+    // Obtener todos los repartidores activos/online y sus ubicaciones (Optimizado sin N+1)
     $group->get('/repartidores-online', function (Request $request, Response $response) {
         try {
             $dbObj = new Db();
             $db = $dbObj->connect();
 
-            // Seleccionar repartidores que tengan coordenadas válidas
-            $sql = "SELECT id, nombre, email, telefono, latitud_actual AS latitud, longitud_actual AS longitud, estado 
-                    FROM usuarios 
-                    WHERE rol = 'repartidor' AND estado = 'activo' AND latitud_actual != 0 AND longitud_actual != 0";
+            // Seleccionar repartidores que tengan coordenadas válidas y calcular su estado de ocupación en una sola consulta
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.latitud_actual AS latitud, u.longitud_actual AS longitud, u.estado,
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) > 0 AS ocupado
+                    FROM usuarios u
+                    WHERE u.rol = 'repartidor' AND u.estado = 'activo' AND u.latitud_actual != 0 AND u.longitud_actual != 0";
             $stmt = $db->query($sql);
             $repartidores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Para cada repartidor, determinar si está en ruta o libre
+            // Asegurar tipo booleano para el atributo ocupado
             foreach ($repartidores as &$rep) {
-                $checkSql = "SELECT COUNT(*) FROM pedidos WHERE repartidor_id = :rep_id AND estado IN ('asignado', 'en_camino_recogida', 'en_ruta')";
-                $checkStmt = $db->prepare($checkSql);
-                $checkStmt->execute([':rep_id' => $rep['id']]);
-                $count = (int)$checkStmt->fetchColumn();
-
-                $rep['ocupado'] = $count > 0;
+                $rep['ocupado'] = (bool)$rep['ocupado'];
             }
 
             $response->getBody()->write(json_encode([
@@ -220,6 +216,62 @@ $app->group('/api/admin', function ($group) {
             $response->getBody()->write(json_encode([
                 "status" => "error",
                 "message" => "Error de base de datos analítica: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Obtener historial completo de pedidos con filtros (GET /api/admin/historial)
+    $group->get('/historial', function (Request $request, Response $response) {
+        $queryParams = $request->getQueryParams();
+        $fecha_inicio = $queryParams['fecha_inicio'] ?? null;
+        $fecha_fin = $queryParams['fecha_fin'] ?? null;
+        $estado = $queryParams['estado'] ?? null;
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $sql = "SELECT p.*, u.nombre as repartidor_nombre 
+                    FROM pedidos p 
+                    LEFT JOIN usuarios u ON p.repartidor_id = u.id";
+            
+            $conditions = [];
+            $params = [];
+
+            if (!empty($fecha_inicio)) {
+                $conditions[] = "DATE(p.created_at) >= :fecha_inicio";
+                $params[':fecha_inicio'] = $fecha_inicio;
+            }
+            if (!empty($fecha_fin)) {
+                $conditions[] = "DATE(p.created_at) <= :fecha_fin";
+                $params[':fecha_fin'] = $fecha_fin;
+            }
+            if (!empty($estado) && $estado !== 'todos') {
+                $conditions[] = "p.estado = :estado";
+                $params[':estado'] = $estado;
+            }
+
+            if (count($conditions) > 0) {
+                $sql .= " WHERE " . implode(" AND ", $conditions);
+            }
+
+            $sql .= " ORDER BY p.id DESC";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+            $pedidos = $stmt->fetchAll();
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => $pedidos
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al obtener historial: " . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }

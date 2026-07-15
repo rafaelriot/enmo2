@@ -47,10 +47,25 @@ $app->group('/api/usuarios', function ($group) {
                 // Quitar password de la respuesta
                 unset($user['password']);
 
+                // Generar Token JWT
+                $secretKey = $_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456';
+                $payload = [
+                    "iss" => "enmo2-api",
+                    "aud" => "enmo2-app",
+                    "iat" => time(),
+                    "exp" => time() + (24 * 60 * 60), // Expira en 24 horas
+                    "id" => $user['id'],
+                    "nombre" => $user['nombre'],
+                    "email" => $user['email'],
+                    "rol" => $user['rol']
+                ];
+                $jwt = Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
+
                 $response->getBody()->write(json_encode([
                     "status" => "success",
                     "message" => "Inicio de sesión exitoso.",
-                    "usuario" => $user
+                    "usuario" => $user,
+                    "token" => $jwt
                 ]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
             } else {
@@ -96,11 +111,26 @@ $app->group('/api/usuarios', function ($group) {
             $user = $stmt->fetch();
 
             if ($user) {
+                // Generar Token JWT para Google login
+                $secretKey = $_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456';
+                $payload = [
+                    "iss" => "enmo2-api",
+                    "aud" => "enmo2-app",
+                    "iat" => time(),
+                    "exp" => time() + (24 * 60 * 60),
+                    "id" => $user['id'],
+                    "nombre" => $user['nombre'],
+                    "email" => $user['email'],
+                    "rol" => $user['rol']
+                ];
+                $jwt = Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
+
                 // Si existe el usuario, iniciar sesión automáticamente
                 $response->getBody()->write(json_encode([
                     "status" => "success",
                     "message" => "Inicio de sesión con Google exitoso.",
-                    "usuario" => $user
+                    "usuario" => $user,
+                    "token" => $jwt
                 ]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
             }
@@ -121,6 +151,20 @@ $app->group('/api/usuarios', function ($group) {
             ]);
 
             $nuevoId = $db->lastInsertId();
+            
+            // Generar JWT para el usuario recién registrado
+            $secretKey = $_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456';
+            $payload = [
+                "iss" => "enmo2-api",
+                "aud" => "enmo2-app",
+                "iat" => time(),
+                "exp" => time() + (24 * 60 * 60),
+                "id" => $nuevoId,
+                "nombre" => $nombre,
+                "email" => $email,
+                "rol" => "cliente"
+            ];
+            $jwt = Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
 
             $response->getBody()->write(json_encode([
                 "status" => "success",
@@ -132,7 +176,8 @@ $app->group('/api/usuarios', function ($group) {
                     "telefono" => $telefonoDummy,
                     "rol" => "cliente",
                     "estado" => "activo"
-                ]
+                ],
+                "token" => $jwt
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 

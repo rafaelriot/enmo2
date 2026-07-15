@@ -13,100 +13,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
     rel="stylesheet" />
-  <script id="tailwind-config">
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          "colors": {
-            "on-error": "#ffffff",
-            "secondary-fixed-dim": "#ffba20",
-            "on-primary": "#ffffff",
-            "on-secondary-container": "#6b4b00",
-            "surface-variant": "#e2e2e5",
-            "secondary": "#7c5800",
-            "inverse-on-surface": "#f0f0f3",
-            "background": "#f9f9fc",
-            "on-secondary": "#ffffff",
-            "tertiary-fixed": "#ffdbd0",
-            "surface-dim": "#dadadc",
-            "primary": "#006e25",
-            "on-surface": "#1a1c1e",
-            "on-tertiary-fixed": "#3a0b00",
-            "surface-bright": "#f9f9fc",
-            "surface-container-high": "#e8e8ea",
-            "inverse-surface": "#2f3133",
-            "outline-variant": "#bdcab9",
-            "tertiary-container": "#ff591f",
-            "on-tertiary": "#ffffff",
-            "primary-fixed-dim": "#66df75",
-            "primary-container": "#28a745",
-            "on-primary-container": "#00330d",
-            "outline": "#6e7b6b",
-            "tertiary": "#ae3200",
-            "error": "#ba1a1a",
-            "surface-tint": "#006e25",
-            "on-primary-fixed-variant": "#00531a",
-            "on-primary-fixed": "#002106",
-            "surface-container": "#eeeef0",
-            "error-container": "#ffdad6",
-            "on-background": "#1a1c1e",
-            "secondary-fixed": "#ffdea8",
-            "on-secondary-fixed-variant": "#5e4200",
-            "surface-container-lowest": "#ffffff",
-            "secondary-container": "#feb700",
-            "on-error-container": "#93000a",
-            "surface-container-highest": "#e2e2e5",
-            "primary-fixed": "#83fc8e",
-            "on-tertiary-container": "#541300",
-            "tertiary-fixed-dim": "#ffb59e",
-            "surface-container-low": "#f3f3f6",
-            "surface": "#f9f9fc",
-            "on-tertiary-fixed-variant": "#852400",
-            "on-secondary-fixed": "#271900",
-            "on-surface-variant": "#3e4a3c",
-            "inverse-primary": "#66df75"
-          },
-          "borderRadius": {
-            "DEFAULT": "0.25rem",
-            "lg": "0.5rem",
-            "xl": "0.75rem",
-            "full": "9999px"
-          },
-          "spacing": {
-            "margin-desktop": "32px",
-            "md": "24px",
-            "sm": "12px",
-            "lg": "48px",
-            "gutter": "16px",
-            "xs": "4px",
-            "margin-mobile": "16px",
-            "base": "8px"
-          },
-          "fontFamily": {
-            "title-md": ["Hanken Grotesk"],
-            "label-sm": ["Plus Jakarta Sans"],
-            "label-bold": ["Hanken Grotesk"],
-            "headline-lg": ["Hanken Grotesk"],
-            "display-lg": ["Hanken Grotesk"],
-            "headline-lg-mobile": ["Hanken Grotesk"],
-            "body-md": ["Plus Jakarta Sans"],
-            "body-lg": ["Plus Jakarta Sans"]
-          },
-          "fontSize": {
-            "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
-            "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
-            "label-bold": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "700" }],
-            "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
-            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
-            "headline-lg-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }],
-            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
-            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
-          }
-        },
-      },
-    }
-  </script>
+  <script src="tailwind-config.js"></script>
+  <script src="app.js"></script>
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -818,47 +726,83 @@
         const sendBtn = document.getElementById('mini-chat-send');
 
         // Renderizar historial guardado
-        function renderChat() {
-            const mensajes = JSON.parse(localStorage.getItem(chatKey) || '[]');
+        async function renderChat() {
             if (!messagesEl) return;
-            // Limpiar y re-renderizar
-            messagesEl.innerHTML = '';
-            if (mensajes.length === 0) {
-                messagesEl.innerHTML = '<p class="text-xs text-outline text-center py-2 italic">Sin mensajes aún.</p>';
-            } else {
-                mensajes.forEach(m => {
-                    const bubble = document.createElement('div');
-                    bubble.className = 'flex flex-col items-end';
-                    bubble.innerHTML = `
-                        <div class="max-w-[85%] bg-primary text-on-primary text-xs rounded-2xl rounded-tr-sm px-3 py-2 shadow-sm leading-snug">${m.texto}</div>
-                        <span class="text-[9px] text-outline mt-0.5 mr-1">${m.hora} · Via WhatsApp</span>
-                    `;
-                    messagesEl.appendChild(bubble);
+            try {
+                const response = await fetch(`api/pedidos/${pedidoId}/mensajes`, {
+                    headers: getAuthHeaders()
                 });
-                messagesEl.scrollTop = messagesEl.scrollHeight;
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'success') {
+                    const mensajes = result.data;
+                    messagesEl.innerHTML = '';
+                    if (mensajes.length === 0) {
+                        messagesEl.innerHTML = '<p class="text-xs text-outline text-center py-2 italic">Sin mensajes aún.</p>';
+                    } else {
+                        const currentUser = JSON.parse(localStorage.getItem('usuario') || '{}');
+                        mensajes.forEach(m => {
+                            const isMine = parseInt(m.remitente_id) === parseInt(currentUser.id);
+                            const bubble = document.createElement('div');
+                            bubble.className = isMine ? 'flex flex-col items-end w-full' : 'flex flex-col items-start w-full';
+                            
+                            const bubbleClass = isMine 
+                                ? 'bg-primary text-on-primary rounded-tr-sm' 
+                                : 'bg-surface-container-high text-on-background rounded-tl-sm';
+                                
+                            const time = new Date(m.created_at || new Date()).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                            
+                            bubble.innerHTML = `
+                                <div class="max-w-[85%] ${bubbleClass} text-xs rounded-2xl px-3 py-2 shadow-sm leading-snug">${m.mensaje}</div>
+                                <span class="text-[9px] text-outline mt-0.5 mx-1">${m.remitente_nombre} · ${time}</span>
+                            `;
+                            messagesEl.appendChild(bubble);
+                        });
+                        messagesEl.scrollTop = messagesEl.scrollHeight;
+                    }
+                }
+            } catch (err) {
+                console.error("Error al cargar mensajes del chat:", err);
             }
         }
 
-        // Función para enviar un mensaje (guardar + WhatsApp)
-        function enviarMensaje(texto) {
+        // Función para enviar un mensaje (guardar en BD + WhatsApp)
+        async function enviarMensaje(texto) {
             const txt = texto.trim();
             if (!txt) return;
 
-            // Guardar en localStorage
-            const mensajes = JSON.parse(localStorage.getItem(chatKey) || '[]');
-            const ahora = new Date();
-            const hora = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-            mensajes.push({ texto: txt, hora });
-            localStorage.setItem(chatKey, JSON.stringify(mensajes));
-            renderChat();
+            const currentUser = JSON.parse(localStorage.getItem('usuario') || '{}');
+            if (!currentUser.id) return;
 
-            // Abrir WhatsApp con el mensaje
-            const tel = window._chatTelefono || '';
-            if (tel.length >= 10) {
-                const waUrl = `https://wa.me/52${tel}?text=${encodeURIComponent(txt)}`;
-                window.open(waUrl, '_blank');
-            } else {
-                mostrarToast('Mensaje guardado. Cliente sin teléfono registrado para WhatsApp.', true);
+            try {
+                // Guardar en la base de datos
+                const response = await fetch(`api/pedidos/${pedidoId}/mensajes`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
+                    },
+                    body: JSON.stringify({
+                        remitente_id: currentUser.id,
+                        mensaje: txt
+                    })
+                });
+
+                if (response.ok) {
+                    renderChat();
+                    
+                    // Abrir WhatsApp con el mensaje
+                    const tel = window._chatTelefono || '';
+                    if (tel.length >= 10) {
+                        const waUrl = `https://wa.me/52${tel}?text=${encodeURIComponent(txt)}`;
+                        window.open(waUrl, '_blank');
+                    }
+                } else {
+                    mostrarToast('Error al enviar el mensaje al servidor.', false);
+                }
+            } catch (err) {
+                console.error("Error al enviar mensaje:", err);
+                mostrarToast('Error de conexión al enviar mensaje.', false);
             }
 
             // Limpiar input
@@ -868,8 +812,14 @@
         // Exponer globalmente para mensajes rápidos
         window._enviarMensajeChat = enviarMensaje;
 
-        // Renderizar al iniciar
+        // Renderizar al iniciar y configurar sondeo de mensajes
         renderChat();
+        const chatInterval = setInterval(renderChat, 5000); // Polling cada 5 segundos
+
+        // Limpiar intervalo al descargar la página
+        window.addEventListener('beforeunload', () => {
+            clearInterval(chatInterval);
+        });
 
         // Evento botón enviar
         if (sendBtn) {

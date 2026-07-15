@@ -168,6 +168,15 @@ $app->group('/api/pedidos', function ($group) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
 
+        // Convertir base64 de foto_paquete a imagen física WebP si aplica
+        if (!empty($foto_paquete) && strpos($foto_paquete, 'data:image/') === 0) {
+            $baseDir = __DIR__ . '/../../public';
+            $subida = ImageHelper::uploadBase64WebP($foto_paquete, $baseDir, 'paquetes');
+            if ($subida !== false) {
+                $foto_paquete = $subida;
+            }
+        }
+
         try {
             $dbObj = new Db();
             $db = $dbObj->connect();
@@ -409,6 +418,76 @@ $app->group('/api/pedidos', function ($group) {
             $response->getBody()->write(json_encode([
                 "status" => "error",
                 "message" => $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Obtener mensajes de un pedido (GET /api/pedidos/{id}/mensajes)
+    $group->get('/{id}/mensajes', function (Request $request, Response $response, array $args) {
+        $pedido_id = $args['id'];
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+            $sql = "SELECT m.*, u.nombre as remitente_nombre, u.rol as remitente_rol 
+                    FROM mensajes_pedido m 
+                    LEFT JOIN usuarios u ON m.remitente_id = u.id 
+                    WHERE m.pedido_id = :pedido_id 
+                    ORDER BY m.id ASC";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':pedido_id' => $pedido_id]);
+            $mensajes = $stmt->fetchAll();
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => $mensajes
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al obtener mensajes: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Enviar mensaje en un pedido (POST /api/pedidos/{id}/mensajes)
+    $group->post('/{id}/mensajes', function (Request $request, Response $response, array $args) {
+        $pedido_id = $args['id'];
+        $data = json_decode($request->getBody()->getContents(), true);
+        $remitente_id = $data['remitente_id'] ?? null;
+        $mensaje = $data['mensaje'] ?? '';
+
+        if (!$remitente_id || empty($mensaje)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Faltan parámetros obligatorios (remitente_id o mensaje)."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+            $sql = "INSERT INTO mensajes_pedido (pedido_id, remitente_id, mensaje) 
+                    VALUES (:pedido_id, :remitente_id, :mensaje)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([
+                ':pedido_id' => $pedido_id,
+                ':remitente_id' => $remitente_id,
+                ':mensaje' => $mensaje
+            ]);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Mensaje enviado correctamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al enviar mensaje: " . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }

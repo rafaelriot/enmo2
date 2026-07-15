@@ -7,10 +7,17 @@ use PDOException;
 class Db {
     // Configuración para entorno local o Hostinger.
     // El usuario debe actualizar estos campos con los de su base de datos.
-    private $host = 'localhost';
-    private $user = 'u980038333_enmo2root';
-    private $pass = 'S$vTGIfnu1';
-    private $dbname = 'u980038333_enmo2';
+    private $host;
+    private $user;
+    private $pass;
+    private $dbname;
+
+    public function __construct() {
+        $this->host = $_ENV['DB_HOST'] ?? 'localhost';
+        $this->user = $_ENV['DB_USER'] ?? 'root';
+        $this->pass = $_ENV['DB_PASS'] ?? '';
+        $this->dbname = $_ENV['DB_NAME'] ?? 'enmo2';
+    }
 
     public function connect() {
         $mysql_connect_str = "mysql:host=$this->host;dbname=$this->dbname;charset=utf8mb4";
