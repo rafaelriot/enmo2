@@ -2,8 +2,10 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Db;
+use App\ImageHelper;
 
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../config/ImageHelper.php';
 
 // Rutas de Pedidos
 $app->group('/api/pedidos', function ($group) {
@@ -288,12 +290,22 @@ $app->group('/api/pedidos', function ($group) {
                 ];
             } else {
                 if ($estado === 'entregado' && $foto_confirmacion !== null) {
+                    // Si viene una imagen base64, procesarla de manera optimizada
+                    $rutaEvidencia = $foto_confirmacion;
+                    if (strpos($foto_confirmacion, 'data:image/') === 0) {
+                        $baseDir = __DIR__ . '/../../public';
+                        $subida = ImageHelper::uploadBase64WebP($foto_confirmacion, $baseDir, 'evidencias');
+                        if ($subida !== false) {
+                            $rutaEvidencia = $subida;
+                        }
+                    }
+
                     $sql = "UPDATE pedidos 
                             SET estado = :estado, foto_confirmacion = :foto_confirmacion, updated_at = CURRENT_TIMESTAMP 
                             WHERE id = :pedido_id";
                     $params = [
                         ':estado' => $estado,
-                        ':foto_confirmacion' => $foto_confirmacion,
+                        ':foto_confirmacion' => $rutaEvidencia,
                         ':pedido_id' => $pedido_id
                     ];
                 } else {

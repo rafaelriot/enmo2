@@ -1495,8 +1495,8 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Comprimir la imagen a JPEG con calidad al 70%
-                    selectedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                    // Comprimir la imagen a WebP con calidad al 75%
+                    selectedPhotoBase64 = canvas.toDataURL('image/webp', 0.75);
                     
                     previewImg.src = selectedPhotoBase64;
                     previewImg.classList.remove('hidden');
