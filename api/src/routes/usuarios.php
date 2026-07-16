@@ -48,7 +48,7 @@ $app->group('/api/usuarios', function ($group) {
                 unset($user['password']);
 
                 // Generar Token JWT
-                $secretKey = $_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456';
+                $secretKey = getenv('JWT_SECRET') ?: ($_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456');
                 $payload = [
                     "iss" => "enmo2-api",
                     "aud" => "enmo2-app",
@@ -112,7 +112,7 @@ $app->group('/api/usuarios', function ($group) {
 
             if ($user) {
                 // Generar Token JWT para Google login
-                $secretKey = $_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456';
+                $secretKey = getenv('JWT_SECRET') ?: ($_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456');
                 $payload = [
                     "iss" => "enmo2-api",
                     "aud" => "enmo2-app",
@@ -153,7 +153,7 @@ $app->group('/api/usuarios', function ($group) {
             $nuevoId = $db->lastInsertId();
             
             // Generar JWT para el usuario recién registrado
-            $secretKey = $_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456';
+            $secretKey = getenv('JWT_SECRET') ?: ($_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456');
             $payload = [
                 "iss" => "enmo2-api",
                 "aud" => "enmo2-app",

@@ -13,10 +13,10 @@ class Db {
     private $dbname;
 
     public function __construct() {
-        $this->host = $_ENV['DB_HOST'] ?? 'localhost';
-        $this->user = $_ENV['DB_USER'] ?? 'root';
-        $this->pass = $_ENV['DB_PASS'] ?? '';
-        $this->dbname = $_ENV['DB_NAME'] ?? 'enmo2';
+        $this->host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
+        $this->user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
+        $this->pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : ($_ENV['DB_PASS'] ?? '');
+        $this->dbname = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'enmo2');
     }
 
     public function connect() {

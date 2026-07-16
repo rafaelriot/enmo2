@@ -33,7 +33,7 @@ class JwtAuthMiddleware {
         }
 
         try {
-            $secretKey = $_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456';
+            $secretKey = getenv('JWT_SECRET') ?: ($_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456');
             $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
             
             // Adjuntar datos del usuario decodificados al request
