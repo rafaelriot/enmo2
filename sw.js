@@ -1,4 +1,4 @@
-const CACHE_NAME = 'enmo2-cache-v2';
+const CACHE_NAME = 'enmo2-cache-v3';
 const ASSETS_TO_CACHE = [
   './',
   './inicio_de_sesion.html',
