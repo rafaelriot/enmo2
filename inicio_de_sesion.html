@@ -327,7 +327,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, nombre, google_id })
                 });
-                const result = await apiRes.json();
+                const rawText = await apiRes.text();
+                console.log("Respuesta bruta del servidor:", rawText);
+                const result = JSON.parse(rawText);
 
                 if (apiRes.ok && result.status === 'success') {
                     localStorage.setItem('usuario', JSON.stringify(result.usuario));
@@ -348,18 +350,36 @@
 
         // 3. Inicializar e inyectar el botón oficial de Google
         window.onload = function () {
-            google.accounts.id.initialize({
-                client_id: "1041922961177-a55ssg1jaqoq01e2tcrecnvngg3strlh.apps.googleusercontent.com", // REEMPLAZAR CON TU CLIENT ID
-                callback: handleCredentialResponse,
-                auto_select: false // Habilita One-Tap automático si se desea (true)
-            });
+            console.log("Inicializando Google Identity Services...");
+            try {
+                google.accounts.id.initialize({
+                    client_id: "1041922961177-a55ssg1jaqoq01e2tcrecnvngg3strlh.apps.googleusercontent.com", // REEMPLAZAR CON TU CLIENT ID
+                    callback: handleCredentialResponse,
+                    auto_select: false // Habilita One-Tap automático si se desea (true)
+                });
+                console.log("Google Identity Services inicializado correctamente.");
+            } catch (e) {
+                console.error("Error al inicializar Google Identity Services:", e);
+            }
 
             // Vincular el botón personalizado inyectado
             const btnGoogle = document.getElementById('btn-google-login');
             if (btnGoogle) {
                 btnGoogle.addEventListener('click', () => {
-                    // Lanza el selector nativo de cuentas de Google
-                    google.accounts.id.prompt(); 
+                    console.log("Intentando mostrar el prompt de Google...");
+                    // Lanza el selector nativo de cuentas de Google con callback de diagnóstico
+                    google.accounts.id.prompt((notification) => {
+                        console.log("Notificación del prompt de Google:", notification);
+                        if (notification.isNotDisplayed()) {
+                            console.warn("El prompt de Google no se mostró. Razón:", notification.getNotDisplayedReason());
+                            errorMessage.textContent = 'El selector de cuentas de Google fue bloqueado o no pudo mostrarse. Razón: ' + notification.getNotDisplayedReason();
+                            errorMessage.classList.remove('hidden');
+                        } else if (notification.isSkippedMoment()) {
+                            console.warn("Google prompt skip. Razón:", notification.getSkippedReason());
+                        } else if (notification.isDismissedMoment()) {
+                            console.warn("Google prompt cerrado por usuario. Razón:", notification.getDismissedReason());
+                        }
+                    }); 
                 });
             }
         };
