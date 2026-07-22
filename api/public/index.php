@@ -1,7 +1,10 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// En producción: no mostrar errores PHP como HTML (rompe respuestas JSON)
+// Los errores se registran en el log del servidor
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
+ini_set('log_errors', 1);
 
 use Slim\Factory\AppFactory;
 
@@ -74,6 +77,35 @@ $app->get('/api[/]', function ($request, $response, $args) {
         "message" => "¡Bienvenido a la API de enMo2 Logística de Velocidad!"
     ]));
     return $response->withHeader('Content-Type', 'application/json');
+});
+
+// Health-check endpoint para diagnóstico rápido
+$app->get('/api/health', function ($request, $response, $args) {
+    $checks = [
+        'php_version' => phpversion(),
+        'env_loaded' => !empty(getenv('DB_HOST')) || !empty($_ENV['DB_HOST']),
+        'db_host' => getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'NOT SET'),
+        'db_name' => getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'NOT SET'),
+        'db_user' => getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'NOT SET'),
+        'vendor_exists' => file_exists(__DIR__ . '/../vendor/autoload.php'),
+    ];
+
+    // Intentar conexión a BD
+    try {
+        $dbObj = new App\Db();
+        $db = $dbObj->connect();
+        $checks['db_connection'] = 'OK';
+    } catch (\Exception $e) {
+        $checks['db_connection'] = 'FAILED: ' . $e->getMessage();
+    }
+
+    $allOk = $checks['env_loaded'] && $checks['vendor_exists'] && $checks['db_connection'] === 'OK';
+
+    $response->getBody()->write(json_encode([
+        'status' => $allOk ? 'ok' : 'error',
+        'checks' => $checks
+    ], JSON_PRETTY_PRINT));
+    return $response->withHeader('Content-Type', 'application/json')->withStatus($allOk ? 200 : 500);
 });
 
 // Ejecutar la aplicación

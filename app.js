@@ -290,4 +290,34 @@ document.addEventListener('DOMContentLoaded', () => {
             input.parentElement.classList.remove('shadow-md');
         });
     });
+
+    // 🛡️ Registrar Service Worker con auto-actualización
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => {
+                console.log('Service Worker registrado con éxito:', reg.scope);
+                
+                // Detectar cuando hay una actualización disponible
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'activated') {
+                                console.log('[SW] Nueva versión activada, recargando...');
+                                window.location.reload();
+                            }
+                        });
+                    }
+                });
+            })
+            .catch(err => console.error('Error registrando Service Worker:', err));
+
+        // Escuchar mensajes del Service Worker (notificación de actualización)
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'SW_UPDATED') {
+                console.log('[SW] Actualización detectada:', event.data.version);
+                window.location.reload();
+            }
+        });
+    }
 });
