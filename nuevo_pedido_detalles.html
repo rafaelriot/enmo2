@@ -331,6 +331,11 @@
         }
         const usuario = JSON.parse(usuarioStr);
 
+        // Si el usuario es repartidor, redireccionar a su panel (no puede crear pedidos)
+        if (usuario.rol === 'repartidor') {
+            window.location.href = 'dashboard_repartidor.html';
+        }
+
         // Obtener pedido_id de la URL si estamos editando
         const urlParams = new URLSearchParams(window.location.search);
         const pedidoIdEditar = urlParams.get('pedido_id');

@@ -324,7 +324,15 @@
                     if (result.token) {
                         localStorage.setItem('token', result.token);
                     }
-                    window.location.href = 'inicio_cliente.html';
+                    
+                    // Redirección dinámica basada en el rol de la cuenta
+                    if (result.usuario.rol === 'repartidor') {
+                        window.location.href = 'dashboard_repartidor.html';
+                    } else if (result.usuario.rol === 'administrador') {
+                        window.location.href = 'dashboard_principal.html';
+                    } else {
+                        window.location.href = 'inicio_cliente.html';
+                    }
                 } else {
                     errorMessage.textContent = result.message || 'Error al validar la cuenta con el servidor.';
                     errorMessage.classList.remove('hidden');

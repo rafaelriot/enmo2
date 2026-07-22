@@ -367,26 +367,28 @@ $app->group('/api/usuarios', function ($group) {
             $dbObj = new Db();
             $db = $dbObj->connect();
 
-            // Verificar que el email no esté en uso
-            $checkSql = "SELECT id FROM usuarios WHERE email = :email LIMIT 1";
+            // Verificar que el email no esté en uso (sin importar el rol)
+            $checkSql = "SELECT id, rol FROM usuarios WHERE email = :email LIMIT 1";
             $checkStmt = $db->prepare($checkSql);
             $checkStmt->execute([':email' => $email]);
-            if ($checkStmt->fetch()) {
+            $userExist = $checkStmt->fetch();
+            if ($userExist) {
                 $response->getBody()->write(json_encode([
                     "status"  => "error",
-                    "message" => "Este correo electrónico ya está registrado."
+                    "message" => "Este correo ya está registrado como " . ucfirst($userExist['rol']) . ". No es posible duplicar cuentas."
                 ]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
             }
 
-            // Verificar que el teléfono no esté en uso
-            $checkTelSql = "SELECT id FROM usuarios WHERE telefono = :telefono LIMIT 1";
+            // Verificar que el teléfono no esté en uso (sin importar el rol)
+            $checkTelSql = "SELECT id, rol FROM usuarios WHERE telefono = :telefono LIMIT 1";
             $checkTelStmt = $db->prepare($checkTelSql);
             $checkTelStmt->execute([':telefono' => $telefono]);
-            if ($checkTelStmt->fetch()) {
+            $telExist = $checkTelStmt->fetch();
+            if ($telExist) {
                 $response->getBody()->write(json_encode([
                     "status"  => "error",
-                    "message" => "Este número de teléfono ya está registrado."
+                    "message" => "Este teléfono ya está registrado como " . ucfirst($telExist['rol']) . ". No es posible duplicar cuentas."
                 ]));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(409);
             }
