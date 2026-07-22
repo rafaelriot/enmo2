@@ -328,6 +328,7 @@
 </div>
 </nav>
 </div>
+<script src="app.js"></script>
 <script>
         // Obtener pedido_id desde los parámetros de la URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -463,7 +464,8 @@
                 const response = await fetch('api/pedidos/actualizar-estado', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
                     },
                     body: JSON.stringify({
                         pedido_id: parseInt(pedidoId),

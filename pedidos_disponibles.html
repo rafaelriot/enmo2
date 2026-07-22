@@ -214,6 +214,7 @@
 <div id="toast-container" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999]"></div>
 
 <!-- JavaScript Logic -->
+<script src="app.js"></script>
 <script>
     // 1. Verificar sesión y rol de repartidor
     const usuarioStr = localStorage.getItem('usuario');
@@ -389,7 +390,10 @@
         try {
             const response = await fetch('api/pedidos/actualizar-estado', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    ...getAuthHeaders()
+                },
                 body: JSON.stringify({
                     pedido_id: pedidoId,
                     estado: 'asignado',

@@ -285,6 +285,7 @@
   </a>
 </nav>
 
+<script src="app.js"></script>
 <script>
     // ─── Sesión y rol ────────────────────────────────────────────────────
     const usuarioStr = localStorage.getItem('usuario');
@@ -316,7 +317,9 @@
     // ─── Mapa para ADMINISTRADOR / REPARTIDOR: muestra todos los repartidores online ───
     async function actualizarMapaRepartidores() {
         try {
-            const response = await fetch('api/admin/repartidores-online');
+            const response = await fetch('api/admin/repartidores-online', {
+                headers: getAuthHeaders()
+            });
             const result = await response.json();
 
             if (response.ok && result.status === 'success') {
