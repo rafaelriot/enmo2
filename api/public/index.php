@@ -15,6 +15,27 @@ require __DIR__ . '/../vendor/autoload.php';
 if (file_exists(__DIR__ . '/../.env')) {
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
     $dotenv->load();
+} else {
+    // Auto-configurar para Hostinger si no existe .env
+    $isHostinger = strpos($_SERVER['DOCUMENT_ROOT'] ?? '', 'hostinger') !== false
+                || strpos($_SERVER['SERVER_NAME'] ?? '', 'hostingersite.com') !== false;
+    if ($isHostinger) {
+        $hostingerEnv = [
+            'DB_HOST' => 'localhost',
+            'DB_USER' => 'u980038333_enmo2root',
+            'DB_PASS' => 'S$vTGIfnu1',
+            'DB_NAME' => 'u980038333_enmo2',
+            'SMTP_HOST' => 'smtp.hostinger.com',
+            'SMTP_USER' => 'recuperacion@enmo2.com',
+            'SMTP_PASS' => 'S$vTGIfnu1',
+            'SMTP_PORT' => '465',
+            'JWT_SECRET' => '9f7ef95a32b9845d4e12e753ac5631bb538d3fcad7023190df031d2ba5b106ae',
+        ];
+        foreach ($hostingerEnv as $key => $value) {
+            putenv("$key=$value");
+            $_ENV[$key] = $value;
+        }
+    }
 }
 
 // Crear la aplicación de Slim

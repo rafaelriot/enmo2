@@ -13,10 +13,22 @@ class Db {
     private $dbname;
 
     public function __construct() {
-        $this->host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
-        $this->user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
-        $this->pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : ($_ENV['DB_PASS'] ?? '');
-        $this->dbname = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'enmo2');
+        // Auto-detectar entorno Hostinger si no hay .env cargado
+        $isHostinger = strpos($_SERVER['DOCUMENT_ROOT'] ?? '', 'hostinger') !== false 
+                    || strpos($_SERVER['SERVER_NAME'] ?? '', 'hostingersite.com') !== false;
+        
+        if ($isHostinger && empty(getenv('DB_HOST')) && empty($_ENV['DB_HOST'])) {
+            // Credenciales de producción en Hostinger
+            $this->host = 'localhost';
+            $this->user = 'u980038333_enmo2root';
+            $this->pass = 'S$vTGIfnu1';
+            $this->dbname = 'u980038333_enmo2';
+        } else {
+            $this->host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
+            $this->user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? 'root');
+            $this->pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : ($_ENV['DB_PASS'] ?? '');
+            $this->dbname = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? 'enmo2');
+        }
     }
 
     public function connect() {
