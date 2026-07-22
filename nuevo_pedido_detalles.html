@@ -778,7 +778,8 @@
                 const response = await fetch('api/pedidos/crear', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
                     },
                     body: JSON.stringify(payload)
                 });
