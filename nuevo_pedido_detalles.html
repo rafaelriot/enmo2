@@ -789,6 +789,12 @@
 
                 if (response.ok && result.status === 'success') {
                     window.location.href = `confirmacion_de_pedido.html?pedido_id=${result.pedido_id}`;
+                } else if (response.status === 403) {
+                    mostrarToast('Tu cuenta no tiene rol de Cliente. Cerrando sesión para re-iniciar...', false);
+                    setTimeout(() => {
+                        localStorage.clear();
+                        window.location.href = 'inicio_de_sesion.html';
+                    }, 2500);
                 } else {
                     mostrarToast('Error al registrar pedido: ' + (result.message || 'Error desconocido'), false);
                     btnSubmitPedido.disabled = false;

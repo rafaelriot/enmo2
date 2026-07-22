@@ -121,7 +121,7 @@ $app->group('/api/usuarios', function ($group) {
                     "id" => $user['id'],
                     "nombre" => $user['nombre'],
                     "email" => $user['email'],
-                    "rol" => $user['rol']
+                    "rol" => !empty($user['rol']) ? $user['rol'] : 'cliente'
                 ];
                 $jwt = Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
 
