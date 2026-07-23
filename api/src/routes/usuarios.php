@@ -614,4 +614,227 @@ $app->group('/api/usuarios', function ($group) {
         }
     });
 
+    // ========================================================
+    // DOCUMENTOS DE REPARTIDOR
+    // ========================================================
+
+    // Subir un documento (POST /api/usuarios/documentos/upload)
+    $group->post('/documentos/upload', function (Request $request, Response $response) {
+        $uploadedFiles = $request->getUploadedFiles();
+        $params = $request->getParsedBody() ?? [];
+
+        // Fallback: si getParsedBody está vacío, leer de $_POST
+        if (empty($params)) {
+            $params = $_POST;
+        }
+
+        $usuarioId = $params['usuario_id'] ?? null;
+        $tipoDocumento = $params['tipo_documento'] ?? null;
+
+        // Validar campos requeridos
+        if (empty($usuarioId) || empty($tipoDocumento)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "usuario_id y tipo_documento son requeridos."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // Validar tipo de documento
+        $tiposPermitidos = ['ine', 'licencia', 'seguro'];
+        if (!in_array($tipoDocumento, $tiposPermitidos)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Tipo de documento inválido. Valores permitidos: ine, licencia, seguro."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // Obtener el archivo
+        $archivo = $uploadedFiles['archivo'] ?? null;
+        if (!$archivo || $archivo->getError() !== UPLOAD_ERR_OK) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "No se recibió ningún archivo o hubo un error al subirlo."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // Validar tamaño (máximo 3 MB)
+        $maxSize = 3 * 1024 * 1024; // 3 MB
+        if ($archivo->getSize() > $maxSize) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "El archivo excede el tamaño máximo permitido de 3 MB."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // Validar tipo MIME
+        $mimePermitidos = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+        $clientMediaType = $archivo->getClientMediaType();
+        if (!in_array($clientMediaType, $mimePermitidos)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Formato de archivo no permitido. Solo se aceptan JPG, PNG, WEBP y PDF."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        // Generar nombre de archivo único
+        $extension = pathinfo($archivo->getClientFilename(), PATHINFO_EXTENSION);
+        $nombreArchivo = $tipoDocumento . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $extension;
+
+        // Crear directorio si no existe
+        $dirBase = __DIR__ . '/../../uploads/documentos/' . $usuarioId;
+        if (!is_dir($dirBase)) {
+            mkdir($dirBase, 0755, true);
+        }
+
+        $rutaCompleta = $dirBase . '/' . $nombreArchivo;
+        $rutaRelativa = 'uploads/documentos/' . $usuarioId . '/' . $nombreArchivo;
+
+        try {
+            // Mover archivo
+            $archivo->moveTo($rutaCompleta);
+
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // Eliminar documento anterior del mismo tipo si existe (limpiar archivo viejo)
+            $oldSql = "SELECT ruta_archivo FROM documentos_repartidor WHERE usuario_id = :uid AND tipo_documento = :tipo";
+            $oldStmt = $db->prepare($oldSql);
+            $oldStmt->execute([':uid' => $usuarioId, ':tipo' => $tipoDocumento]);
+            $oldDoc = $oldStmt->fetch();
+            if ($oldDoc && !empty($oldDoc['ruta_archivo'])) {
+                $oldPath = __DIR__ . '/../../' . $oldDoc['ruta_archivo'];
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            // INSERT o UPDATE
+            $sql = "INSERT INTO documentos_repartidor (usuario_id, tipo_documento, nombre_archivo, ruta_archivo, estado, motivo_rechazo, revisado_por)
+                    VALUES (:uid, :tipo, :nombre, :ruta, 'pendiente', NULL, NULL)
+                    ON DUPLICATE KEY UPDATE
+                        nombre_archivo = VALUES(nombre_archivo),
+                        ruta_archivo = VALUES(ruta_archivo),
+                        estado = 'pendiente',
+                        motivo_rechazo = NULL,
+                        revisado_por = NULL,
+                        updated_at = CURRENT_TIMESTAMP";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([
+                ':uid' => $usuarioId,
+                ':tipo' => $tipoDocumento,
+                ':nombre' => $archivo->getClientFilename(),
+                ':ruta' => $rutaRelativa
+            ]);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Documento subido exitosamente.",
+                "documento" => [
+                    "tipo" => $tipoDocumento,
+                    "nombre" => $archivo->getClientFilename(),
+                    "estado" => "pendiente"
+                ]
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
+
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al guardar el documento: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Obtener documentos de un repartidor (GET /api/usuarios/documentos/{usuario_id})
+    $group->get('/documentos/{usuario_id}', function (Request $request, Response $response, array $args) {
+        $usuarioId = $args['usuario_id'];
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $sql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo, created_at, updated_at
+                    FROM documentos_repartidor
+                    WHERE usuario_id = :uid
+                    ORDER BY tipo_documento ASC";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':uid' => $usuarioId]);
+            $documentos = $stmt->fetchAll();
+
+            // Determinar estado general de verificación
+            $tiposRequeridos = ['ine', 'licencia', 'seguro'];
+            $tiposSubidos = array_column($documentos, 'tipo_documento');
+            $todosSubidos = count(array_intersect($tiposRequeridos, $tiposSubidos)) === count($tiposRequeridos);
+            $todosAprobados = $todosSubidos && count(array_filter($documentos, fn($d) => $d['estado'] !== 'aprobado')) === 0;
+            $algunoRechazado = count(array_filter($documentos, fn($d) => $d['estado'] === 'rechazado')) > 0;
+
+            $estadoGeneral = 'sin_documentos';
+            if ($todosAprobados) {
+                $estadoGeneral = 'verificado';
+            } elseif ($algunoRechazado) {
+                $estadoGeneral = 'requiere_accion';
+            } elseif (count($documentos) > 0) {
+                $estadoGeneral = 'en_revision';
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "estado_general" => $estadoGeneral,
+                "documentos" => $documentos
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al obtener documentos: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Servir archivo de documento (GET /api/usuarios/documentos/archivo/{doc_id})
+    $group->get('/documentos/archivo/{doc_id}', function (Request $request, Response $response, array $args) {
+        $docId = $args['doc_id'];
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $sql = "SELECT ruta_archivo, nombre_archivo FROM documentos_repartidor WHERE id = :id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':id' => $docId]);
+            $doc = $stmt->fetch();
+
+            if (!$doc) {
+                $response->getBody()->write(json_encode(["status" => "error", "message" => "Documento no encontrado."]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            $filePath = __DIR__ . '/../../' . $doc['ruta_archivo'];
+            if (!file_exists($filePath)) {
+                $response->getBody()->write(json_encode(["status" => "error", "message" => "Archivo no encontrado en el servidor."]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            $mimeType = mime_content_type($filePath);
+            $stream = new \Slim\Psr7\Stream(fopen($filePath, 'r'));
+
+            return $response
+                ->withHeader('Content-Type', $mimeType)
+                ->withHeader('Content-Disposition', 'inline; filename="' . $doc['nombre_archivo'] . '"')
+                ->withBody($stream);
+
+        } catch (\Exception $e) {
+            $response->getBody()->write(json_encode(["status" => "error", "message" => "Error: " . $e->getMessage()]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
 });

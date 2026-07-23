@@ -37,6 +37,16 @@
     </style>
 </head>
 <body class="bg-surface pb-32">
+<script>
+// Guard: Solo administradores pueden acceder a esta página
+(function() {
+    const u = localStorage.getItem('usuario');
+    if (!u) { window.location.href = 'inicio_de_sesion.html'; return; }
+    const usr = JSON.parse(u);
+    if (usr.rol === 'repartidor') { window.location.href = 'dashboard_repartidor.html'; return; }
+    if (usr.rol === 'cliente') { window.location.href = 'inicio_cliente.html'; return; }
+})();
+</script>
 <!-- Top Navigation Bar -->
 <header class="fixed top-0 w-full z-50 bg-surface border-b-2 border-surface-container-highest h-16 flex justify-between items-center px-margin-mobile max-w-screen-xl mx-auto">
 <div class="flex items-center gap-base">

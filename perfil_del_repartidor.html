@@ -255,52 +255,15 @@
       <span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
       Documentación y Verificación
     </p>
-    <span class="bg-primary/15 text-primary text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
-      <span class="material-symbols-outlined text-[12px] font-bold">check_circle</span> VERIFICADO
+    <span id="badge-verificacion" class="bg-surface-container text-on-surface-variant text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+      <span class="material-symbols-outlined text-[12px]">hourglass_top</span> CARGANDO...
     </span>
   </div>
-  <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
-    <div class="flex items-center justify-between py-1 border-b border-surface-container/50">
-      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
-        <span class="material-symbols-outlined text-primary text-[16px]">file_present</span>
-        Licencia de Conducir
-      </span>
-      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
-        <span>Adjunto</span>
-        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
-      </span>
-    </div>
-    <div class="flex items-center justify-between py-1 border-b border-surface-container/50">
-      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
-        <span class="material-symbols-outlined text-primary text-[16px]">security</span>
-        Seguro de Moto
-      </span>
-      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
-        <span>Vigente</span>
-        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
-      </span>
-    </div>
-    <div class="flex items-center justify-between py-1">
-      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
-        <span class="material-symbols-outlined text-primary text-[16px]">home_pin</span>
-        Comprobante Domicilio
-      </span>
-      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
-        <span>Adjunto</span>
-        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
-      </span>
-    </div>
-    <div class="flex items-center justify-between py-1">
-      <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
-        <span class="material-symbols-outlined text-primary text-[16px]">badge</span>
-        INE / Identificación
-      </span>
-      <span class="text-primary flex items-center text-xs font-bold gap-0.5">
-        <span>Adjunto</span>
-        <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
-      </span>
-    </div>
+  <div id="docs-container" class="grid grid-cols-1 gap-y-2 text-sm">
+    <p class="text-center text-on-surface-variant text-xs py-2">Cargando documentos...</p>
   </div>
+  <!-- Upload modal for re-uploading rejected docs -->
+  <input type="file" id="reupload-input" class="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" />
 </div>
 </div>
 </section>
@@ -723,10 +686,151 @@
                 btnSave.innerHTML = `<span class="material-symbols-outlined">save</span> Guardar Cambios`;
             }
         }
+        // ===== GESTIÓN DE DOCUMENTOS =====
+        const docLabels = {
+            ine: { icon: 'badge', label: 'INE / Identificación' },
+            licencia: { icon: 'drive_eta', label: 'Licencia de Conducir' },
+            seguro: { icon: 'shield', label: 'Seguro de Moto' }
+        };
+
+        async function cargarDocumentos() {
+            const container = document.getElementById('docs-container');
+            const badge = document.getElementById('badge-verificacion');
+
+            try {
+                const res = await fetch(`api/usuarios/documentos/${usuario.id}`);
+                const result = await res.json();
+
+                if (!res.ok || result.status !== 'success') {
+                    container.innerHTML = '<p class="text-center text-error text-xs py-2">Error al cargar documentos.</p>';
+                    return;
+                }
+
+                // Actualizar badge general
+                const estadoGeneral = result.estado_general;
+                if (estadoGeneral === 'verificado') {
+                    badge.className = 'bg-primary/15 text-primary text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1';
+                    badge.innerHTML = '<span class="material-symbols-outlined text-[12px] font-bold">check_circle</span> VERIFICADO';
+                } else if (estadoGeneral === 'requiere_accion') {
+                    badge.className = 'bg-error-container text-on-error-container text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1';
+                    badge.innerHTML = '<span class="material-symbols-outlined text-[12px]">error</span> REQUIERE ACCIÓN';
+                } else if (estadoGeneral === 'en_revision') {
+                    badge.className = 'bg-secondary-container text-on-secondary-container text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1';
+                    badge.innerHTML = '<span class="material-symbols-outlined text-[12px]">hourglass_top</span> EN REVISIÓN';
+                } else {
+                    badge.className = 'bg-surface-container text-on-surface-variant text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1';
+                    badge.innerHTML = '<span class="material-symbols-outlined text-[12px]">upload_file</span> SIN DOCUMENTOS';
+                }
+
+                // Crear mapa de docs por tipo
+                const docsMap = {};
+                result.documentos.forEach(d => { docsMap[d.tipo_documento] = d; });
+
+                let html = '';
+                for (const [tipo, info] of Object.entries(docLabels)) {
+                    const doc = docsMap[tipo];
+                    let statusHtml = '';
+
+                    if (!doc) {
+                        statusHtml = `
+                            <button onclick="iniciarUploadDoc('${tipo}')" class="text-outline flex items-center text-xs font-bold gap-0.5 hover:text-primary transition-colors">
+                                <span>Subir</span>
+                                <span class="material-symbols-outlined text-[16px]">upload</span>
+                            </button>`;
+                    } else if (doc.estado === 'aprobado') {
+                        statusHtml = `
+                            <span class="text-primary flex items-center text-xs font-bold gap-0.5">
+                                <span>Aprobado</span>
+                                <span class="material-symbols-outlined text-primary text-[16px] font-bold">check</span>
+                            </span>`;
+                    } else if (doc.estado === 'pendiente') {
+                        statusHtml = `
+                            <span class="text-secondary flex items-center text-xs font-bold gap-0.5">
+                                <span>Pendiente</span>
+                                <span class="material-symbols-outlined text-secondary text-[16px]">hourglass_top</span>
+                            </span>`;
+                    } else if (doc.estado === 'rechazado') {
+                        statusHtml = `
+                            <div class="flex flex-col items-end">
+                                <span class="text-error flex items-center text-xs font-bold gap-0.5">
+                                    <span>Rechazado</span>
+                                    <span class="material-symbols-outlined text-error text-[16px]">cancel</span>
+                                </span>
+                                ${doc.motivo_rechazo ? `<span class="text-[10px] text-error/70">${doc.motivo_rechazo}</span>` : ''}
+                                <button onclick="iniciarUploadDoc('${tipo}')" class="text-primary text-[10px] font-bold mt-0.5 hover:underline">Re-subir</button>
+                            </div>`;
+                    }
+
+                    const iconColor = doc && doc.estado === 'aprobado' ? 'text-primary' : (doc && doc.estado === 'rechazado' ? 'text-error' : 'text-on-surface-variant');
+
+                    html += `
+                        <div class="flex items-center justify-between py-1.5 border-b border-surface-container/50">
+                            <span class="text-on-surface-variant flex items-center gap-1.5 text-xs font-medium">
+                                <span class="material-symbols-outlined ${iconColor} text-[16px]">${info.icon}</span>
+                                ${info.label}
+                            </span>
+                            ${statusHtml}
+                        </div>`;
+                }
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error cargando documentos:', error);
+                container.innerHTML = '<p class="text-center text-error text-xs py-2">Error de conexión.</p>';
+            }
+        }
+
+        // Re-upload de documentos
+        let currentUploadTipo = null;
+        const reuploadInput = document.getElementById('reupload-input');
+
+        function iniciarUploadDoc(tipo) {
+            currentUploadTipo = tipo;
+            reuploadInput.click();
+        }
+
+        if (reuploadInput) {
+            reuploadInput.addEventListener('change', async function() {
+                const file = this.files[0];
+                if (!file || !currentUploadTipo) return;
+
+                if (file.size > 3 * 1024 * 1024) {
+                    alert('El archivo excede 3 MB.');
+                    this.value = '';
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('usuario_id', usuario.id);
+                formData.append('tipo_documento', currentUploadTipo);
+                formData.append('archivo', file);
+
+                try {
+                    const res = await fetch('api/usuarios/documentos/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await res.json();
+                    if (res.ok && result.status === 'success') {
+                        mostrarToast('Documento subido correctamente. En revisión.', true);
+                        cargarDocumentos(); // Recargar estado
+                    } else {
+                        alert('Error: ' + (result.message || 'No se pudo subir el archivo.'));
+                    }
+                } catch (err) {
+                    alert('Error de conexión al subir documento.');
+                }
+
+                this.value = '';
+                currentUploadTipo = null;
+            });
+        }
 
         // Ejecutar funciones al iniciar la página
         iniciarRastreoGPS(); // Inicia rastreo por defecto ya que el switch está activado
         cargarPedidos();
+        cargarDocumentos();
     </script>
     
     <!-- Modal para Editar Perfil -->

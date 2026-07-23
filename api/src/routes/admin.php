@@ -276,4 +276,132 @@ $app->group('/api/admin', function ($group) {
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     });
+
+    // ========================================================
+    // GESTIÓN DE DOCUMENTOS DE REPARTIDORES
+    // ========================================================
+
+    // Listar repartidores con documentos pendientes de revisión (GET /api/admin/repartidores-pendientes)
+    $group->get('/repartidores-pendientes', function (Request $request, Response $response) {
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // Obtener repartidores que tienen al menos un documento pendiente
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.created_at as fecha_registro,
+                           COUNT(d.id) as total_documentos,
+                           SUM(CASE WHEN d.estado = 'pendiente' THEN 1 ELSE 0 END) as docs_pendientes,
+                           SUM(CASE WHEN d.estado = 'aprobado' THEN 1 ELSE 0 END) as docs_aprobados,
+                           SUM(CASE WHEN d.estado = 'rechazado' THEN 1 ELSE 0 END) as docs_rechazados
+                    FROM usuarios u
+                    INNER JOIN documentos_repartidor d ON u.id = d.usuario_id
+                    WHERE u.rol = 'repartidor'
+                    GROUP BY u.id
+                    HAVING docs_pendientes > 0
+                    ORDER BY u.created_at DESC";
+            $stmt = $db->query($sql);
+            $repartidores = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            // Para cada repartidor, obtener sus documentos
+            foreach ($repartidores as &$rep) {
+                $docSql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo, created_at, updated_at
+                           FROM documentos_repartidor
+                           WHERE usuario_id = :uid
+                           ORDER BY tipo_documento ASC";
+                $docStmt = $db->prepare($docSql);
+                $docStmt->execute([':uid' => $rep['id']]);
+                $rep['documentos'] = $docStmt->fetchAll(\PDO::FETCH_ASSOC);
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => $repartidores
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (\PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error de base de datos: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Revisar (aprobar/rechazar) un documento (POST /api/admin/documentos/revisar)
+    $group->post('/documentos/revisar', function (Request $request, Response $response) {
+        $data = json_decode($request->getBody()->getContents(), true);
+
+        $docId = $data['documento_id'] ?? null;
+        $accion = $data['accion'] ?? null; // 'aprobar' o 'rechazar'
+        $motivoRechazo = $data['motivo_rechazo'] ?? null;
+        $revisadoPor = $data['admin_id'] ?? null;
+
+        if (empty($docId) || empty($accion)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "documento_id y accion son requeridos."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        if (!in_array($accion, ['aprobar', 'rechazar'])) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Acción inválida. Valores permitidos: aprobar, rechazar."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        if ($accion === 'rechazar' && empty($motivoRechazo)) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Se requiere un motivo de rechazo."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $nuevoEstado = ($accion === 'aprobar') ? 'aprobado' : 'rechazado';
+
+            $sql = "UPDATE documentos_repartidor
+                    SET estado = :estado,
+                        motivo_rechazo = :motivo,
+                        revisado_por = :admin_id,
+                        updated_at = CURRENT_TIMESTAMP
+                    WHERE id = :doc_id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([
+                ':estado' => $nuevoEstado,
+                ':motivo' => ($accion === 'rechazar') ? $motivoRechazo : null,
+                ':admin_id' => $revisadoPor,
+                ':doc_id' => $docId
+            ]);
+
+            if ($stmt->rowCount() === 0) {
+                $response->getBody()->write(json_encode([
+                    "status" => "error",
+                    "message" => "Documento no encontrado."
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Documento " . ($accion === 'aprobar' ? 'aprobado' : 'rechazado') . " exitosamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (\PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error de base de datos: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
 });

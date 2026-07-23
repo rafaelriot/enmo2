@@ -220,28 +220,47 @@
 </div>
 </div>
 </section>
-<!-- Document Upload - Bento Grid -->
+<!-- Document Upload - Bento Grid (Funcional) -->
 <section class="space-y-md">
 <h2 class="font-title-md text-primary flex items-center gap-2">
 <span class="material-symbols-outlined">description</span>
                 Documentación Requerida
             </h2>
+<p class="text-label-sm text-on-surface-variant -mt-2">Formatos: JPG, PNG, WEBP, PDF • Máximo 3 MB por archivo</p>
 <div class="grid grid-cols-2 md:grid-cols-3 gap-gutter">
-<button class="bento-upload-card flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40">
-<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary">badge</span>
+<!-- INE -->
+<label class="bento-upload-card flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40 cursor-pointer relative overflow-hidden" id="card-ine">
+<input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" id="file-ine" data-tipo="ine" onchange="handleFileSelect(this, 'ine')"/>
+<div id="preview-ine" class="absolute inset-0 hidden">
+  <img class="w-full h-full object-cover rounded-xl" id="img-preview-ine"/>
+  <div class="absolute bottom-0 left-0 right-0 bg-primary/90 text-white text-[10px] font-bold py-1 text-center">✓ Seleccionado</div>
+</div>
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary" id="icon-ine">badge</span>
 <span class="font-label-bold text-on-surface leading-tight">Identificación Oficial</span>
 <span class="font-label-sm text-outline mt-1">(INE/Pasaporte)</span>
-</button>
-<button class="bento-upload-card flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40">
-<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary">drive_eta</span>
+</label>
+<!-- Licencia -->
+<label class="bento-upload-card flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40 cursor-pointer relative overflow-hidden" id="card-licencia">
+<input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" id="file-licencia" data-tipo="licencia" onchange="handleFileSelect(this, 'licencia')"/>
+<div id="preview-licencia" class="absolute inset-0 hidden">
+  <img class="w-full h-full object-cover rounded-xl" id="img-preview-licencia"/>
+  <div class="absolute bottom-0 left-0 right-0 bg-primary/90 text-white text-[10px] font-bold py-1 text-center">✓ Seleccionado</div>
+</div>
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary" id="icon-licencia">drive_eta</span>
 <span class="font-label-bold text-on-surface leading-tight">Licencia de Conducir</span>
 <span class="font-label-sm text-outline mt-1">(Vigente)</span>
-</button>
-<button class="bento-upload-card col-span-2 md:col-span-1 flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40">
-<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary">shield</span>
+</label>
+<!-- Seguro -->
+<label class="bento-upload-card col-span-2 md:col-span-1 flex flex-col items-center justify-center p-md bg-surface-container-lowest border-2 border-dashed border-outline-variant rounded-xl hover:bg-surface-container-low text-center group h-40 cursor-pointer relative overflow-hidden" id="card-seguro">
+<input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden" id="file-seguro" data-tipo="seguro" onchange="handleFileSelect(this, 'seguro')"/>
+<div id="preview-seguro" class="absolute inset-0 hidden">
+  <img class="w-full h-full object-cover rounded-xl" id="img-preview-seguro"/>
+  <div class="absolute bottom-0 left-0 right-0 bg-primary/90 text-white text-[10px] font-bold py-1 text-center">✓ Seleccionado</div>
+</div>
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2 group-hover:text-primary" id="icon-seguro">shield</span>
 <span class="font-label-bold text-on-surface leading-tight">Seguro de Moto</span>
 <span class="font-label-sm text-outline mt-1">(Cobertura vigente)</span>
-</button>
+</label>
 </div>
 </section>
 <!-- Terms & Conditions -->
@@ -271,6 +290,91 @@
             btnAtras.addEventListener('click', () => {
                 window.location.href = 'inicio_de_sesion.html';
             });
+        }
+
+        // ===== MANEJO DE ARCHIVOS DE DOCUMENTOS =====
+        const archivosSeleccionados = { ine: null, licencia: null, seguro: null };
+
+        function handleFileSelect(input, tipo) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validar tamaño (3 MB)
+            if (file.size > 3 * 1024 * 1024) {
+                alert('El archivo excede el tamaño máximo de 3 MB.');
+                input.value = '';
+                return;
+            }
+
+            // Validar tipo
+            const tiposPermitidos = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+            if (!tiposPermitidos.includes(file.type)) {
+                alert('Formato no permitido. Solo JPG, PNG, WEBP y PDF.');
+                input.value = '';
+                return;
+            }
+
+            archivosSeleccionados[tipo] = file;
+
+            const card = document.getElementById('card-' + tipo);
+            const preview = document.getElementById('preview-' + tipo);
+            const imgPreview = document.getElementById('img-preview-' + tipo);
+
+            // Mostrar preview
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imgPreview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // PDF: mostrar ícono de PDF
+                imgPreview.src = '';
+                preview.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center justify-center bg-primary/10 rounded-xl">
+                        <span class="material-symbols-outlined text-primary text-4xl">picture_as_pdf</span>
+                        <span class="text-[10px] font-bold text-primary mt-1">${file.name}</span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 bg-primary/90 text-white text-[10px] font-bold py-1 text-center">✓ Seleccionado</div>
+                `;
+                preview.classList.remove('hidden');
+            }
+
+            // Estilo visual de éxito
+            card.classList.remove('border-dashed', 'border-outline-variant');
+            card.classList.add('border-solid', 'border-primary');
+        }
+
+        // Función para subir documentos después del registro
+        async function subirDocumentos(usuarioId) {
+            const tipos = ['ine', 'licencia', 'seguro'];
+            let subidos = 0;
+
+            for (const tipo of tipos) {
+                if (!archivosSeleccionados[tipo]) continue;
+
+                const formData = new FormData();
+                formData.append('usuario_id', usuarioId);
+                formData.append('tipo_documento', tipo);
+                formData.append('archivo', archivosSeleccionados[tipo]);
+
+                try {
+                    const res = await fetch('api/usuarios/documentos/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await res.json();
+                    if (res.ok && result.status === 'success') {
+                        subidos++;
+                    } else {
+                        console.warn(`Error subiendo ${tipo}:`, result.message);
+                    }
+                } catch (err) {
+                    console.error(`Error subiendo documento ${tipo}:`, err);
+                }
+            }
+            return subidos;
         }
 
         // Sugeridor de contraseña segura
@@ -353,13 +457,24 @@
                             email,
                             telefono,
                             password,
-                            rol: 'repartidor' // Especificar el rol de repartidor
+                            rol: 'repartidor'
                         })
                     });
                     const result = await response.json();
 
                     if (response.ok && result.status === 'success') {
-                        alert('¡Cuenta de repartidor creada exitosamente! Ahora puedes iniciar sesión.');
+                        const nuevoUsuarioId = result.usuario.id;
+
+                        // Subir documentos si se seleccionaron
+                        const totalArchivos = Object.values(archivosSeleccionados).filter(f => f !== null).length;
+                        if (totalArchivos > 0) {
+                            btnRegistrar.innerHTML = `<span>Subiendo documentos...</span><span class="material-symbols-outlined animate-spin">sync</span>`;
+                            const subidos = await subirDocumentos(nuevoUsuarioId);
+                            alert(`¡Cuenta creada exitosamente! Se subieron ${subidos} de ${totalArchivos} documentos. Tus documentos serán revisados por el equipo de enMo2.`);
+                        } else {
+                            alert('¡Cuenta creada exitosamente! Recuerda subir tus documentos desde tu perfil para ser verificado.');
+                        }
+
                         window.location.href = 'inicio_de_sesion.html';
                     } else {
                         alert(result.message || 'Error al registrar la cuenta.');
@@ -374,20 +489,5 @@
                 }
             });
         }
-
-        // Simple interactive feedback for bento cards
-        document.querySelectorAll('.bento-upload-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const icon = card.querySelector('.material-symbols-outlined');
-                
-                // Simulate file selection
-                icon.innerText = 'check_circle';
-                icon.classList.remove('text-on-surface-variant');
-                icon.classList.add('text-primary');
-                card.classList.add('bg-primary-fixed/20', 'border-primary');
-                card.classList.remove('border-outline-variant', 'border-dashed');
-                card.style.borderStyle = 'solid';
-            });
-        });
     </script>
 </body></html>

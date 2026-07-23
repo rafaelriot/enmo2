@@ -11,6 +11,16 @@
     <script src="app.js"></script>
 </head>
 <body class="bg-background text-on-background min-h-screen pb-32">
+<script>
+// Guard: Solo administradores
+(function() {
+    const u = localStorage.getItem('usuario');
+    if (!u) { window.location.href = 'inicio_de_sesion.html'; return; }
+    const usr = JSON.parse(u);
+    if (usr.rol === 'repartidor') { window.location.href = 'dashboard_repartidor.html'; return; }
+    if (usr.rol === 'cliente') { window.location.href = 'inicio_cliente.html'; return; }
+})();
+</script>
     <!-- Top Bar -->
     <header class="fixed top-0 w-full z-50 bg-surface border-b-2 border-surface-container-highest h-16 flex justify-between items-center px-margin-mobile max-w-screen-xl mx-auto">
         <div class="flex items-center gap-xs">

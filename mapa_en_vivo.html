@@ -147,6 +147,16 @@
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-md overflow-hidden select-none">
+<script>
+// Guard: Solo administradores
+(function() {
+    const u = localStorage.getItem('usuario');
+    if (!u) { window.location.href = 'inicio_de_sesion.html'; return; }
+    const usr = JSON.parse(u);
+    if (usr.rol === 'repartidor') { window.location.href = 'dashboard_repartidor.html'; return; }
+    if (usr.rol === 'cliente') { window.location.href = 'inicio_cliente.html'; return; }
+})();
+</script>
 <!-- Full Screen Map Background Container -->
 <div id="map" class="map-canvas"></div>
 <!-- Top App Bar / Search Container -->
