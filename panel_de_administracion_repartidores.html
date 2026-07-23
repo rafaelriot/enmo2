@@ -166,87 +166,29 @@
 <!-- Candidates List -->
 <div class="lg:col-span-4 flex flex-col gap-sm">
 <h2 class="font-title-md text-title-md mb-2">Candidatos Pendientes</h2>
-<!-- Candidate Item -->
-<div class="cursor-pointer bg-surface-container-lowest p-gutter rounded-xl shadow-sm hover:shadow-md transition-all border-l-4 border-primary speed-line-green snappy-transition" onclick="selectCandidate(1)">
-<div class="flex justify-between items-start">
-<div>
-<p class="font-label-bold text-label-bold">Carlos Rodríguez</p>
-<p class="text-label-sm text-on-surface-variant">Honda CB190R • 12/10/2023</p>
-</div>
-<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-full text-[10px] font-bold">PENDIENTE</span>
-</div>
-</div>
-<div class="cursor-pointer bg-surface-container-lowest p-gutter rounded-xl shadow-sm hover:shadow-md transition-all opacity-70 hover:opacity-100 snappy-transition" onclick="selectCandidate(2)">
-<div class="flex justify-between items-start">
-<div>
-<p class="font-label-bold text-label-bold">Elena Martínez</p>
-<p class="text-label-sm text-on-surface-variant">Yamaha FZ25 • 11/10/2023</p>
-</div>
-<span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-full text-[10px] font-bold">PENDIENTE</span>
-</div>
+<div id="candidates-container" class="flex flex-col gap-sm">
+  <p class="text-on-surface-variant text-sm py-4">Cargando candidatos pendientes...</p>
 </div>
 </div>
 <!-- Detail View -->
-<div class="lg:col-span-8 bg-surface-container-low rounded-xl p-gutter md:p-md h-fit" id="candidate-detail">
+<div class="lg:col-span-8 bg-surface-container-low rounded-xl p-gutter md:p-md h-fit hidden" id="candidate-detail">
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-gutter">
 <div class="flex items-center gap-4">
-<div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a delivery driver candidate, friendly expression, wearing a neutral grey t-shirt against a clean minimalist studio background. Soft cinematic lighting with high-end digital photography style, emphasizing trust and professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIn3K7BNswiKHcnhoNzOmThBHF6DpoGKeafwY7zYtGkSZ6DXDhEWU9SONtorOBaaKNjkWlUNpKP9JKWFG8QECZK86NDepe5nP-xpkPVSMToAtpKc7KYGhf6PqdxPT2llMrWkDwWKnh2uG1T3qZ8kT8FyhdPeuOHbScjDOzw4CrAhyzohn2BKOWgh9hApqrfx1ko0tyu513SR6J8vJXULzImmGOhuC1E1ihUj6si9-tTeWi4fZXAJuz0vVdnJ9c_f0RtBpajHV1JRjK"/>
+<div class="w-16 h-16 rounded-full bg-primary-container text-on-primary-container font-black text-xl flex items-center justify-center" id="detail-avatar">
+?
 </div>
 <div>
-<h3 class="font-headline-lg-mobile text-headline-lg-mobile" id="detail-name">Carlos Rodríguez</h3>
-<p class="text-on-surface-variant font-body-md">Solicitud #4492 • Ciudad de México</p>
-</div>
-</div>
-<div class="flex gap-2">
-<button class="bg-error text-on-error px-6 py-2 rounded-lg font-label-bold snappy-transition hover:scale-105 active:scale-95">Rechazar Candidato</button>
-<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold snappy-transition hover:scale-105 active:scale-95 shadow-md">Aprobar Solicitud</button>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-<!-- Doc 1 -->
-<div class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant">
-<div class="flex justify-between items-start mb-2">
-<span class="font-label-bold">Identificación (INE)</span>
-<span class="material-symbols-outlined text-secondary-container">warning</span>
-</div>
-<div class="aspect-video bg-surface-variant rounded-lg mb-gutter overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A clear, high-resolution digital photograph of a Mexican voter ID card (INE) placed on a dark carbon fiber texture background. The lighting is sharp, highlighting the holographic security elements and professional layout. Kinetic modernism style with high contrast and sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWxvSOuMU7w0pBvkwSePiAoQxWUG15MuzlEh8-dNjNnMiqoBMhVsLVQN07fa50n3QbjyMJ0NnViTB81ONE0HbcUv7IigucQ1iVpid2ylFjL2aCzljw7ItDmVCxQBPrbK3swaJBLT1aJfLqgOBh-aEuVR4F06tOClkRqfwpp7lEKEHfwmAMGm5YR_8wi24ezR7lhWKy9kCtF0PClgsNPKCfqwDQ7qWMoCnZ2IAYufFrp0ZfxltwaOuQ9tALvyfu6ykmIP9AVZLwG2m0"/>
-</div>
-<div class="flex gap-2">
-<button class="flex-1 border border-error text-error py-1 rounded font-label-sm hover:bg-error-container snappy-transition">Rechazar</button>
-<button class="flex-1 bg-primary-container text-on-primary-container py-1 rounded font-label-sm hover:opacity-90 snappy-transition">Aceptar</button>
-</div>
-</div>
-<!-- Doc 2 -->
-<div class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant">
-<div class="flex justify-between items-start mb-2">
-<span class="font-label-bold">Licencia</span>
-<span class="material-symbols-outlined text-secondary-container">warning</span>
-</div>
-<div class="aspect-video bg-surface-variant rounded-lg mb-gutter overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A professional close-up photograph of a driver's license showing motorcycle authorization, resting on a polished metal surface that reflects soft amber light. The composition is modern and technical, using a vibrant color palette of greens and yellows to suggest authority and compliance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnRBorOhLhaW2rj4gw8t4U2PuK5M4Qdt_6rsVOfSpl4_32HKPrOTp_ptZm4LZt1pa9epZM8Dzr63DNx4gCxo1e4X-3yajthPrM3_d4BKbAORF6rfzf4BLAxRzT2kDcM4yioXDV7-bQLhyASSlPlBTxIXlRVz3_Pf1q3r6NjFUIFG-sjvZrvX6eVmEzI6Nl6UlkOVcgOu_3xCATMUCpbReZamO4RjK9UPUOk7Ld60rjbdxG4iOwiA_Sca4ZqbirVk-5_CFlsyvEtn37"/>
-</div>
-<div class="flex gap-2">
-<button class="flex-1 border border-error text-error py-1 rounded font-label-sm hover:bg-error-container snappy-transition">Rechazar</button>
-<button class="flex-1 bg-primary-container text-on-primary-container py-1 rounded font-label-sm hover:opacity-90 snappy-transition">Aceptar</button>
-</div>
-</div>
-<!-- Doc 3 -->
-<div class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant">
-<div class="flex justify-between items-start mb-2">
-<span class="font-label-bold">Seguro Vigente</span>
-<span class="material-symbols-outlined text-secondary-container">warning</span>
-</div>
-<div class="aspect-video bg-surface-variant rounded-lg mb-gutter overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A crisp digital document representing an insurance policy for a delivery vehicle, featuring clean typography and a green seal of approval. The document is displayed on a high-tech tablet screen with subtle glass reflections and a professional, trustworthy aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFPsSiIyWFN1XhUisOYaJBsjyo-VxcY4dbVtECHLItpMCym2ouV2VeqYZAflv6a51Ad1V-49bchxwD9DCiDeeVHyCCTCc8YUcN9iA7z-AS7fK9_DjSYUIQOmh7YUFkIgIDFqXjUj8qoPs3yrUYvSVcr1rh6z9aYFKoDc6GqQfSN9p1pF65RfTbZT2OJV_0mZjT4q2BYy4Ai1LOi_TnF3vVj2mcwbYmLdXemTwQ_uBYWIIcQjHU6waS4Rza2J2A2DH7_vqngdybp0K5"/>
-</div>
-<div class="flex gap-2">
-<button class="flex-1 border border-error text-error py-1 rounded font-label-sm hover:bg-error-container snappy-transition">Rechazar</button>
-<button class="flex-1 bg-primary-container text-on-primary-container py-1 rounded font-label-sm hover:opacity-90 snappy-transition">Aceptar</button>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile" id="detail-name">Selecciona un candidato</h3>
+<p class="text-on-surface-variant font-body-md" id="detail-info">Cargando detalles...</p>
 </div>
 </div>
 </div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter" id="detail-docs-container">
+<!-- Los documentos se renderizan dinámicamente aquí -->
+</div>
+</div>
+<div class="lg:col-span-8 bg-surface-container-low rounded-xl p-gutter md:p-md h-48 flex items-center justify-center text-on-surface-variant" id="candidate-empty">
+  <p class="text-sm font-label-bold">Selecciona un candidato de la izquierda para revisar sus documentos.</p>
 </div>
 </section>
 <!-- VIEW: FLOTA -->
@@ -355,7 +297,18 @@
 </a>
 </nav>
 
+<script src="app.js"></script>
 <script>
+        let repartidoresPendientes = [];
+        let candidatoSeleccionado = null;
+
+        const docTitles = {
+            ine: 'Identificación (INE)',
+            licencia: 'Licencia de Conducir',
+            seguro: 'Seguro de Moto'
+        };
+
+        // Cambiar pestañas
         function switchTab(tab) {
             const solView = document.getElementById('view-solicitudes');
             const flotaView = document.getElementById('view-flota');
@@ -369,6 +322,7 @@
                 solBtn.classList.remove('text-on-surface-variant');
                 flotaBtn.classList.remove('text-primary', 'border-primary');
                 flotaBtn.classList.add('text-on-surface-variant');
+                cargarCandidatosPendientes();
             } else {
                 solView.classList.add('hidden');
                 flotaView.classList.remove('hidden');
@@ -379,22 +333,169 @@
             }
         }
 
-        function selectCandidate(id) {
-            const nameEl = document.getElementById('detail-name');
-            if (id === 1) {
-                nameEl.innerText = "Carlos Rodríguez";
-            } else {
-                nameEl.innerText = "Elena Martínez";
+        // Cargar candidatos pendientes desde la API
+        async function cargarCandidatosPendientes() {
+            const container = document.getElementById('candidates-container');
+
+            try {
+                const response = await fetch('api/admin/repartidores-pendientes', {
+                    headers: getAuthHeaders()
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    repartidoresPendientes = result.data;
+                    renderizarListaCandidatos();
+                } else {
+                    container.innerHTML = `<p class="text-error text-sm py-4">${result.message || 'Error al cargar candidatos.'}</p>`;
+                }
+            } catch (error) {
+                console.error("Error al cargar candidatos pendientes:", error);
+                container.innerHTML = `<p class="text-error text-sm py-4">Error de conexión al cargar candidatos.</p>`;
             }
-            // Simple visual feedback for list selection
-            const cards = document.querySelectorAll('#view-solicitudes .lg\\:col-span-4 > div');
-            cards.forEach(card => {
-                card.classList.add('opacity-70');
-                card.classList.remove('border-l-4', 'border-primary', 'speed-line-green');
-            });
-            const selectedCard = event.currentTarget;
-            selectedCard.classList.remove('opacity-70');
-            selectedCard.classList.add('border-l-4', 'border-primary', 'speed-line-green');
         }
+
+        function renderizarListaCandidatos() {
+            const container = document.getElementById('candidates-container');
+
+            if (!repartidoresPendientes || repartidoresPendientes.length === 0) {
+                container.innerHTML = `<p class="text-on-surface-variant text-sm py-4">No hay candidatos con documentos pendientes.</p>`;
+                document.getElementById('candidate-detail').classList.add('hidden');
+                document.getElementById('candidate-empty').classList.remove('hidden');
+                return;
+            }
+
+            container.innerHTML = '';
+            repartidoresPendientes.forEach((rep, index) => {
+                const isSelected = candidatoSeleccionado && candidatoSeleccionado.id === rep.id;
+                const card = document.createElement('div');
+                card.className = `cursor-pointer bg-surface-container-lowest p-gutter rounded-xl shadow-sm hover:shadow-md transition-all border-l-4 ${isSelected ? 'border-primary speed-line-green' : 'border-transparent opacity-70 hover:opacity-100'} snappy-transition`;
+                card.onclick = () => selectCandidate(rep.id);
+
+                const fecha = new Date(rep.fecha_registro).toLocaleDateString('es-MX');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-label-bold text-label-bold">${rep.nombre}</p>
+                            <p class="text-label-sm text-on-surface-variant">${rep.email} • ${fecha}</p>
+                        </div>
+                        <span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded-full text-[10px] font-bold">${rep.docs_pendientes} PENDIENTE(S)</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // Seleccionar automáticamente el primero si no hay ninguno seleccionado
+            if (!candidatoSeleccionado && repartidoresPendientes.length > 0) {
+                selectCandidate(repartidoresPendientes[0].id);
+            }
+        }
+
+        function selectCandidate(id) {
+            candidatoSeleccionado = repartidoresPendientes.find(r => r.id === id);
+            if (!candidatoSeleccionado) return;
+
+            // Actualizar vista de lista
+            renderizarListaCandidatos();
+
+            document.getElementById('candidate-empty').classList.add('hidden');
+            const detailView = document.getElementById('candidate-detail');
+            detailView.classList.remove('hidden');
+
+            // Avatar de iniciales
+            const iniciales = candidatoSeleccionado.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('detail-avatar').textContent = iniciales;
+
+            document.getElementById('detail-name').textContent = candidatoSeleccionado.nombre;
+            document.getElementById('detail-info').textContent = `Teléfono: ${candidatoSeleccionado.telefono} • Email: ${candidatoSeleccionado.email}`;
+
+            // Renderizar documentos
+            const docsContainer = document.getElementById('detail-docs-container');
+            docsContainer.innerHTML = '';
+
+            candidatoSeleccionado.documentos.forEach(doc => {
+                const title = docTitles[doc.tipo_documento] || doc.tipo_documento.toUpperCase();
+                let statusBadge = '<span class="material-symbols-outlined text-secondary-container">warning</span>';
+                let isPdf = doc.nombre_archivo.toLowerCase().endsWith('.pdf');
+
+                let statusText = '';
+                if (doc.estado === 'aprobado') {
+                    statusBadge = '<span class="material-symbols-outlined text-primary">check_circle</span>';
+                    statusText = '<span class="text-primary text-xs font-bold">Aprobado</span>';
+                } else if (doc.estado === 'rechazado') {
+                    statusBadge = '<span class="material-symbols-outlined text-error">cancel</span>';
+                    statusText = `<span class="text-error text-xs font-bold">Rechazado: ${doc.motivo_rechazo || ''}</span>`;
+                }
+
+                const cardHtml = `
+                    <div class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="font-label-bold text-sm">${title}</span>
+                                ${statusBadge}
+                            </div>
+                            <div class="aspect-video bg-surface-variant rounded-lg mb-gutter overflow-hidden relative flex items-center justify-center">
+                                ${isPdf ? 
+                                    `<div class="flex flex-col items-center p-4 text-center">
+                                        <span class="material-symbols-outlined text-primary text-4xl">picture_as_pdf</span>
+                                        <a href="api/usuarios/documentos/archivo/${doc.id}" target="_blank" class="text-xs text-primary font-bold hover:underline mt-1">Ver PDF</a>
+                                    </div>` : 
+                                    `<img class="w-full h-full object-cover cursor-pointer" src="api/usuarios/documentos/archivo/${doc.id}" onclick="window.open('api/usuarios/documentos/archivo/${doc.id}', '_blank')"/>`
+                                }
+                            </div>
+                            <div class="mb-2 text-right">${statusText}</div>
+                        </div>
+                        ${doc.estado === 'pendiente' ? `
+                            <div class="flex gap-2">
+                                <button onclick="revisarDocumento(${doc.id}, 'rechazar')" class="flex-1 border border-error text-error py-1.5 rounded font-label-sm hover:bg-error-container snappy-transition">Rechazar</button>
+                                <button onclick="revisarDocumento(${doc.id}, 'aprobar')" class="flex-1 bg-primary-container text-on-primary-container py-1.5 rounded font-label-sm hover:opacity-90 snappy-transition">Aprobar</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                docsContainer.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        async function revisarDocumento(docId, accion) {
+            let motivo = null;
+            if (accion === 'rechazar') {
+                motivo = prompt("Ingresa el motivo de rechazo del documento:");
+                if (!motivo) return; // Cancelado
+            }
+
+            const adminUser = JSON.parse(localStorage.getItem('usuario') || '{}');
+
+            try {
+                const response = await fetch('api/admin/documentos/revisar', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        documento_id: docId,
+                        accion: accion,
+                        motivo_rechazo: motivo,
+                        admin_id: adminUser.id || null
+                    })
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    alert(`Documento ${accion === 'aprobar' ? 'aprobado' : 'rechazado'} correctamente.`);
+                    candidatoSeleccionado = null;
+                    cargarCandidatosPendientes();
+                } else {
+                    alert("Error: " + (result.message || "No se pudo actualizar el documento."));
+                }
+            } catch (error) {
+                console.error("Error revisando documento:", error);
+                alert("Error de conexión al revisar el documento.");
+            }
+        }
+
+        // Cargar candidatos al inicio
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarCandidatosPendientes();
+        });
     </script>
 </body></html>
