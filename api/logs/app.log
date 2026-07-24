@@ -1,0 +1,2 @@
+{"timestamp":"2026-07-24T17:59:43.000+02:00","level":"INFO","message":"Prueba de log de información","correlation_id":"test-uuid-1784908783","method":"CLI","uri":"N/A","ip":"127.0.0.1","user_id":null,"user_role":null,"context":{"correlation_id":"test-uuid-1784908783","modulo":"test"}}
+{"timestamp":"2026-07-24T17:59:43.000+02:00","level":"ERROR","message":"Prueba de log de error simulado","correlation_id":"test-uuid-1784908783","method":"CLI","uri":"N/A","ip":"127.0.0.1","user_id":null,"user_role":null,"context":{"correlation_id":"test-uuid-1784908783","modulo":"test"}}

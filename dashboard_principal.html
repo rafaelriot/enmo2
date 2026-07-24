@@ -225,6 +225,42 @@
   </div>
 </div>
 </section>
+
+<!-- System Health & Observability Section -->
+<section class="mb-md">
+  <div class="flex items-center justify-between mb-sm">
+    <h2 class="font-title-md text-title-md text-on-surface flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">monitor_heart</span>
+      Salud del Sistema y Observabilidad
+    </h2>
+    <button onclick="cargarLogsObservabilidad()" class="text-xs font-label-bold text-primary hover:underline flex items-center gap-1">
+      <span class="material-symbols-outlined text-sm">refresh</span> Actualizar
+    </button>
+  </div>
+  
+  <div class="bg-surface-container-lowest p-md rounded-2xl border border-surface-container-high custom-shadow space-y-4">
+    <!-- Status Metrics Grid -->
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div class="bg-surface-container-low p-3 rounded-xl">
+        <p class="text-[10px] uppercase font-bold text-on-surface-variant">API Latencia</p>
+        <p class="font-title-md text-primary font-black mt-1" id="metric-latency">-- ms</p>
+      </div>
+      <div class="bg-surface-container-low p-3 rounded-xl">
+        <p class="text-[10px] uppercase font-bold text-on-surface-variant">Base de Datos</p>
+        <p class="font-title-md text-primary font-black mt-1" id="metric-db">OK</p>
+      </div>
+      <div class="bg-surface-container-low p-3 rounded-xl">
+        <p class="text-[10px] uppercase font-bold text-on-surface-variant">Logs Totales</p>
+        <p class="font-title-md text-on-surface font-black mt-1" id="metric-log-count">0</p>
+      </div>
+    </div>
+
+    <!-- Live Log Console -->
+    <div class="bg-on-background text-primary-fixed p-3 rounded-xl font-mono text-[11px] h-48 overflow-y-auto space-y-1 select-all" id="obs-log-console">
+      <p class="text-white/50 italic text-center py-4">Cargando eventos de observabilidad...</p>
+    </div>
+  </div>
+</section>
 </main>
 
 <!-- Bottom Navigation Bar -->
@@ -577,6 +613,45 @@
         }
     }
 
+    // 9. Cargar y mostrar logs de observabilidad en tiempo real
+    async function cargarLogsObservabilidad() {
+        const consoleEl = document.getElementById('obs-log-console');
+        const metricLatency = document.getElementById('metric-latency');
+        const metricLogCount = document.getElementById('metric-log-count');
+
+        try {
+            const startFetch = performance.now();
+            const res = await fetch('api/admin/observabilidad/logs', {
+                headers: getAuthHeaders()
+            });
+            const endFetch = performance.now();
+            const responseTimeHeader = res.headers.get('X-Response-Time-Ms');
+            if (metricLatency) metricLatency.textContent = responseTimeHeader ? `${Math.round(responseTimeHeader)} ms` : `${Math.round(endFetch - startFetch)} ms`;
+
+            const result = await res.json();
+            if (res.ok && result.status === 'success') {
+                if (metricLogCount) metricLogCount.textContent = result.total;
+                const logs = result.data;
+                if (!consoleEl) return;
+                if (logs.length === 0) {
+                    consoleEl.innerHTML = '<p class="text-white/50 italic text-center py-4">No hay eventos registrados aún.</p>';
+                } else {
+                    consoleEl.innerHTML = logs.map(l => {
+                        let colorClass = 'text-green-400';
+                        if (l.level === 'WARNING') colorClass = 'text-amber-400';
+                        if (l.level === 'ERROR' || l.level === 'CRITICAL') colorClass = 'text-red-400 font-bold';
+                        const timeStr = l.timestamp ? l.timestamp.substring(11, 19) : '';
+                        const cidShort = l.correlation_id ? l.correlation_id.substring(0, 8) : 'sys';
+                        return `<div class="hover:bg-white/10 px-1 py-0.5 rounded transition-colors"><span class="text-white/40">[${timeStr}]</span> <span class="text-secondary-fixed">[${cidShort}]</span> <span class="${colorClass}">${l.level}</span>: ${l.message}</div>`;
+                    }).join('');
+                }
+            }
+        } catch (err) {
+            console.error("Error cargando logs de observabilidad:", err);
+            if (consoleEl) consoleEl.innerHTML = '<p class="text-error text-center py-4">Error de conexión con el servicio de observabilidad.</p>';
+        }
+    }
+
     // 8. Cargas iniciales y bucles (cada 8 segundos)
     function inicializarDashboard() {
         const usuario = checkAuth();
@@ -588,11 +663,13 @@
         cargarListadoPedidos();
         actualizarMiniMapa();
         cargarGraficos();
+        cargarLogsObservabilidad();
 
         setInterval(cargarEstadisticas, 8000);
         setInterval(cargarListadoPedidos, 8000);
         setInterval(actualizarMiniMapa, 8000);
         setInterval(cargarGraficos, 16000); // Gráficos se actualizan cada 16 segundos
+        setInterval(cargarLogsObservabilidad, 15000);
     }
 
     inicializarDashboard();

@@ -404,4 +404,35 @@ $app->group('/api/admin', function ($group) {
         }
     });
 
+    // ========================================================
+    // OBSERVABILIDAD Y SALUD DEL SISTEMA
+    // ========================================================
+
+    // Obtener los logs más recientes del sistema (GET /api/admin/observabilidad/logs)
+    $group->get('/observabilidad/logs', function (Request $request, Response $response) {
+        $logs = App\Logger::getRecentLogs(100);
+        $response->getBody()->write(json_encode([
+            "status" => "success",
+            "total" => count($logs),
+            "data" => $logs
+        ]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    });
+
 });
+
+// Endpoint público para reporte de errores JS del cliente (POST /api/observabilidad/client-log)
+$app->post('/api/observabilidad/client-log', function (Request $request, Response $response) {
+    $data = json_decode($request->getBody()->getContents(), true);
+    $mensaje = $data['mensaje'] ?? 'Error JS desconocido en el cliente';
+    $context = $data['context'] ?? [];
+
+    App\Logger::error("[CLIENT-JS] " . $mensaje, $context);
+
+    $response->getBody()->write(json_encode([
+        "status" => "success",
+        "message" => "Log recibido."
+    ]));
+    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+});
+

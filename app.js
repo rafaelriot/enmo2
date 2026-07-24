@@ -1,12 +1,48 @@
-// Helper para obtener headers de autenticación con JWT
+// Generar o recuperar Correlation ID para rastreo end-to-end por sesión
+function getCorrelationId() {
+    let cid = sessionStorage.getItem('correlation_id');
+    if (!cid) {
+        cid = 'client-' + Math.random().toString(36).substring(2, 11) + '-' + Date.now();
+        sessionStorage.setItem('correlation_id', cid);
+    }
+    return cid;
+}
+
+// Helper para obtener headers de autenticación con JWT y Correlation-ID
 function getAuthHeaders(extraHeaders = {}) {
     const token = localStorage.getItem('token');
-    const headers = { ...extraHeaders };
+    const headers = {
+        'X-Correlation-ID': getCorrelationId(),
+        ...extraHeaders
+    };
     if (token) {
         headers['Authorization'] = 'Bearer ' + token;
     }
     return headers;
 }
+
+// Global Client Observability: Captura de errores no atrapados en el navegador
+window.addEventListener('error', function(event) {
+    const errorData = {
+        mensaje: event.message || 'Error JS',
+        context: {
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno,
+            url: window.location.href,
+            user: localStorage.getItem('usuario') ? JSON.parse(localStorage.getItem('usuario')).email : 'Anon'
+        }
+    };
+    
+    // Enviar silenciosamente al backend de observabilidad
+    try {
+        fetch('api/observabilidad/client-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(errorData)
+        }).catch(() => {});
+    } catch(e) {}
+});
 
 // Redireccionar al login si no tiene sesión activa
 function checkAuth() {
