@@ -637,12 +637,18 @@
                     consoleEl.innerHTML = '<p class="text-white/50 italic text-center py-4">No hay eventos registrados aún.</p>';
                 } else {
                     consoleEl.innerHTML = logs.map(l => {
-                        let colorClass = 'text-green-400';
-                        if (l.level === 'WARNING') colorClass = 'text-amber-400';
+                        let colorClass = 'text-emerald-400 font-bold';
+                        if (l.level === 'WARNING') colorClass = 'text-amber-400 font-bold';
                         if (l.level === 'ERROR' || l.level === 'CRITICAL') colorClass = 'text-red-400 font-bold';
-                        const timeStr = l.timestamp ? l.timestamp.substring(11, 19) : '';
+                        const timeStr = l.timestamp ? l.timestamp.substring(11, 19) : '--:--:--';
                         const cidShort = l.correlation_id ? l.correlation_id.substring(0, 8) : 'sys';
-                        return `<div class="hover:bg-white/10 px-1 py-0.5 rounded transition-colors"><span class="text-white/40">[${timeStr}]</span> <span class="text-secondary-fixed">[${cidShort}]</span> <span class="${colorClass}">${l.level}</span>: ${l.message}</div>`;
+                        const msgClean = (l.message || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                        return `<div class="hover:bg-white/10 px-2 py-1 rounded transition-colors flex items-center gap-2 text-[11px] whitespace-nowrap font-mono">
+                            <span class="text-white/40 font-mono">${timeStr}</span>
+                            <span class="text-secondary-container font-bold font-mono">[${cidShort}]</span>
+                            <span class="${colorClass} uppercase w-12 font-mono">${l.level}</span>
+                            <span class="text-white/90 font-mono truncate" title="${msgClean}">${msgClean}</span>
+                        </div>`;
                     }).join('');
                 }
             }
