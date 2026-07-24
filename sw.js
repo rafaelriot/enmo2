@@ -1,4 +1,4 @@
-const CACHE_NAME = 'enmo2-cache-v6';
+const CACHE_NAME = 'enmo2-cache-v7';
 const STATIC_ASSETS = [
   './manifest.json',
   './tailwind-config.js',

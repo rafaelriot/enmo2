@@ -715,8 +715,6 @@
     function inicializarDashboard() {
         const usuario = checkAuth();
         if (!usuario) return;
-        
-        setupBottomNavigation(usuario);
 
         // Configurar avatar y datos del sidebar
         if (usuario.nombre) {

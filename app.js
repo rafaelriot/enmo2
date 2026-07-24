@@ -258,7 +258,8 @@ function setupSidebar(usuario) {
 
 // Configuración común de navegación inferior
 function setupBottomNavigation(usuario) {
-    const bottomNav = document.querySelector('nav.bottom-nav, nav[id*="bottom"]');
+    // Buscar la barra de navegación inferior explícita, ignorando siempre el menú lateral de aside/#sidebar
+    const bottomNav = document.querySelector('nav.bottom-nav, nav[id*="bottom"]:not(#sidebar nav)');
     if (!bottomNav || !usuario) return;
 
     const currentPath = window.location.pathname;
