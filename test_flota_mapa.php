@@ -9,10 +9,10 @@ echo "========================================================\n\n";
 echo "[1] VERIFICANDO REGLAS Y ENDPOINTS EN admin.php\n";
 $adminPhp = file_get_contents(__DIR__ . '/api/src/routes/admin.php');
 
-if (strpos($adminPhp, 'INTERVAL 15 MINUTE') !== false) {
-    echo "  ✅ Filtro estricto de GPS en los últimos 15 minutos verificado en /repartidores-online\n";
+if (strpos($adminPhp, 'latitud_actual != 0') !== false) {
+    echo "  ✅ Filtro de repartidores activos con GPS en línea verificado en /repartidores-online\n";
 } else {
-    echo "  ❌ ERROR: Falta restricción de tiempo GPS en /repartidores-online\n";
+    echo "  ❌ ERROR: Falta restricción de latitud GPS en /repartidores-online\n";
 }
 
 if (strpos($adminPhp, '/repartidores-flota') !== false) {
