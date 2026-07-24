@@ -134,17 +134,21 @@ $app->group('/api/admin', function ($group) {
         }
     });
 
-    // Obtener todos los repartidores activos/online y sus ubicaciones (Optimizado sin N+1)
+    // Obtener todos los repartidores activos/online y sus ubicaciones reales en tiempo real (GPS < 15 min)
     $group->get('/repartidores-online', function (Request $request, Response $response) {
         try {
             $dbObj = new Db();
             $db = $dbObj->connect();
 
-            // Seleccionar repartidores que tengan coordenadas válidas y calcular su estado de ocupación en una sola consulta
-            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.latitud_actual AS latitud, u.longitud_actual AS longitud, u.estado,
+            // Seleccionar únicamente repartidores activos con coordenadas vigentes (actualizadas en los últimos 15 minutos)
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.latitud_actual AS latitud, u.longitud_actual AS longitud, u.estado, u.foto_url, u.updated_at,
                            (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) > 0 AS ocupado
                     FROM usuarios u
-                    WHERE u.rol = 'repartidor' AND u.estado = 'activo' AND u.latitud_actual != 0 AND u.longitud_actual != 0";
+                    WHERE u.rol = 'repartidor' 
+                      AND u.estado = 'activo' 
+                      AND u.latitud_actual != 0 
+                      AND u.longitud_actual != 0
+                      AND u.updated_at >= NOW() - INTERVAL 15 MINUTE";
             $stmt = $db->query($sql);
             $repartidores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -158,6 +162,51 @@ $app->group('/api/admin', function ($group) {
                 "data" => $repartidores
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error de base de datos: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Obtener toda la flota de repartidores registrados con sus estados reales (GET /api/admin/repartidores-flota)
+    $group->get('/repartidores-flota', function (Request $request, Response $response) {
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado AS estado_cuenta, u.latitud_actual, u.longitud_actual, u.updated_at,
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) > 0 AS ocupado,
+                           (u.latitud_actual != 0 AND u.longitud_actual != 0 AND u.updated_at >= NOW() - INTERVAL 15 MINUTE) AS is_online,
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado = 'entregado') AS total_viajes
+                    FROM usuarios u
+                    WHERE u.rol = 'repartidor'
+                    ORDER BY is_online DESC, u.nombre ASC";
+            $stmt = $db->query($sql);
+            $flota = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($flota as &$rep) {
+                $rep['ocupado'] = (bool)$rep['ocupado'];
+                $rep['is_online'] = (bool)$rep['is_online'];
+                
+                // Determinar estado de conexión humano
+                if ($rep['estado_cuenta'] !== 'activo') {
+                    $rep['estado_conexion'] = 'inactivo';
+                } else if ($rep['is_online']) {
+                    $rep['estado_conexion'] = $rep['ocupado'] ? 'en_ruta' : 'en_linea';
+                } else {
+                    $rep['estado_conexion'] = 'desconectado';
+                }
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => $flota
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
         } catch (PDOException $e) {
             $response->getBody()->write(json_encode([
                 "status" => "error",

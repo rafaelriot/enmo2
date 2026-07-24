@@ -578,7 +578,7 @@
         renderizarPedidos();
     });
 
-    // 7. Cargar repartidores en mini mapa
+    // 7. Cargar repartidores en mini mapa (solo los realmente conectados en línea)
     async function actualizarMiniMapa() {
         try {
             const response = await fetch('api/admin/repartidores-online', {
@@ -588,6 +588,16 @@
             if (response.ok && result.status === 'success') {
                 const repartidores = result.data;
                 document.getElementById('map-repartidores-count').textContent = `${repartidores.length} Repartidores Activos`;
+
+                const activeIds = new Set(repartidores.map(r => r.id));
+
+                // Remover marcadores de repartidores que se hayan desconectado
+                Object.keys(riderMarkers).forEach(id => {
+                    if (!activeIds.has(parseInt(id))) {
+                        map.removeLayer(riderMarkers[id]);
+                        delete riderMarkers[id];
+                    }
+                });
 
                 repartidores.forEach(rep => {
                     const lat = parseFloat(rep.latitud);

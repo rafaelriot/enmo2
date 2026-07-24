@@ -333,6 +333,15 @@
             const result = await response.json();
 
             if (response.ok && result.status === 'success') {
+                const activeIds = new Set(result.data.map(r => r.id));
+
+                Object.keys(riderMarkers).forEach(id => {
+                    if (!activeIds.has(parseInt(id))) {
+                        map.removeLayer(riderMarkers[id]);
+                        delete riderMarkers[id];
+                    }
+                });
+
                 result.data.forEach(rep => {
                     const lat = parseFloat(rep.latitud);
                     const lng = parseFloat(rep.longitud);

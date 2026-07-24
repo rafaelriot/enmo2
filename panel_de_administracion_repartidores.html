@@ -196,91 +196,17 @@
 <div class="flex flex-col md:flex-row gap-gutter items-center mb-lg">
 <div class="relative w-full md:w-96">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border-2 border-transparent focus:border-primary rounded-xl outline-none shadow-sm transition-all font-body-md" placeholder="Buscar repartidor por nombre o placa..." type="text"/>
+<input id="input-buscar-flota" class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border-2 border-transparent focus:border-primary rounded-xl outline-none shadow-sm transition-all font-body-md" placeholder="Buscar repartidor por nombre, correo o teléfono..." type="text"/>
 </div>
 <div class="flex gap-2 w-full md:w-auto">
-<button class="flex-1 md:flex-none px-6 py-2 bg-primary text-on-primary rounded-lg font-label-bold">Todos</button>
-<button class="flex-1 md:flex-none px-6 py-2 bg-surface-container-highest text-on-surface-variant rounded-lg font-label-bold hover:bg-surface-variant transition-all">Activos</button>
-<button class="flex-1 md:flex-none px-6 py-2 bg-surface-container-highest text-on-surface-variant rounded-lg font-label-bold hover:bg-surface-variant transition-all">Inactivos</button>
+<button onclick="filtrarFlota('todos')" id="btn-flota-todos" class="flex-1 md:flex-none px-6 py-2 bg-primary text-on-primary rounded-lg font-label-bold">Todos</button>
+<button onclick="filtrarFlota('online')" id="btn-flota-online" class="flex-1 md:flex-none px-6 py-2 bg-surface-container-highest text-on-surface-variant rounded-lg font-label-bold hover:bg-surface-variant transition-all">En Línea</button>
+<button onclick="filtrarFlota('desconectado')" id="btn-flota-desconectado" class="flex-1 md:flex-none px-6 py-2 bg-surface-container-highest text-on-surface-variant rounded-lg font-label-bold hover:bg-surface-variant transition-all">Desconectados</button>
 </div>
 </div>
 <!-- Fleet Bento Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-<!-- Driver Card 1 -->
-<div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm border-l-4 border-primary speed-line-green hover:shadow-md transition-all">
-<div class="flex justify-between mb-sm">
-<div class="flex items-center gap-3">
-<div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A portrait of a male delivery driver in a professional green enMo2 uniform, smiling confidently. He is outdoors in a vibrant urban setting during the golden hour, with soft warm light hitting his face. High-energy, optimistic aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZBwwbQtLSwEhbitnScbwJKrLCG-Pp_eLbVNH3XT6WFqmtzZt3vIA0IqjDFvL5hL1YRsIE4EnkaSnfOBee_hK7rAx4K2hB9CZSzH4oXGG5lVSNHD20qyC4SIyg85ePJfHHeop7vyO_NawdwC9jtaSJYMygUBngPA1pXAIf8H6-RWWTp62VATHU9S_ar--H_aAftlx-DnDw2BlCH_iMzKDgadSRKpBkW_uIE1gFGGcBqmx3bd7otGxEaD-iLcXiIe1KQs2sVVSiy_XE"/>
-</div>
-<div>
-<p class="font-label-bold">Mario Silva</p>
-<p class="text-label-sm text-on-surface-variant">Italika 250Z • ABC-123</p>
-</div>
-</div>
-<div class="text-right">
-<span class="inline-block px-2 py-1 bg-primary/10 text-primary rounded text-[10px] font-bold">ACTIVO</span>
-<p class="text-[10px] text-on-surface-variant mt-1">4.9 ★ (1.2k viajes)</p>
-</div>
-</div>
-<div class="h-1 bg-surface-container rounded-full overflow-hidden mb-2">
-<div class="h-full bg-primary w-[85%]"></div>
-</div>
-<div class="flex justify-between text-[10px] font-label-bold uppercase text-on-surface-variant">
-<span>En Ruta</span>
-<span class="text-primary">Entrega Próxima</span>
-</div>
-</div>
-<!-- Driver Card 2 -->
-<div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm border-l-4 border-secondary-container speed-line-yellow hover:shadow-md transition-all">
-<div class="flex justify-between mb-sm">
-<div class="flex items-center gap-3">
-<div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A professional portrait of a female delivery driver with a bright yellow enMo2 helmet resting on her arm. She is standing next to a modern electric scooter in a clean, brightly lit warehouse environment. High-performance utility aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcdaz0bXTnwF5kcp044z86gN3WzwYxP-kD3pRx62LBycAlowpZM-hNmj1WBH28oYoTSD_u6ZoiK46LJ9pQ0L1NITXSk5aK82RWgCkK-19uhCXvYP85evyeaYGcu2ZJRSHRo4pXSb5ztzSadmLknkqhaFD6r2vitVndSy7MQrol_ridGYKc4o5X9hLu26-bK2gKcaQEeyLLEmNVuVaX-Qnc2yZo_N5fLb4EhV_ncHPu1QjjA-_3oIgABvW0ZPgKANGQa--3mBYKSKz-"/>
-</div>
-<div>
-<p class="font-label-bold">Lucía Mendez</p>
-<p class="text-label-sm text-on-surface-variant">Yamaha R15 • XYZ-987</p>
-</div>
-</div>
-<div class="text-right">
-<span class="inline-block px-2 py-1 bg-secondary-container/20 text-on-secondary-container rounded text-[10px] font-bold uppercase">En Descanso</span>
-<p class="text-[10px] text-on-surface-variant mt-1">4.7 ★ (850 viajes)</p>
-</div>
-</div>
-<div class="h-1 bg-surface-container rounded-full overflow-hidden mb-2">
-<div class="h-full bg-secondary-container w-[10%]"></div>
-</div>
-<div class="flex justify-between text-[10px] font-label-bold uppercase text-on-surface-variant">
-<span>Estado</span>
-<span>Disponible en 20m</span>
-</div>
-</div>
-<!-- Driver Card 3 -->
-<div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm border-l-4 border-tertiary-container speed-line-orange hover:shadow-md transition-all opacity-80">
-<div class="flex justify-between mb-sm">
-<div class="flex items-center gap-3">
-<div class="w-12 h-12 rounded-full bg-surface-variant overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="A dramatic profile shot of a delivery driver silhouette against a sunset-colored urban skyline. The colors are deep orange and navy blue, emphasizing a sense of high-speed movement and professional momentum. High-contrast outlines style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq0TvkmS4095_CeO5o_q3UmG82yTFNtQ7kse44GqJcQZGbsnlsT_6abmvXAGrdPG6XfHaj64I0F96-AQzg469DVPpIHXNdmzMeLKArHm51i-_HG_Dj7nqwv4PQ4Zpfg-QyNhTQY-tkgTmfmkUmueXFrj92zYL1vgTJGv1HgexhOSgdaIfSKPp9pR3npXcsWFeyatXzSLI7LhAOMXe1o-jjD8xxMKfdFgNTdCkfjR9Za9Xe4zApZU5N0yagX0nEsa7fZHxv72kJgoha"/>
-</div>
-<div>
-<p class="font-label-bold">Roberto Juárez</p>
-<p class="text-label-sm text-on-surface-variant">Vento Rocketman • RKT-456</p>
-</div>
-</div>
-<div class="text-right">
-<span class="inline-block px-2 py-1 bg-error-container text-on-error-container rounded text-[10px] font-bold uppercase">Inactivo</span>
-<p class="text-[10px] text-on-surface-variant mt-1">4.5 ★ (300 viajes)</p>
-</div>
-</div>
-<div class="h-1 bg-surface-container rounded-full overflow-hidden mb-2">
-<div class="h-full bg-error w-0"></div>
-</div>
-<div class="flex justify-between text-[10px] font-label-bold uppercase text-on-surface-variant">
-<span>Sin Conexión</span>
-<span class="text-error">Reportado</span>
-</div>
-</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="flota-container">
+  <p class="text-on-surface-variant text-sm py-8 text-center col-span-full">Cargando flota de repartidores...</p>
 </div>
 </section>
 </main>
@@ -493,9 +419,140 @@
             }
         }
 
-        // Cargar candidatos al inicio
+        // ─── LÓGICA DE FLOTA COMPLETA EN TIEMPO REAL ───
+        let flotaCompleta = [];
+        let filtroFlotaActual = 'todos';
+
+        async function cargarFlotaRepartidores() {
+            const container = document.getElementById('flota-container');
+            container.innerHTML = '<p class="text-on-surface-variant text-sm py-8 text-center col-span-full">Cargando flota de repartidores...</p>';
+
+            try {
+                const response = await fetch('api/admin/repartidores-flota', {
+                    headers: getAuthHeaders()
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    flotaCompleta = result.data;
+                    renderizarFlota();
+                } else {
+                    container.innerHTML = `<p class="text-error text-sm py-8 text-center col-span-full">${result.message || 'Error al obtener flota.'}</p>`;
+                }
+            } catch (err) {
+                console.error("Error al cargar flota:", err);
+                container.innerHTML = '<p class="text-error text-sm py-8 text-center col-span-full">Error de conexión al cargar la flota.</p>';
+            }
+        }
+
+        function filtrarFlota(tipo) {
+            filtroFlotaActual = tipo;
+            ['todos', 'online', 'desconectado'].forEach(t => {
+                const btn = document.getElementById(`btn-flota-${t}`);
+                if (!btn) return;
+                if (t === tipo) {
+                    btn.className = 'flex-1 md:flex-none px-6 py-2 bg-primary text-on-primary rounded-lg font-label-bold';
+                } else {
+                    btn.className = 'flex-1 md:flex-none px-6 py-2 bg-surface-container-highest text-on-surface-variant rounded-lg font-label-bold hover:bg-surface-variant transition-all';
+                }
+            });
+            renderizarFlota();
+        }
+
+        function renderizarFlota() {
+            const container = document.getElementById('flota-container');
+            const searchInput = document.getElementById('input-buscar-flota');
+            const busqueda = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+            let filtrados = flotaCompleta.filter(r => {
+                const matchTexto = r.nombre.toLowerCase().includes(busqueda) || 
+                                   (r.email && r.email.toLowerCase().includes(busqueda)) || 
+                                   (r.telefono && r.telefono.includes(busqueda));
+
+                if (!matchTexto) return false;
+
+                if (filtroFlotaActual === 'online') {
+                    return r.is_online;
+                } else if (filtroFlotaActual === 'desconectado') {
+                    return !r.is_online;
+                }
+                return true; // todos
+            });
+
+            if (filtrados.length === 0) {
+                container.innerHTML = '<p class="text-on-surface-variant text-sm py-8 text-center col-span-full">No se encontraron repartidores con los criterios especificados.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            filtrados.forEach(r => {
+                let badgeColor = 'bg-outline/20 text-outline';
+                let badgeText = 'DESCONECTADO';
+                let borderSpeed = 'border-outline-variant';
+                let subText = 'Sin señal GPS reciente';
+
+                if (r.estado_cuenta !== 'activo') {
+                    badgeColor = 'bg-error-container text-on-error-container';
+                    badgeText = 'SUSPENDIDO / INACTIVO';
+                    borderSpeed = 'border-error';
+                    subText = 'Cuenta inhabilitada';
+                } else if (r.is_online) {
+                    if (r.ocupado) {
+                        badgeColor = 'bg-amber-500/20 text-amber-600 font-black';
+                        badgeText = 'EN RUTA (OCUPADO)';
+                        borderSpeed = 'border-amber-500 speed-line-yellow';
+                        subText = 'Realizando pedido activo';
+                    } else {
+                        badgeColor = 'bg-emerald-500/20 text-emerald-600 font-black';
+                        badgeText = 'EN LÍNEA (DISPONIBLE)';
+                        borderSpeed = 'border-emerald-500 speed-line-green';
+                        subText = 'Aparece en Mapa de Operaciones';
+                    }
+                }
+
+                const iniciales = r.nombre ? r.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase() : 'RP';
+
+                const avatarHtml = r.foto_url ? 
+                    `<img class="w-full h-full object-cover" src="${r.foto_url}" />` :
+                    `<div class="w-full h-full bg-primary-container text-on-primary-container font-black text-sm flex items-center justify-center">${iniciales}</div>`;
+
+                const cardHtml = `
+                    <div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm border-l-4 ${borderSpeed} hover:shadow-md transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-sm">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-surface-container-high">
+                                        ${avatarHtml}
+                                    </div>
+                                    <div>
+                                        <p class="font-label-bold text-on-surface">${r.nombre}</p>
+                                        <p class="text-label-sm text-on-surface-variant">${r.telefono || 'Sin tel.'}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <span class="inline-block px-2 py-1 ${badgeColor} rounded text-[9px] uppercase tracking-wider">${badgeText}</span>
+                                    <p class="text-[10px] text-on-surface-variant mt-1 font-bold">${r.total_viajes || 0} viajes realizados</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 pt-3 border-t border-surface-container-high flex justify-between items-center text-[10px] font-label-bold uppercase text-on-surface-variant">
+                            <span class="truncate">${subText}</span>
+                            <span class="text-primary font-bold">ID: #${r.id}</span>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        // Listener para búsqueda en tiempo real en la flota
+        document.getElementById('input-buscar-flota')?.addEventListener('input', renderizarFlota);
+
+        // Cargar candidatos al inicio y flota
         document.addEventListener('DOMContentLoaded', () => {
             cargarCandidatosPendientes();
+            cargarFlotaRepartidores();
         });
     </script>
 </body></html>
