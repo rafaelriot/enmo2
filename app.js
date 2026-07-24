@@ -234,10 +234,10 @@ function setupSidebar(usuario) {
                 ];
             } else if (usuario.rol === 'administrador') {
                 links = [
-                    { icon: 'dashboard', label: 'Dashboard', href: 'dashboard_principal.html', active: currentPath.includes('dashboard_principal') },
-                    { icon: 'history', label: 'Historial', href: 'historial_pedidos.html', active: currentPath.includes('historial_pedidos') },
+                    { icon: 'home', label: 'Dashboard Inicio', href: 'dashboard_principal.html', active: currentPath.includes('dashboard_principal') },
+                    { icon: 'two_wheeler', label: 'Gestión Repartidores', href: 'panel_de_administracion_repartidores.html', active: currentPath.includes('panel_de_administracion_repartidores') },
+                    { icon: 'group', label: 'Gestión Clientes', href: 'gestion_de_clientes.html', active: currentPath.includes('gestion_de_clientes') },
                     { icon: 'map', label: 'Mapa en Vivo', href: 'mapa_en_vivo.html', active: currentPath.includes('mapa_en_vivo') },
-                    { icon: 'list_alt', label: 'Pedidos', href: 'gestion_de_pedidos.html', active: currentPath.includes('gestion_de_pedidos') },
                 ];
             } else {
                 links = [
