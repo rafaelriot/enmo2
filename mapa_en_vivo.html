@@ -564,8 +564,8 @@
     // ─── Arrancar el mapa según el rol ───────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
         if (usuario.nombre) {
-            const init = usuario.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
-            if (document.getElementById('sidebar-avatar')) document.getElementById('sidebar-avatar').textContent = init;
+            const sidebarAvatarContainer = document.getElementById('sidebar-avatar');
+            if (sidebarAvatarContainer) renderUserAvatar(usuario, sidebarAvatarContainer);
             if (document.getElementById('sidebar-user-name')) document.getElementById('sidebar-user-name').textContent = usuario.nombre;
             if (document.getElementById('sidebar-user-email')) document.getElementById('sidebar-user-email').textContent = usuario.email;
         }
