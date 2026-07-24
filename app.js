@@ -321,3 +321,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/**
+ * Renderiza el avatar de un usuario en un elemento contenedor dado.
+ * Si el usuario tiene foto_url (ej. Google OAuth), muestra la imagen real.
+ * De lo contrario, muestra las iniciales de su nombre o un ícono por defecto.
+ * 
+ * @param {HTMLElement|string} container - Elemento contenedor o ID
+ * @param {Object} user - Objeto con datos de usuario (nombre, foto_url)
+ * @param {string} defaultIcon - Nombre de ícono de Material Symbols (default: 'person')
+ */
+function renderUserAvatar(container, user, defaultIcon = 'person') {
+    const el = typeof container === 'string' ? document.getElementById(container) : container;
+    if (!el) return;
+
+    if (user && user.foto_url && user.foto_url.trim() !== '') {
+        el.innerHTML = `<img src="${user.foto_url}" class="w-full h-full object-cover rounded-full" alt="Avatar" referrerpolicy="no-referrer" onerror="this.onerror=null; renderUserAvatarFallback(this.parentElement, '${user.nombre || ''}', '${defaultIcon}')"/>`;
+        el.classList.remove('bg-primary-container', 'bg-surface-container-high', 'text-on-primary-container');
+        el.classList.add('overflow-hidden', 'bg-surface-container-high');
+    } else {
+        renderUserAvatarFallback(el, user ? user.nombre : '', defaultIcon);
+    }
+}
+
+function renderUserAvatarFallback(el, nombre, defaultIcon) {
+    if (!el) return;
+    if (nombre && nombre.trim() !== '') {
+        const iniciales = nombre.trim().split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+        el.innerHTML = `<span class="font-bold text-sm leading-none select-none">${iniciales}</span>`;
+        el.className = el.className.replace(/bg-[^\s]+/, '') + ' bg-primary-container text-on-primary-container flex items-center justify-center font-black';
+    } else {
+        el.innerHTML = `<span class="material-symbols-outlined text-xl">${defaultIcon}</span>`;
+        el.className = el.className.replace(/bg-[^\s]+/, '') + ' bg-surface-container-high text-on-surface-variant flex items-center justify-center';
+    }
+}
+

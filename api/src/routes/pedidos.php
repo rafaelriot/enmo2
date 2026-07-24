@@ -110,10 +110,11 @@ $app->group('/api/pedidos', function ($group) {
             $dbObj = new Db();
             $db = $dbObj->connect();
 
-            $sql = "SELECT p.*, u.nombre as repartidor_nombre, u.telefono as repartidor_telefono, u.latitud_actual as repartidor_lat, u.longitud_actual as repartidor_lng,
-                    p.cliente_telefono as cliente_telefono
+            $sql = "SELECT p.*, u.nombre as repartidor_nombre, u.telefono as repartidor_telefono, u.foto_url as repartidor_foto, u.latitud_actual as repartidor_lat, u.longitud_actual as repartidor_lng,
+                    p.cliente_telefono as cliente_telefono, u_cli.foto_url as cliente_foto
                     FROM pedidos p 
                     LEFT JOIN usuarios u ON p.repartidor_id = u.id 
+                    LEFT JOIN usuarios u_cli ON p.cliente_usuario_id = u_cli.id
                     WHERE p.id = :id 
                     LIMIT 1";
             $stmt = $db->prepare($sql);

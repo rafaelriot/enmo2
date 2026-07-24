@@ -30,7 +30,7 @@ $app->group('/api/usuarios', function ($group) {
             $db = $dbObj->connect();
 
             // Buscar usuario por correo electrónico o teléfono
-            $sql = "SELECT id, nombre, email, password, telefono, rol, estado 
+            $sql = "SELECT id, nombre, email, foto_url, password, telefono, rol, estado 
                     FROM usuarios 
                     WHERE email = :email OR telefono = :telefono 
                     LIMIT 1";
@@ -78,7 +78,7 @@ $app->group('/api/usuarios', function ($group) {
         } catch (PDOException $e) {
             $response->getBody()->write(json_encode([
                 "status" => "error",
-                "message" => "Error del servidor: " . $e->getMessage()
+                "message" => "Error de base de datos: " . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
@@ -91,6 +91,7 @@ $app->group('/api/usuarios', function ($group) {
         $email = trim($data['email'] ?? '');
         $nombre = trim($data['nombre'] ?? '');
         $google_id = trim($data['google_id'] ?? '');
+        $foto_url = trim($data['foto_url'] ?? '');
 
         if (empty($email) || empty($nombre)) {
             $response->getBody()->write(json_encode([
@@ -105,12 +106,20 @@ $app->group('/api/usuarios', function ($group) {
             $db = $dbObj->connect();
 
             // 1. Buscar si el correo ya existe
-            $sql = "SELECT id, nombre, email, telefono, rol, estado FROM usuarios WHERE email = :email LIMIT 1";
+            $sql = "SELECT id, nombre, email, foto_url, telefono, rol, estado FROM usuarios WHERE email = :email LIMIT 1";
             $stmt = $db->prepare($sql);
             $stmt->execute([':email' => $email]);
             $user = $stmt->fetch();
 
             if ($user) {
+                // Si viene foto_url de Google y cambió o no la tenía, actualizarla
+                if (!empty($foto_url) && $user['foto_url'] !== $foto_url) {
+                    $updateFotoSql = "UPDATE usuarios SET foto_url = :foto_url WHERE id = :id";
+                    $updateFotoStmt = $db->prepare($updateFotoSql);
+                    $updateFotoStmt->execute([':foto_url' => $foto_url, ':id' => $user['id']]);
+                    $user['foto_url'] = $foto_url;
+                }
+
                 // Generar Token JWT para Google login
                 $secretKey = getenv('JWT_SECRET') ?: ($_ENV['JWT_SECRET'] ?? 'super-secret-key-change-in-production-123456');
                 $payload = [
@@ -140,12 +149,13 @@ $app->group('/api/usuarios', function ($group) {
             $telefonoDummy = '9990000000';
             $passwordDummy = password_hash(bin2hex(random_bytes(10)), PASSWORD_DEFAULT);
 
-            $insertSql = "INSERT INTO usuarios (nombre, email, telefono, password, rol, estado)
-                          VALUES (:nombre, :email, :telefono, :password, 'cliente', 'activo')";
+            $insertSql = "INSERT INTO usuarios (nombre, email, foto_url, telefono, password, rol, estado)
+                          VALUES (:nombre, :email, :foto_url, :telefono, :password, 'cliente', 'activo')";
             $insertStmt = $db->prepare($insertSql);
             $insertStmt->execute([
                 ':nombre' => $nombre,
                 ':email' => $email,
+                ':foto_url' => !empty($foto_url) ? $foto_url : null,
                 ':telefono' => $telefonoDummy,
                 ':password' => $passwordDummy
             ]);
@@ -168,11 +178,12 @@ $app->group('/api/usuarios', function ($group) {
 
             $response->getBody()->write(json_encode([
                 "status" => "success",
-                "message" => "Registro con Google exitoso.",
+                "message" => "Cuenta creada e inicio de sesión exitoso.",
                 "usuario" => [
                     "id" => (int)$nuevoId,
                     "nombre" => $nombre,
                     "email" => $email,
+                    "foto_url" => !empty($foto_url) ? $foto_url : null,
                     "telefono" => $telefonoDummy,
                     "rol" => "cliente",
                     "estado" => "activo"

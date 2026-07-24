@@ -308,12 +308,13 @@
             const email = payload.email;
             const nombre = payload.name;
             const google_id = payload.sub; // Identificador único de Google
+            const foto_url = payload.picture || ''; // Foto de perfil de Google
 
             try {
                 const apiRes = await fetch('api/usuarios/google-oauth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, nombre, google_id })
+                    body: JSON.stringify({ email, nombre, google_id, foto_url })
                 });
                 const rawText = await apiRes.text();
                 console.log("Respuesta bruta del servidor:", rawText);

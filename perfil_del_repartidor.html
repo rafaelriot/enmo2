@@ -189,8 +189,8 @@
 <div class="flex items-center justify-between mb-md">
 <div class="flex items-center gap-md">
 <div class="relative">
-<div class="w-24 h-24 rounded-full border-4 border-primary-container overflow-hidden shadow-lg">
-<img class="w-full h-full object-cover" data-alt="A high-quality studio portrait of a professional male delivery rider named Carlos Ruiz, wearing a grey enMo2 branded polo shirt. He is smiling warmly with a confident expression, set against a clean, light grey background that matches the modern logistics aesthetic. The lighting is soft and cinematic, highlighting his professional demeanor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf_9m_bXPKukWlpM339Fq5KuW00pqX1x-XUTIxDd56a2hkTNnuyoA-U6pn-1ApH5OhgkDBd4u6jbmsb5CwG7qUR4WqurjF-cI9Zjd4CGIykptbziBGOn9D7lWkcyxZDT2_c_K31MsMPWrIsWYJp3JDnC3XShEUP3KOlBYECA3anXQdyEHSH_XON5UUgaQnDcg-g-Rr4XB9EUnzhOcvoI0sVKfu4Ut8hJb0Ywfa_6k5bN3tOnV8p9t5C1lYo82Rcclx50LB9Baywipm"/>
+<div class="w-24 h-24 rounded-full border-4 border-primary-container shadow-lg flex items-center justify-center bg-primary-container text-on-primary-container text-2xl font-black" id="rider-hero-avatar">
+  ?
 </div>
 <div class="absolute -bottom-1 -right-1 bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
 <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>
@@ -308,12 +308,9 @@
         document.getElementById('sidebar-user-name').textContent = usuario.nombre;
         document.getElementById('sidebar-user-email').textContent = usuario.email;
 
-        // Colocar iniciales en el avatar
-        const inicialesAvatar = usuario.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
-        const avatarEl = document.getElementById('sidebar-user-avatar');
-        if (avatarEl) {
-            avatarEl.textContent = inicialesAvatar;
-        }
+        // Renderizar avatars dinámicos con foto de Google o fallback
+        renderUserAvatar('sidebar-user-avatar', usuario);
+        renderUserAvatar('rider-hero-avatar', usuario);
 
         // Control del menú lateral (Sidebar/Drawer)
         const btnMenu = document.getElementById('btn-menu');

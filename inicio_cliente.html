@@ -386,6 +386,7 @@
         document.getElementById('saludo-nombre').textContent = usuario.nombre.split(' ')[0] + ' 👋';
         document.getElementById('sidebar-user-name').textContent = usuario.nombre;
         document.getElementById('sidebar-user-email').textContent = usuario.email;
+        renderUserAvatar('sidebar-avatar', usuario);
         document.getElementById('sidebar-avatar').textContent = usuario.nombre.charAt(0).toUpperCase();
 
         // Drawer controls

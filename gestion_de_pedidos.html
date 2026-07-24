@@ -138,8 +138,8 @@
   
   <!-- User Profile Info in Sidebar -->
   <div class="flex items-center gap-3 p-4 bg-surface-container rounded-xl mb-6">
-    <div class="w-12 h-12 rounded-full bg-primary-container overflow-hidden">
-      <img class="w-full h-full object-cover" id="sidebar-user-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDf_9m_bXPKukWlpM339Fq5KuW00pqX1x-XUTIxDd56a2hkTNnuyoA-U6pn-1ApH5OhgkDBd4u6jbmsb5CwG7qUR4WqurjF-cI9Zjd4CGIykptbziBGOn9D7lWkcyxZDT2_c_K31MsMPWrIsWYJp3JDnC3XShEUP3KOlBYECA3anXQdyEHSH_XON5UUgaQnDcg-g-Rr4XB9EUnzhOcvoI0sVKfu4Ut8hJb0Ywfa_6k5bN3tOnV8p9t5C1lYo82Rcclx50LB9Baywipm"/>
+    <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm flex-shrink-0" id="sidebar-user-avatar">
+      ?
     </div>
     <div class="min-w-0 flex-grow">
       <h4 class="font-title-md text-sm text-on-surface truncate" id="sidebar-user-name">Usuario</h4>
@@ -336,6 +336,7 @@
             // Rellenar información del usuario en el sidebar
             document.getElementById('sidebar-user-name').textContent = usuario.nombre;
             document.getElementById('sidebar-user-email').textContent = usuario.email;
+            renderUserAvatar('sidebar-user-avatar', usuario);
             
             // Lógica para abrir/cerrar sidebar
             const btnMenu = document.getElementById('btn-menu');
