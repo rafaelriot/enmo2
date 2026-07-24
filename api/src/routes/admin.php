@@ -466,6 +466,91 @@ $app->group('/api/admin', function ($group) {
     });
 
     // ========================================================
+    // GESTIÓN DE ESTADO / ELIMINACIÓN DE REPARTIDORES
+    // ========================================================
+
+    // Cambiar estado de un repartidor (activo/inactivo) (PUT /api/admin/repartidores/{id}/estado)
+    $group->put('/repartidores/{id}/estado', function (Request $request, Response $response, array $args) {
+        $id = (int)$args['id'];
+        $data = json_decode($request->getBody()->getContents(), true);
+        $nuevoEstado = $data['estado'] ?? null;
+
+        if (!in_array($nuevoEstado, ['activo', 'inactivo'])) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Estado inválido. Valores permitidos: activo, inactivo."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $stmt = $db->prepare("UPDATE usuarios SET estado = :estado WHERE id = :id AND rol = 'repartidor'");
+            $stmt->execute([':estado' => $nuevoEstado, ':id' => $id]);
+
+            if ($stmt->rowCount() === 0) {
+                $response->getBody()->write(json_encode([
+                    "status" => "error",
+                    "message" => "Repartidor no encontrado."
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Estado actualizado a '$nuevoEstado' correctamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (\Throwable $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al actualizar estado: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Eliminar un repartidor (DELETE /api/admin/repartidores/{id})
+    $group->delete('/repartidores/{id}', function (Request $request, Response $response, array $args) {
+        $id = (int)$args['id'];
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // Verificar que existe y es repartidor
+            $check = $db->prepare("SELECT id FROM usuarios WHERE id = :id AND rol = 'repartidor'");
+            $check->execute([':id' => $id]);
+            if (!$check->fetch()) {
+                $response->getBody()->write(json_encode([
+                    "status" => "error",
+                    "message" => "Repartidor no encontrado."
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            $stmt = $db->prepare("DELETE FROM usuarios WHERE id = :id AND rol = 'repartidor'");
+            $stmt->execute([':id' => $id]);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Repartidor eliminado correctamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (\Throwable $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error al eliminar repartidor: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // ========================================================
     // OBSERVABILIDAD Y SALUD DEL SISTEMA
     // ========================================================
 
