@@ -341,7 +341,7 @@ $app->group('/api/admin', function ($group) {
             $db = $dbObj->connect();
 
             // Obtener repartidores que tienen al menos un documento pendiente
-            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.created_at as fecha_registro,
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono,
                            COUNT(d.id) as total_documentos,
                            SUM(CASE WHEN d.estado = 'pendiente' THEN 1 ELSE 0 END) as docs_pendientes,
                            SUM(CASE WHEN d.estado = 'aprobado' THEN 1 ELSE 0 END) as docs_aprobados,
@@ -351,13 +351,13 @@ $app->group('/api/admin', function ($group) {
                     WHERE u.rol = 'repartidor'
                     GROUP BY u.id
                     HAVING docs_pendientes > 0
-                    ORDER BY u.created_at DESC";
+                    ORDER BY u.id DESC";
             $stmt = $db->query($sql);
             $repartidores = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             // Para cada repartidor, obtener sus documentos
             foreach ($repartidores as &$rep) {
-                $docSql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo, created_at, updated_at
+                $docSql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo
                            FROM documentos_repartidor
                            WHERE usuario_id = :uid
                            ORDER BY tipo_documento ASC";
@@ -475,7 +475,7 @@ $app->group('/api/admin', function ($group) {
             $dbObj = new Db();
             $db = $dbObj->connect();
 
-            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado, u.created_at,
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado,
                            (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_usuario_id = u.id) AS total_pedidos
                     FROM usuarios u
                     WHERE u.rol = 'cliente'
