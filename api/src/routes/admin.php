@@ -142,7 +142,7 @@ $app->group('/api/admin', function ($group) {
 
             // Seleccionar únicamente repartidores activos con coordenadas vigentes (actualizadas en los últimos 15 minutos)
             $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.latitud_actual AS latitud, u.longitud_actual AS longitud, u.estado, u.foto_url, u.updated_at,
-                           (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) > 0 AS ocupado
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) AS conteo_activos
                     FROM usuarios u
                     WHERE u.rol = 'repartidor' 
                       AND u.estado = 'activo' 
@@ -154,7 +154,8 @@ $app->group('/api/admin', function ($group) {
 
             // Asegurar tipo booleano para el atributo ocupado
             foreach ($repartidores as &$rep) {
-                $rep['ocupado'] = (bool)$rep['ocupado'];
+                $rep['ocupado'] = ((int)($rep['conteo_activos'] ?? 0)) > 0;
+                unset($rep['conteo_activos']);
             }
 
             $response->getBody()->write(json_encode([
@@ -162,10 +163,11 @@ $app->group('/api/admin', function ($group) {
                 "data" => $repartidores
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-        } catch (PDOException $e) {
+        } catch (\Throwable $e) {
+            App\Logger::error("Error en repartidores-online: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $response->getBody()->write(json_encode([
                 "status" => "error",
-                "message" => "Error de base de datos: " . $e->getMessage()
+                "message" => "Error interno del servidor: " . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
@@ -178,18 +180,25 @@ $app->group('/api/admin', function ($group) {
             $db = $dbObj->connect();
 
             $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado AS estado_cuenta, u.latitud_actual, u.longitud_actual, u.updated_at,
-                           (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) > 0 AS ocupado,
-                           (u.latitud_actual != 0 AND u.longitud_actual != 0 AND u.updated_at >= NOW() - INTERVAL 15 MINUTE) AS is_online,
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) AS conteo_activos,
                            (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado = 'entregado') AS total_viajes
                     FROM usuarios u
                     WHERE u.rol = 'repartidor'
-                    ORDER BY is_online DESC, u.nombre ASC";
+                    ORDER BY u.nombre ASC";
             $stmt = $db->query($sql);
             $flota = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            $now = time();
             foreach ($flota as &$rep) {
-                $rep['ocupado'] = (bool)$rep['ocupado'];
-                $rep['is_online'] = (bool)$rep['is_online'];
+                $updatedTimestamp = $rep['updated_at'] ? strtotime($rep['updated_at']) : 0;
+                $diffMinutes = ($now - $updatedTimestamp) / 60;
+                
+                $lat = (float)($rep['latitud_actual'] ?? 0);
+                $lng = (float)($rep['longitud_actual'] ?? 0);
+                
+                $rep['ocupado'] = ((int)($rep['conteo_activos'] ?? 0)) > 0;
+                $rep['is_online'] = ($lat != 0.0 && $lng != 0.0 && $diffMinutes <= 15);
+                unset($rep['conteo_activos']);
                 
                 // Determinar estado de conexión humano
                 if ($rep['estado_cuenta'] !== 'activo') {
