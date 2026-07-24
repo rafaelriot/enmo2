@@ -601,8 +601,16 @@
             if (usuario.nombre) {
                 const sidebarAvatarContainer = document.getElementById('sidebar-avatar');
                 const topAvatarContainer = document.getElementById('top-avatar');
-                if (sidebarAvatarContainer) renderUserAvatar(usuario, sidebarAvatarContainer);
-                if (topAvatarContainer) renderUserAvatar(usuario, topAvatarContainer);
+                
+                if (typeof renderUserAvatar === 'function') {
+                    if (sidebarAvatarContainer) renderUserAvatar(usuario, sidebarAvatarContainer);
+                    if (topAvatarContainer) renderUserAvatar(usuario, topAvatarContainer);
+                } else {
+                    const init = usuario.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+                    if (sidebarAvatarContainer) sidebarAvatarContainer.textContent = init;
+                    if (topAvatarContainer) topAvatarContainer.textContent = init;
+                }
+
                 if (document.getElementById('sidebar-user-name')) document.getElementById('sidebar-user-name').textContent = usuario.nombre;
                 if (document.getElementById('sidebar-user-email')) document.getElementById('sidebar-user-email').textContent = usuario.email;
             }
