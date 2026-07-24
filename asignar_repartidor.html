@@ -352,7 +352,9 @@
             container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm">Buscando repartidores activos...</p>';
 
             try {
-                const response = await fetch('api/usuarios/repartidores');
+                const response = await fetch('api/usuarios/repartidores', {
+                    headers: getAuthHeaders()
+                });
                 const result = await response.json();
 
                 if (response.ok && result.status === 'success') {

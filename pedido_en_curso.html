@@ -892,7 +892,7 @@
                     // Sincronizar el origen del pedido con la ubicación actual del repartidor simulado
                     fetch('api/pedidos/actualizar-coordenadas-recogida', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                         body: JSON.stringify({
                             pedido_id: pedidoId,
                             latitud: latRep,
@@ -1580,7 +1580,7 @@
 
             const response = await fetch('api/pedidos/actualizar-estado', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify(payload)
             });
             const res = await response.json();
@@ -1645,7 +1645,7 @@
             // Sincronizar el origen en la DB inmediatamente para que coincida con el repartidor
             fetch('api/pedidos/actualizar-coordenadas-recogida', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     pedido_id: pedidoId,
                     latitud: latRep,

@@ -295,7 +295,9 @@
         container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm py-8">Buscando servicios disponibles...</p>';
 
         try {
-            const response = await fetch('api/pedidos');
+            const response = await fetch('api/pedidos', {
+                headers: getAuthHeaders()
+            });
             const result = await response.json();
 
             if (response.ok && result.status === 'success') {

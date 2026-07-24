@@ -405,9 +405,7 @@
             try {
                 const response = await fetch('api/usuarios/location', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify({
                         repartidor_id: usuario.id,
                         latitud: latitud,
