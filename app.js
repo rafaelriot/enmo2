@@ -258,7 +258,7 @@ function setupSidebar(usuario) {
 
 // Configuración común de navegación inferior
 function setupBottomNavigation(usuario) {
-    const bottomNav = document.querySelector('nav');
+    const bottomNav = document.querySelector('nav.bottom-nav, nav[id*="bottom"]');
     if (!bottomNav || !usuario) return;
 
     const currentPath = window.location.pathname;
