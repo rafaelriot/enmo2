@@ -457,6 +457,35 @@ $app->group('/api/admin', function ($group) {
     // OBSERVABILIDAD Y SALUD DEL SISTEMA
     // ========================================================
 
+    // Obtener todos los clientes registrados (GET /api/admin/clientes)
+    $group->get('/clientes', function (Request $request, Response $response) {
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado, u.created_at,
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_usuario_id = u.id) AS total_pedidos
+                    FROM usuarios u
+                    WHERE u.rol = 'cliente'
+                    ORDER BY u.id DESC";
+            $stmt = $db->query($sql);
+            $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => $clientes
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error de base de datos: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
     // Obtener los logs más recientes del sistema (GET /api/admin/observabilidad/logs)
     $group->get('/observabilidad/logs', function (Request $request, Response $response) {
         $logs = App\Logger::getRecentLogs(100);

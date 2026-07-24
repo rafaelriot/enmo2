@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>enMo2 - Gestión de Clientes</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="tailwind-config.js"></script>
+    <script src="app.js"></script>
+    <style>
+        .speed-line-green { border-left: 4px solid #006e25; }
+        .kinetic-gradient { background: linear-gradient(90deg, #006e25 0%, #feb700 50%, #ff591f 100%); }
+        body { background-color: #f9f9fc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1a1c1e; }
+        .custom-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
+    </style>
+</head>
+<body class="bg-surface pb-32">
+<script>
+// Guard: Solo administradores pueden acceder a esta página
+(function() {
+    const u = localStorage.getItem('usuario');
+    if (!u) { window.location.href = 'inicio_de_sesion.html'; return; }
+    const usr = JSON.parse(u);
+    if (usr.rol !== 'administrador') { window.location.href = 'inicio_de_sesion.html'; return; }
+})();
+</script>
+
+<!-- Navigation Drawer Backdrop -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-[9998] hidden opacity-0 transition-opacity duration-300"></div>
+
+<!-- Navigation Drawer -->
+<aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-surface-container-lowest border-r border-surface-container-highest z-[9999] -translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-2xl">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="font-display-lg text-[22px] font-black tracking-tighter text-primary">enMo2 Admin</h1>
+    <button id="btn-close-sidebar" class="p-1 rounded-full hover:bg-surface-container transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+  </div>
+  <div class="flex items-center gap-4 p-4 bg-surface-container rounded-xl mb-6">
+    <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xl font-bold uppercase" id="sidebar-avatar">AD</div>
+    <div class="min-w-0 flex-grow">
+      <h4 class="font-title-md text-sm text-on-surface truncate" id="sidebar-user-name">Administrador</h4>
+      <p class="text-xs text-on-surface-variant truncate" id="sidebar-user-email">admin@enmo2.com</p>
+    </div>
+  </div>
+  <nav class="flex-grow space-y-2">
+    <a href="dashboard_principal.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold">
+      <span class="material-symbols-outlined">home</span>
+      <span>Dashboard Inicio</span>
+    </a>
+    <a href="panel_de_administracion_repartidores.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold">
+      <span class="material-symbols-outlined">two_wheeler</span>
+      <span>Gestión Repartidores</span>
+    </a>
+    <a href="gestion_de_clientes.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-container/10 text-primary transition-colors font-label-bold">
+      <span class="material-symbols-outlined">group</span>
+      <span>Gestión Clientes</span>
+    </a>
+    <a href="mapa_en_vivo.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold">
+      <span class="material-symbols-outlined">map</span>
+      <span>Mapa en Vivo</span>
+    </a>
+  </nav>
+  <div class="pt-6 border-t border-surface-container">
+    <button id="btn-logout" class="w-full py-3 rounded-xl bg-error-container text-on-error-container font-label-bold text-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">logout</span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b-2 border-surface-container-highest h-16 flex justify-between items-center px-margin-mobile max-w-screen-xl mx-auto">
+  <div class="flex items-center gap-base">
+    <button id="btn-menu" class="material-symbols-outlined text-primary p-2 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 duration-150">menu</button>
+    <span class="font-title-md text-title-md font-bold text-on-surface">Gestión de Clientes</span>
+  </div>
+  <div class="flex items-center gap-xs">
+    <div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-bold text-label-bold" id="top-avatar">AD</div>
+  </div>
+</header>
+
+<main class="mt-20 px-margin-mobile max-w-screen-xl mx-auto">
+  <!-- Header Title -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-md">
+    <div>
+      <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Directorio de Clientes</h1>
+      <p class="font-body-md text-on-surface-variant">Consulta y administra las cuentas de usuarios clientes registrados</p>
+    </div>
+    <div class="bg-surface-container-lowest px-4 py-2 rounded-xl border border-surface-container-high flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary">person</span>
+      <div>
+        <p class="text-[10px] uppercase font-bold text-on-surface-variant">Total Clientes</p>
+        <p class="font-title-md text-primary font-black" id="total-clientes-count">0</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter Bar -->
+  <div class="mb-md bg-surface-container-lowest p-4 rounded-xl border border-surface-container-high custom-shadow flex items-center gap-3">
+    <span class="material-symbols-outlined text-outline">search</span>
+    <input id="input-buscar-cliente" type="text" class="w-full bg-transparent border-none focus:ring-0 font-body-md text-on-surface placeholder:text-outline p-0" placeholder="Buscar por nombre, correo electrónico o teléfono..."/>
+  </div>
+
+  <!-- Clients Bento Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter" id="clientes-container">
+    <div class="animate-pulse col-span-full h-32 bg-surface-container-high rounded-xl"></div>
+  </div>
+</main>
+
+<script>
+let clientesLista = [];
+
+async function cargarClientes() {
+    const container = document.getElementById('clientes-container');
+    const totalCountEl = document.getElementById('total-clientes-count');
+
+    try {
+        const res = await fetch('api/admin/clientes', {
+            headers: getAuthHeaders()
+        });
+        const result = await res.json();
+
+        if (res.ok && result.status === 'success') {
+            clientesLista = result.data;
+            if (totalCountEl) totalCountEl.textContent = clientesLista.length;
+            renderizarClientes();
+        } else {
+            container.innerHTML = `<p class="text-error text-center py-8 col-span-full">${result.message || 'Error al cargar clientes.'}</p>`;
+        }
+    } catch (err) {
+        console.error("Error al cargar clientes:", err);
+        container.innerHTML = '<p class="text-error text-center py-8 col-span-full">Error de conexión al cargar clientes.</p>';
+    }
+}
+
+function renderizarClientes() {
+    const container = document.getElementById('clientes-container');
+    const searchInput = document.getElementById('input-buscar-cliente');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    const filtrados = clientesLista.filter(c => 
+        (c.nombre && c.nombre.toLowerCase().includes(query)) ||
+        (c.email && c.email.toLowerCase().includes(query)) ||
+        (c.telefono && c.telefono.includes(query))
+    );
+
+    if (filtrados.length === 0) {
+        container.innerHTML = '<p class="text-on-surface-variant text-center py-8 col-span-full">No se encontraron clientes registrados con los criterios especificados.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    filtrados.forEach(c => {
+        const iniciales = c.nombre ? c.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase() : 'CL';
+        const fechaReg = c.created_at ? new Date(c.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
+
+        const avatarHtml = c.foto_url ?
+            `<img src="${c.foto_url}" class="w-full h-full object-cover" />` :
+            `<div class="w-full h-full bg-primary-container text-on-primary-container font-black flex items-center justify-center text-sm">${iniciales}</div>`;
+
+        const cardHtml = `
+            <div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm border border-surface-container-high border-l-4 speed-line-green hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                    <div class="flex items-start justify-between gap-3 mb-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-surface-container-high">
+                                ${avatarHtml}
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="font-label-bold text-on-surface text-sm truncate">${c.nombre}</h3>
+                                <p class="text-xs text-on-surface-variant truncate">${c.email}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-0.5 bg-primary/10 text-primary rounded text-[9px] font-bold uppercase tracking-wider">CLIENTE</span>
+                    </div>
+
+                    <div class="space-y-1 my-3 text-xs text-on-surface-variant">
+                        <p class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-outline">call</span>
+                            <span>${c.telefono || 'Sin número'}</span>
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm text-outline">calendar_today</span>
+                            <span>Registro: ${fechaReg}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-surface-container-high flex justify-between items-center text-[10px] font-label-bold uppercase">
+                    <span class="text-on-surface-variant">Pedidos Realizados</span>
+                    <span class="text-primary font-black text-xs">${c.total_pedidos || 0} envíos</span>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Configurar Sidebar Drawer
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    if (usuario.nombre) {
+        document.getElementById('sidebar-user-name').textContent = usuario.nombre;
+        document.getElementById('sidebar-user-email').textContent = usuario.email;
+        const init = usuario.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('sidebar-avatar').textContent = init;
+        document.getElementById('top-avatar').textContent = init;
+    }
+
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    const btnMenu = document.getElementById('btn-menu');
+    const btnClose = document.getElementById('btn-close-sidebar');
+    const btnLogout = document.getElementById('btn-logout');
+
+    function toggleSidebar(open) {
+        if (open) {
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.remove('hidden');
+            setTimeout(() => backdrop.classList.add('opacity-100'), 50);
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.remove('opacity-100');
+            setTimeout(() => backdrop.classList.add('hidden'), 300);
+        }
+    }
+
+    if (btnMenu) btnMenu.addEventListener('click', () => toggleSidebar(true));
+    if (btnClose) btnClose.addEventListener('click', () => toggleSidebar(false));
+    if (backdrop) backdrop.addEventListener('click', () => toggleSidebar(false));
+    if (btnLogout) btnLogout.addEventListener('click', () => {
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('token');
+        window.location.href = 'inicio_de_sesion.html';
+    });
+
+    document.getElementById('input-buscar-cliente')?.addEventListener('input', renderizarClientes);
+
+    cargarClientes();
+});
+</script>
+</body>
+</html>

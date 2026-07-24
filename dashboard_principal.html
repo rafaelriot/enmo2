@@ -47,16 +47,59 @@
     if (usr.rol === 'cliente') { window.location.href = 'inicio_cliente.html'; return; }
 })();
 </script>
+<!-- Navigation Drawer Backdrop -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/40 z-[9998] hidden opacity-0 transition-opacity duration-300"></div>
+
+<!-- Navigation Drawer -->
+<aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-surface-container-lowest border-r border-surface-container-highest z-[9999] -translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-2xl">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="font-display-lg text-[22px] font-black tracking-tighter text-primary">enMo2 Admin</h1>
+    <button id="btn-close-sidebar" class="p-1 rounded-full hover:bg-surface-container transition-colors">
+      <span class="material-symbols-outlined text-on-surface-variant">close</span>
+    </button>
+  </div>
+  <div class="flex items-center gap-4 p-4 bg-surface-container rounded-xl mb-6">
+    <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xl font-bold uppercase" id="sidebar-avatar">AD</div>
+    <div class="min-w-0 flex-grow">
+      <h4 class="font-title-md text-sm text-on-surface truncate" id="sidebar-user-name">Administrador</h4>
+      <p class="text-xs text-on-surface-variant truncate" id="sidebar-user-email">admin@enmo2.com</p>
+    </div>
+  </div>
+  <nav class="flex-grow space-y-2">
+    <a href="dashboard_principal.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-container/10 text-primary transition-colors font-label-bold">
+      <span class="material-symbols-outlined">home</span>
+      <span>Dashboard Inicio</span>
+    </a>
+    <a href="panel_de_administracion_repartidores.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold">
+      <span class="material-symbols-outlined">two_wheeler</span>
+      <span>Gestión Repartidores</span>
+    </a>
+    <a href="gestion_de_clientes.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold">
+      <span class="material-symbols-outlined">group</span>
+      <span>Gestión Clientes</span>
+    </a>
+    <a href="mapa_en_vivo.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary-container/10 hover:text-primary text-on-surface-variant transition-colors font-label-bold">
+      <span class="material-symbols-outlined">map</span>
+      <span>Mapa en Vivo</span>
+    </a>
+  </nav>
+  <div class="pt-6 border-t border-surface-container">
+    <button id="btn-logout" class="w-full py-3 rounded-xl bg-error-container text-on-error-container font-label-bold text-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">logout</span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
+
 <!-- Top Navigation Bar -->
 <header class="fixed top-0 w-full z-50 bg-surface border-b-2 border-surface-container-highest h-16 flex justify-between items-center px-margin-mobile max-w-screen-xl mx-auto">
 <div class="flex items-center gap-base">
-<button class="material-symbols-outlined text-primary p-2 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 duration-150">menu</button>
-</div>
+<button id="btn-menu" class="material-symbols-outlined text-primary p-2 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 duration-150">menu</button>
 </div>
 <div class="flex items-center gap-xs">
 <button onclick="toggleDarkMode()" class="material-symbols-outlined text-primary p-2 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 duration-150" title="Cambiar Tema">dark_mode</button>
 <button class="material-symbols-outlined text-primary p-2 rounded-lg hover:bg-surface-container-low transition-colors active:scale-95 duration-150">notifications</button>
-<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-bold text-label-bold">AD</div>
+<div class="h-8 w-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-bold text-label-bold" id="top-avatar">AD</div>
 </div>
 </header>
 <main class="mt-20 px-margin-mobile max-w-screen-xl mx-auto">
@@ -675,6 +718,44 @@
         
         setupBottomNavigation(usuario);
 
+        // Configurar avatar y datos del sidebar
+        if (usuario.nombre) {
+            const init = usuario.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase();
+            if (document.getElementById('sidebar-avatar')) document.getElementById('sidebar-avatar').textContent = init;
+            if (document.getElementById('top-avatar')) document.getElementById('top-avatar').textContent = init;
+            if (document.getElementById('sidebar-user-name')) document.getElementById('sidebar-user-name').textContent = usuario.nombre;
+            if (document.getElementById('sidebar-user-email')) document.getElementById('sidebar-user-email').textContent = usuario.email;
+        }
+
+        // Configurar Drawer Sidebar Controls
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const btnMenu = document.getElementById('btn-menu');
+        const btnClose = document.getElementById('btn-close-sidebar');
+        const btnLogout = document.getElementById('btn-logout');
+
+        function toggleSidebar(open) {
+            if (!sidebar || !backdrop) return;
+            if (open) {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                setTimeout(() => backdrop.classList.add('opacity-100'), 50);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.remove('opacity-100');
+                setTimeout(() => backdrop.classList.add('hidden'), 300);
+            }
+        }
+
+        if (btnMenu) btnMenu.addEventListener('click', () => toggleSidebar(true));
+        if (btnClose) btnClose.addEventListener('click', () => toggleSidebar(false));
+        if (backdrop) backdrop.addEventListener('click', () => toggleSidebar(false));
+        if (btnLogout) btnLogout.addEventListener('click', () => {
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('token');
+            window.location.href = 'inicio_de_sesion.html';
+        });
+
         cargarEstadisticas();
         cargarListadoPedidos();
         actualizarMiniMapa();
@@ -684,7 +765,7 @@
         setInterval(cargarEstadisticas, 8000);
         setInterval(cargarListadoPedidos, 8000);
         setInterval(actualizarMiniMapa, 8000);
-        setInterval(cargarGraficos, 16000); // Gráficos se actualizan cada 16 segundos
+        setInterval(cargarGraficos, 16000);
         setInterval(cargarLogsObservabilidad, 15000);
     }
 
