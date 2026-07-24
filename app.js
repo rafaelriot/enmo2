@@ -371,8 +371,21 @@ document.addEventListener('DOMContentLoaded', () => {
  * @param {Object} user - Objeto con datos de usuario (nombre, foto_url)
  * @param {string} defaultIcon - Nombre de ícono de Material Symbols (default: 'person')
  */
-function renderUserAvatar(container, user, defaultIcon = 'person') {
-    const el = typeof container === 'string' ? document.getElementById(container) : container;
+function renderUserAvatar(arg1, arg2, defaultIcon = 'person') {
+    let el = null;
+    let user = null;
+
+    if (arg1 && (typeof arg1 === 'string' || arg1 instanceof HTMLElement)) {
+        el = typeof arg1 === 'string' ? document.getElementById(arg1) : arg1;
+        user = arg2;
+    } else if (arg2 && (typeof arg2 === 'string' || arg2 instanceof HTMLElement)) {
+        el = typeof arg2 === 'string' ? document.getElementById(arg2) : arg2;
+        user = arg1;
+    } else {
+        el = typeof arg1 === 'string' ? document.getElementById(arg1) : (arg1 || arg2);
+        user = (arg1 && arg1.nombre) ? arg1 : arg2;
+    }
+
     if (!el) return;
 
     if (user && user.foto_url && user.foto_url.trim() !== '') {
