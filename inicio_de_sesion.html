@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <link rel="apple-touch-icon" href="images/icon-192.png"/>
 <link rel="manifest" href="manifest.json"/>
@@ -350,9 +350,10 @@
             console.log("Inicializando Google Identity Services...");
             try {
                 google.accounts.id.initialize({
-                    client_id: "1041922961177-a55ssg1jaqoq01e2tcrecnvngg3strlh.apps.googleusercontent.com", // REEMPLAZAR CON TU CLIENT ID
+                    client_id: "1041922961177-a55ssg1jaqoq01e2tcrecnvngg3strlh.apps.googleusercontent.com",
                     callback: handleCredentialResponse,
-                    auto_select: false // Habilita One-Tap automático si se desea (true)
+                    auto_select: false,
+                    use_fedcm_for_prompt: false
                 });
                 console.log("Google Identity Services inicializado correctamente.");
                 
