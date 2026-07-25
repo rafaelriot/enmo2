@@ -77,8 +77,11 @@
 </button>
 </div>
 </div>
-<div class="flex justify-between items-center pt-1">
+<div class="flex flex-col pt-1">
 <div id="error-message" class="text-error font-label-sm text-xs hidden"></div>
+<pre id="error-details" class="text-[10px] text-left bg-slate-100 dark:bg-zinc-800 text-red-600 dark:text-red-400 font-mono p-2 rounded mt-2 hidden overflow-x-auto max-h-40 border border-red-200 dark:border-red-900/50 whitespace-pre-wrap"></pre>
+</div>
+<div class="flex justify-between items-center pt-1">
 <a id="btn-olvidaste-pass" class="font-label-bold text-label-bold text-primary hover:underline ml-auto" href="#">¿Olvidaste tu contraseña?</a>
 </div>
 <button id="btn-login" class="w-full bg-primary text-on-primary font-headline-lg-mobile text-lg py-4 rounded-xl shadow-lg hover:shadow-primary/10 hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-md" type="submit">
@@ -218,6 +221,7 @@
         // Manejo del formulario de inicio de sesión
         const loginForm = document.getElementById('login-form');
         const errorMessage = document.getElementById('error-message');
+        const errorDetails = document.getElementById('error-details');
 
         if (loginForm) {
             const btnLogin = document.getElementById('btn-login');
@@ -226,6 +230,10 @@
                 e.preventDefault();
                 errorMessage.classList.add('hidden');
                 errorMessage.textContent = '';
+                if (errorDetails) {
+                    errorDetails.classList.add('hidden');
+                    errorDetails.textContent = '';
+                }
 
                 // Evitar doble clic deshabilitando el botón y mostrando carga
                 btnLogin.disabled = true;
@@ -244,9 +252,15 @@
                         body: JSON.stringify({ email, password })
                     });
 
-                    const result = await response.json();
+                    const rawText = await response.text();
+                    let result = null;
+                    try {
+                        result = rawText ? JSON.parse(rawText) : null;
+                    } catch (e) {
+                        console.error('Error parseando JSON de login:', e);
+                    }
 
-                    if (response.ok && result.status === 'success') {
+                    if (response.ok && result && result.status === 'success') {
                         // Guardar datos de sesión en localStorage
                         localStorage.setItem('usuario', JSON.stringify(result.usuario));
                         if (result.token) {
@@ -262,8 +276,12 @@
                             window.location.href = 'inicio_cliente.html';
                         }
                     } else {
-                        errorMessage.textContent = result.message || 'Credenciales incorrectas.';
+                        errorMessage.textContent = (result && result.message) ? result.message : 'Credenciales incorrectas.';
                         errorMessage.classList.remove('hidden');
+                        if (!result && rawText && errorDetails) {
+                            errorDetails.textContent = `Detalle técnico:\n${rawText.trim()}`;
+                            errorDetails.classList.remove('hidden');
+                        }
                         btnLogin.disabled = false;
                         btnLogin.innerHTML = originalBtnContent;
                     }
@@ -271,6 +289,10 @@
                     console.error('Error al iniciar sesión:', error);
                     errorMessage.textContent = 'Error de conexión con el servidor.';
                     errorMessage.classList.remove('hidden');
+                    if (errorDetails) {
+                        errorDetails.textContent = `Detalle del error:\n${error.toString()}`;
+                        errorDetails.classList.remove('hidden');
+                    }
                     btnLogin.disabled = false;
                     btnLogin.innerHTML = originalBtnContent;
                 }
@@ -297,6 +319,10 @@
         // 2. Callback cuando Google devuelve las credenciales del usuario
         async function handleCredentialResponse(response) {
             errorMessage.classList.add('hidden');
+            if (errorDetails) {
+                errorDetails.classList.add('hidden');
+                errorDetails.textContent = '';
+            }
             
             // Extraer y decodificar el ID Token
             const payload = parseJwt(response.credential);
@@ -348,11 +374,20 @@
                         : `No se pudo conectar con el servidor de autenticación (HTTP ${apiRes.status}). Reintente más tarde.`;
                     errorMessage.textContent = msg;
                     errorMessage.classList.remove('hidden');
+                    
+                    if ((!result || apiRes.status !== 200) && rawText && errorDetails) {
+                        errorDetails.textContent = `Detalle técnico:\n${rawText.trim()}`;
+                        errorDetails.classList.remove('hidden');
+                    }
                 }
             } catch (error) {
                 console.error("Error de comunicación:", error);
                 errorMessage.textContent = 'Error de conexión con el servidor al autenticar con Google.';
                 errorMessage.classList.remove('hidden');
+                if (errorDetails) {
+                    errorDetails.textContent = `Detalle del error:\n${error.toString()}`;
+                    errorDetails.classList.remove('hidden');
+                }
             }
         }
 

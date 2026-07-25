@@ -420,8 +420,9 @@ $app->group('/api/pedidos', function ($group) {
                 "status" => "error",
                 "message" => $e->getMessage()
             ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
+    });
+
     // Calificar a un cliente por parte del repartidor (POST /api/pedidos/calificar-cliente)
     $group->post('/calificar-cliente', function (Request $request, Response $response) {
         $data = json_decode($request->getBody()->getContents(), true);
