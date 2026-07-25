@@ -40,13 +40,7 @@ class Db {
             $dbConnection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             return $dbConnection;
         } catch (PDOException $e) {
-            // Retorna un error controlado o lanza la excepción
-            header('Content-Type: application/json', true, 500);
-            echo json_encode([
-                "status" => "error",
-                "message" => "No se pudo conectar a la base de datos: " . $e->getMessage()
-            ]);
-            exit;
+            throw new \PDOException("No se pudo conectar a la base de datos: " . $e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 }
