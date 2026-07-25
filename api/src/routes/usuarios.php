@@ -30,17 +30,23 @@ $app->group('/api/usuarios', function ($group) {
             $db = $dbObj->connect();
 
             // Buscar usuario por correo electrónico o teléfono
-            $sql = "SELECT id, nombre, email, foto_url, password, telefono, rol, estado 
-                    FROM usuarios 
-                    WHERE email = :email OR telefono = :telefono 
-                    LIMIT 1";
-            
-            $stmt = $db->prepare($sql);
-            $stmt->execute([
-                ':email' => $email,
-                ':telefono' => $email
-            ]);
-            $user = $stmt->fetch();
+            try {
+                $sql = "SELECT id, nombre, email, foto_url, password, telefono, rol, estado 
+                        FROM usuarios 
+                        WHERE email = :email OR telefono = :telefono 
+                        LIMIT 1";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([':email' => $email, ':telefono' => $email]);
+                $user = $stmt->fetch();
+            } catch (\PDOException $pe) {
+                $sql = "SELECT id, nombre, email, password, telefono, rol, estado 
+                        FROM usuarios 
+                        WHERE email = :email OR telefono = :telefono 
+                        LIMIT 1";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([':email' => $email, ':telefono' => $email]);
+                $user = $stmt->fetch();
+            }
 
             // Verificar la contraseña (usando password_verify para passwords hashed)
             if ($user && password_verify($password, $user['password'])) {
