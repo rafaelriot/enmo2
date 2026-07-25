@@ -6,6 +6,7 @@ use App\Mail;
 
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../config/Mail.php';
+require_once __DIR__ . '/../config/Logger.php';
 
 // Rutas de Usuarios y Repartidores
 $app->group('/api/usuarios', function ($group) {
