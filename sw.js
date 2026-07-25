@@ -1,4 +1,4 @@
-const CACHE_NAME = 'enmo2-cache-v8';
+const CACHE_NAME = 'enmo2-cache-v9';
 const STATIC_ASSETS = [
   './manifest.json',
   './tailwind-config.js',
@@ -47,6 +47,11 @@ self.addEventListener('activate', (event) => {
 // Interceptar solicitudes con estrategias diferenciadas
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // 0. NUNCA cachear peticiones que no sean GET (POST, PUT, DELETE)
+  if (event.request.method !== 'GET') {
+    return;
+  }
 
   // 1. NUNCA cachear peticiones a la API
   if (url.pathname.includes('/api/')) {
