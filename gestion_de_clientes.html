@@ -183,8 +183,8 @@ function renderizarClientes() {
                             <span>${c.telefono || 'Sin número'}</span>
                         </p>
                         <p class="flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm text-outline">calendar_today</span>
-                            <span>Registro: ${fechaReg}</span>
+                            <span class="material-symbols-outlined text-sm text-amber-500" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="font-bold text-on-surface">${c.calificacion_promedio ? `${c.calificacion_promedio} / 5.0 ⭐` : 'Sin calificaciones aún'}</span>
                         </p>
                     </div>
                 </div>

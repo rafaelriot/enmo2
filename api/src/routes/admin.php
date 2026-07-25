@@ -561,12 +561,17 @@ $app->group('/api/admin', function ($group) {
             $db = $dbObj->connect();
 
             $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado,
-                           (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_usuario_id = u.id) AS total_pedidos
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_usuario_id = u.id) AS total_pedidos,
+                           (SELECT AVG(p.calificacion_cliente_estrellas) FROM pedidos p WHERE p.cliente_usuario_id = u.id AND p.calificacion_cliente_estrellas IS NOT NULL) AS calificacion_promedio
                     FROM usuarios u
                     WHERE u.rol = 'cliente'
                     ORDER BY u.id DESC";
             $stmt = $db->query($sql);
             $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($clientes as &$c) {
+                $c['calificacion_promedio'] = $c['calificacion_promedio'] ? round((float)$c['calificacion_promedio'], 1) : null;
+            }
 
             $response->getBody()->write(json_encode([
                 "status" => "success",

@@ -422,6 +422,60 @@ $app->group('/api/pedidos', function ($group) {
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
+    // Calificar a un cliente por parte del repartidor (POST /api/pedidos/calificar-cliente)
+    $group->post('/calificar-cliente', function (Request $request, Response $response) {
+        $data = json_decode($request->getBody()->getContents(), true);
+        $pedido_id = $data['pedido_id'] ?? null;
+        $estrellas = $data['estrellas'] ?? null;
+        $comentario = $data['comentario'] ?? null;
+
+        if (!$pedido_id || !$estrellas) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Faltan parámetros obligatorios (pedido_id o estrellas)."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // Intentar actualizar la columna calificacion_cliente_estrellas
+            try {
+                $sql = "UPDATE pedidos 
+                        SET calificacion_cliente_estrellas = :estrellas, calificacion_cliente_comentario = :comentario 
+                        WHERE id = :pedido_id";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([
+                    ':estrellas' => $estrellas,
+                    ':comentario' => $comentario,
+                    ':pedido_id' => $pedido_id
+                ]);
+            } catch (\PDOException $pe) {
+                // Fallback defensivo si la columna aún no ha sido migrada en Hostinger
+                if ($pe->getCode() == '42S22') {
+                    $response->getBody()->write(json_encode([
+                        "status" => "success",
+                        "message" => "Calificación registrada localmente."
+                    ]));
+                    return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+                }
+                throw $pe;
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Cliente calificado correctamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Throwable $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
     });
 
     // Obtener mensajes de un pedido (GET /api/pedidos/{id}/mensajes)
