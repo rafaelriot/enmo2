@@ -106,18 +106,30 @@ $app->group('/api/usuarios', function ($group) {
             $db = $dbObj->connect();
 
             // 1. Buscar si el correo ya existe
-            $sql = "SELECT id, nombre, email, foto_url, telefono, rol, estado FROM usuarios WHERE email = :email LIMIT 1";
-            $stmt = $db->prepare($sql);
-            $stmt->execute([':email' => $email]);
-            $user = $stmt->fetch();
+            $hasFotoCol = true;
+            try {
+                $sql = "SELECT id, nombre, email, foto_url, telefono, rol, estado FROM usuarios WHERE email = :email LIMIT 1";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([':email' => $email]);
+                $user = $stmt->fetch();
+            } catch (\PDOException $pe) {
+                // Fallback si la columna foto_url aún no existe en el esquema de la BD
+                $hasFotoCol = false;
+                $sql = "SELECT id, nombre, email, telefono, rol, estado FROM usuarios WHERE email = :email LIMIT 1";
+                $stmt = $db->prepare($sql);
+                $stmt->execute([':email' => $email]);
+                $user = $stmt->fetch();
+            }
 
             if ($user) {
-                // Si viene foto_url de Google y cambió o no la tenía, actualizarla
-                if (!empty($foto_url) && $user['foto_url'] !== $foto_url) {
-                    $updateFotoSql = "UPDATE usuarios SET foto_url = :foto_url WHERE id = :id";
-                    $updateFotoStmt = $db->prepare($updateFotoSql);
-                    $updateFotoStmt->execute([':foto_url' => $foto_url, ':id' => $user['id']]);
-                    $user['foto_url'] = $foto_url;
+                // Si existe la columna foto_url y viene una nueva foto de Google, actualizarla
+                if ($hasFotoCol && !empty($foto_url) && ($user['foto_url'] ?? '') !== $foto_url) {
+                    try {
+                        $updateFotoSql = "UPDATE usuarios SET foto_url = :foto_url WHERE id = :id";
+                        $updateFotoStmt = $db->prepare($updateFotoSql);
+                        $updateFotoStmt->execute([':foto_url' => $foto_url, ':id' => $user['id']]);
+                        $user['foto_url'] = $foto_url;
+                    } catch (\Throwable $te) {}
                 }
 
                 // Generar Token JWT para Google login
@@ -134,7 +146,6 @@ $app->group('/api/usuarios', function ($group) {
                 ];
                 $jwt = Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
 
-                // Si existe el usuario, iniciar sesión automáticamente
                 $response->getBody()->write(json_encode([
                     "status" => "success",
                     "message" => "Inicio de sesión con Google exitoso.",
@@ -145,20 +156,31 @@ $app->group('/api/usuarios', function ($group) {
             }
 
             // 2. Si no existe, crear la cuenta como 'cliente'
-            // Generar un número de teléfono dummy o dejarlo vacío (se puede actualizar después)
             $telefonoDummy = '9990000000';
             $passwordDummy = password_hash(bin2hex(random_bytes(10)), PASSWORD_DEFAULT);
 
-            $insertSql = "INSERT INTO usuarios (nombre, email, foto_url, telefono, password, rol, estado)
-                          VALUES (:nombre, :email, :foto_url, :telefono, :password, 'cliente', 'activo')";
-            $insertStmt = $db->prepare($insertSql);
-            $insertStmt->execute([
-                ':nombre' => $nombre,
-                ':email' => $email,
-                ':foto_url' => !empty($foto_url) ? $foto_url : null,
-                ':telefono' => $telefonoDummy,
-                ':password' => $passwordDummy
-            ]);
+            if ($hasFotoCol) {
+                $insertSql = "INSERT INTO usuarios (nombre, email, foto_url, telefono, password, rol, estado)
+                              VALUES (:nombre, :email, :foto_url, :telefono, :password, 'cliente', 'activo')";
+                $insertStmt = $db->prepare($insertSql);
+                $insertStmt->execute([
+                    ':nombre' => $nombre,
+                    ':email' => $email,
+                    ':foto_url' => !empty($foto_url) ? $foto_url : null,
+                    ':telefono' => $telefonoDummy,
+                    ':password' => $passwordDummy
+                ]);
+            } else {
+                $insertSql = "INSERT INTO usuarios (nombre, email, telefono, password, rol, estado)
+                              VALUES (:nombre, :email, :telefono, :password, 'cliente', 'activo')";
+                $insertStmt = $db->prepare($insertSql);
+                $insertStmt->execute([
+                    ':nombre' => $nombre,
+                    ':email' => $email,
+                    ':telefono' => $telefonoDummy,
+                    ':password' => $passwordDummy
+                ]);
+            }
 
             $nuevoId = $db->lastInsertId();
             
@@ -183,7 +205,7 @@ $app->group('/api/usuarios', function ($group) {
                     "id" => (int)$nuevoId,
                     "nombre" => $nombre,
                     "email" => $email,
-                    "foto_url" => !empty($foto_url) ? $foto_url : null,
+                    "foto_url" => $hasFotoCol ? (!empty($foto_url) ? $foto_url : null) : null,
                     "telefono" => $telefonoDummy,
                     "rol" => "cliente",
                     "estado" => "activo"
@@ -192,7 +214,8 @@ $app->group('/api/usuarios', function ($group) {
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
-        } catch (PDOException $e) {
+        } catch (\Throwable $e) {
+            App\Logger::error("Error en Google OAuth: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             $response->getBody()->write(json_encode([
                 "status" => "error",
                 "message" => "Error al autenticar con Google: " . $e->getMessage()
