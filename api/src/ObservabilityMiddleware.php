@@ -41,8 +41,8 @@ class ObservabilityMiddleware {
 
         // Extraer info del token decodificado si existió auth
         $tokenDecoded = $request->getAttribute('token_decoded');
-        $userId = $tokenDecoded->id ?? null;
-        $userRole = $tokenDecoded->rol ?? null;
+        $userId = (is_object($tokenDecoded) && isset($tokenDecoded->id)) ? $tokenDecoded->id : null;
+        $userRole = (is_object($tokenDecoded) && isset($tokenDecoded->rol)) ? $tokenDecoded->rol : null;
 
         $statusCode = $response->getStatusCode();
         $path = $request->getUri()->getPath();
