@@ -159,18 +159,23 @@ $app->group('/api/usuarios', function ($group) {
             $telefonoDummy = '9990000000';
             $passwordDummy = password_hash(bin2hex(random_bytes(10)), PASSWORD_DEFAULT);
 
-            if ($hasFotoCol) {
-                $insertSql = "INSERT INTO usuarios (nombre, email, foto_url, telefono, password, rol, estado)
-                              VALUES (:nombre, :email, :foto_url, :telefono, :password, 'cliente', 'activo')";
-                $insertStmt = $db->prepare($insertSql);
-                $insertStmt->execute([
-                    ':nombre' => $nombre,
-                    ':email' => $email,
-                    ':foto_url' => !empty($foto_url) ? $foto_url : null,
-                    ':telefono' => $telefonoDummy,
-                    ':password' => $passwordDummy
-                ]);
-            } else {
+            try {
+                if ($hasFotoCol) {
+                    $insertSql = "INSERT INTO usuarios (nombre, email, foto_url, telefono, password, rol, estado)
+                                  VALUES (:nombre, :email, :foto_url, :telefono, :password, 'cliente', 'activo')";
+                    $insertStmt = $db->prepare($insertSql);
+                    $insertStmt->execute([
+                        ':nombre' => $nombre,
+                        ':email' => $email,
+                        ':foto_url' => !empty($foto_url) ? $foto_url : null,
+                        ':telefono' => $telefonoDummy,
+                        ':password' => $passwordDummy
+                    ]);
+                } else {
+                    throw new \Exception("No foto_url column");
+                }
+            } catch (\Throwable $ie) {
+                $hasFotoCol = false;
                 $insertSql = "INSERT INTO usuarios (nombre, email, telefono, password, rol, estado)
                               VALUES (:nombre, :email, :telefono, :password, 'cliente', 'activo')";
                 $insertStmt = $db->prepare($insertSql);

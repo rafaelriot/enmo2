@@ -52,7 +52,20 @@ $app->addRoutingMiddleware();
 // Middleware para manejo de errores (útil para desarrollo)
 // Cambia a (false, false, false) en producción en Hostinger
 $envProd = isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'production';
-$errorMiddleware = $app->addErrorMiddleware(!$envProd, !$envProd, !$envProd);
+$errorMiddleware = $app->addErrorMiddleware(!$envProd, true, true);
+$errorMiddleware->setDefaultErrorHandler(function ($request, $exception, $displayErrorDetails) use ($app) {
+    $response = $app->getResponseFactory()->createResponse(500);
+    $payload = [
+        "status" => "error",
+        "message" => $exception->getMessage(),
+        "type" => get_class($exception)
+    ];
+    if ($displayErrorDetails) {
+        $payload['trace'] = $exception->getTraceAsString();
+    }
+    $response->getBody()->write(json_encode($payload));
+    return $response->withHeader('Content-Type', 'application/json');
+});
 
 // Habilitar CORS para permitir peticiones desde la app móvil en otros subdominios/puertos
 $app->add(function ($request, $handler) {
