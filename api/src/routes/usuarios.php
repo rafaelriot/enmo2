@@ -3,6 +3,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Db;
 use App\Mail;
+use Firebase\JWT\JWT;
 
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../config/Mail.php';
@@ -93,22 +94,23 @@ $app->group('/api/usuarios', function ($group) {
 
     // Iniciar Sesión o Registrar con Google (POST /api/usuarios/google-oauth)
     $group->post('/google-oauth', function (Request $request, Response $response) {
-        $data = json_decode($request->getBody()->getContents(), true);
-        
-        $email = trim($data['email'] ?? '');
-        $nombre = trim($data['nombre'] ?? '');
-        $google_id = trim($data['google_id'] ?? '');
-        $foto_url = trim($data['foto_url'] ?? '');
-
-        if (empty($email) || empty($nombre)) {
-            $response->getBody()->write(json_encode([
-                "status" => "error",
-                "message" => "El correo y nombre del perfil de Google son requeridos."
-            ]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
-        }
-
         try {
+            $rawBody = $request->getBody()->getContents();
+            $data = !empty($rawBody) ? json_decode($rawBody, true) : [];
+            
+            $email = trim($data['email'] ?? '');
+            $nombre = trim($data['nombre'] ?? '');
+            $google_id = trim($data['google_id'] ?? '');
+            $foto_url = trim($data['foto_url'] ?? '');
+
+            if (empty($email) || empty($nombre)) {
+                $response->getBody()->write(json_encode([
+                    "status" => "error",
+                    "message" => "El correo y nombre del perfil de Google son requeridos."
+                ], JSON_UNESCAPED_UNICODE));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
             $dbObj = new Db();
             $db = $dbObj->connect();
 
@@ -151,14 +153,14 @@ $app->group('/api/usuarios', function ($group) {
                     "email" => $user['email'],
                     "rol" => !empty($user['rol']) ? $user['rol'] : 'cliente'
                 ];
-                $jwt = Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
+                $jwt = \Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
 
                 $response->getBody()->write(json_encode([
                     "status" => "success",
                     "message" => "Inicio de sesión con Google exitoso.",
                     "usuario" => $user,
                     "token" => $jwt
-                ]));
+                ], JSON_UNESCAPED_UNICODE));
                 return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
             }
 
@@ -208,7 +210,7 @@ $app->group('/api/usuarios', function ($group) {
                 "email" => $email,
                 "rol" => "cliente"
             ];
-            $jwt = Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
+            $jwt = \Firebase\JWT\JWT::encode($payload, $secretKey, 'HS256');
 
             $response->getBody()->write(json_encode([
                 "status" => "success",
@@ -223,15 +225,20 @@ $app->group('/api/usuarios', function ($group) {
                     "estado" => "activo"
                 ],
                 "token" => $jwt
-            ]));
+            ], JSON_UNESCAPED_UNICODE));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(201);
 
         } catch (\Throwable $e) {
-            App\Logger::error("Error en Google OAuth: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            try {
+                if (class_exists('App\Logger')) {
+                    App\Logger::error("Error en Google OAuth: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+                }
+            } catch (\Throwable $logEx) {}
+
             $response->getBody()->write(json_encode([
                 "status" => "error",
                 "message" => "Error al autenticar con Google: " . $e->getMessage()
-            ]));
+            ], JSON_UNESCAPED_UNICODE));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
     });

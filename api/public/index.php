@@ -55,15 +55,19 @@ $envProd = isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'production';
 $errorMiddleware = $app->addErrorMiddleware(!$envProd, true, true);
 $errorMiddleware->setDefaultErrorHandler(function ($request, $exception, $displayErrorDetails) use ($app) {
     $response = $app->getResponseFactory()->createResponse(500);
+    $message = $exception->getMessage();
+    if (empty($message)) {
+        $message = "Error interno del servidor. Por favor consulte los registros de aplicación.";
+    }
     $payload = [
         "status" => "error",
-        "message" => $exception->getMessage(),
+        "message" => $message,
         "type" => get_class($exception)
     ];
     if ($displayErrorDetails) {
         $payload['trace'] = $exception->getTraceAsString();
     }
-    $response->getBody()->write(json_encode($payload));
+    $response->getBody()->write(json_encode($payload, JSON_UNESCAPED_UNICODE));
     return $response->withHeader('Content-Type', 'application/json');
 });
 

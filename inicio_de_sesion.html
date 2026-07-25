@@ -317,11 +317,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, nombre, google_id, foto_url })
                 });
+                
                 const rawText = await apiRes.text();
                 console.log("Respuesta bruta del servidor:", rawText);
-                const result = JSON.parse(rawText);
+                
+                let result = null;
+                try {
+                    result = rawText ? JSON.parse(rawText) : null;
+                } catch (jsonErr) {
+                    console.error("Error al deserializar JSON de respuesta:", jsonErr, rawText);
+                }
 
-                if (apiRes.ok && result.status === 'success') {
+                if (apiRes.ok && result && result.status === 'success') {
                     localStorage.setItem('usuario', JSON.stringify(result.usuario));
                     if (result.token) {
                         localStorage.setItem('token', result.token);
@@ -336,7 +343,10 @@
                         window.location.href = 'inicio_cliente.html';
                     }
                 } else {
-                    errorMessage.textContent = result.message || 'Error al validar la cuenta con el servidor.';
+                    const msg = (result && result.message) 
+                        ? result.message 
+                        : `No se pudo conectar con el servidor de autenticación (HTTP ${apiRes.status}). Reintente más tarde.`;
+                    errorMessage.textContent = msg;
                     errorMessage.classList.remove('hidden');
                 }
             } catch (error) {
