@@ -638,6 +638,89 @@ $app->group('/api/admin', function ($group) {
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     });
 
+    // Obtener repartidores recomendados por distancia Haversine para un pedido específico (GET /api/admin/pedidos/{id}/repartidores-recomendados)
+    $group->get('/pedidos/{id}/repartidores-recomendados', function (Request $request, Response $response, array $args) {
+        $pedido_id = (int)$args['id'];
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // 1. Obtener coordenadas de recogida del pedido
+            $sqlPed = "SELECT latitud_recogida, longitud_recogida FROM pedidos WHERE id = :pedido_id LIMIT 1";
+            $stmtPed = $db->prepare($sqlPed);
+            $stmtPed->execute([':pedido_id' => $pedido_id]);
+            $pedido = $stmtPed->fetch(PDO::FETCH_ASSOC);
+
+            if (!$pedido) {
+                $response->getBody()->write(json_encode([
+                    "status" => "error",
+                    "message" => "Pedido no encontrado"
+                ]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+            }
+
+            $latPed = (float)$pedido['latitud_recogida'];
+            $lngPed = (float)$pedido['longitud_recogida'];
+
+            // 2. Si el pedido no tiene coordenadas válidas, retornar todos los repartidores activos ordenados por ID
+            if ($latPed == 0 || $lngPed == 0) {
+                $sqlRep = "SELECT u.id, u.nombre, u.email, u.telefono, u.latitud_actual, u.longitud_actual,
+                                  (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) AS conteo_activos
+                           FROM usuarios u
+                           WHERE u.rol = 'repartidor' AND u.estado = 'activo'";
+                $stmtRep = $db->query($sqlRep);
+                $repartidores = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($repartidores as &$rep) {
+                    $rep['distancia_km'] = null;
+                    $rep['eta_minutos'] = null;
+                    $rep['ocupado'] = ((int)($rep['conteo_activos'] ?? 0)) > 0;
+                    unset($rep['conteo_activos']);
+                }
+            } else {
+                // Calcular usando Haversine en SQL
+                $sqlRep = "SELECT u.id, u.nombre, u.email, u.telefono, u.latitud_actual, u.longitud_actual,
+                                  (SELECT COUNT(*) FROM pedidos p WHERE p.repartidor_id = u.id AND p.estado IN ('asignado', 'en_camino_recogida', 'en_ruta')) AS conteo_activos,
+                                  ( 6371 * acos( cos( radians(:pedido_lat) ) * cos( radians( latitud_actual ) ) 
+                                  * cos( radians( longitud_actual ) - radians(:pedido_lng) ) 
+                                  + sin( radians(:pedido_lat) ) * sin( radians( latitud_actual ) ) ) ) AS distancia_km
+                           FROM usuarios u
+                           WHERE u.rol = 'repartidor' 
+                             AND u.estado = 'activo' 
+                             AND u.latitud_actual != 0 
+                             AND u.longitud_actual != 0
+                           ORDER BY distancia_km ASC LIMIT 10";
+                $stmtRep = $db->prepare($sqlRep);
+                $stmtRep->execute([
+                    ':pedido_lat' => $latPed,
+                    ':pedido_lng' => $lngPed
+                ]);
+                $repartidores = $stmtRep->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($repartidores as &$rep) {
+                    $rep['distancia_km'] = round((float)$rep['distancia_km'], 2);
+                    // Estimación simple de ETA: velocidad promedio de 20 km/h (3 minutos por km) + 2 min buffer
+                    $rep['eta_minutos'] = max(2, (int)round($rep['distancia_km'] * 3) + 2);
+                    $rep['ocupado'] = ((int)($rep['conteo_activos'] ?? 0)) > 0;
+                    unset($rep['conteo_activos']);
+                }
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => $repartidores
+            ], JSON_UNESCAPED_UNICODE));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Throwable $e) {
+            App\Logger::error("Error en recomendacion de repartidores: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error interno del servidor: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
 });
 
 // Endpoint público para reporte de errores JS del cliente (POST /api/observabilidad/client-log)

@@ -346,13 +346,18 @@
 
         let selectedRiderId = null;
 
-        // Cargar los repartidores desde la API
+        // Cargar los repartidores desde la API con recomendación inteligente por cercanía Haversine
         async function cargarRepartidores() {
             const container = document.getElementById('riders-container');
-            container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm">Buscando repartidores activos...</p>';
+            container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm">Calculando cercanía de repartidores en tiempo real...</p>';
+
+            if (!pedidoId) {
+                container.innerHTML = '<p class="text-center text-error font-label-sm">Falta el parámetro pedido_id en la URL.</p>';
+                return;
+            }
 
             try {
-                const response = await fetch('api/usuarios/repartidores', {
+                const response = await fetch(`api/admin/pedidos/${pedidoId}/repartidores-recomendados`, {
                     headers: getAuthHeaders()
                 });
                 const result = await response.json();
@@ -362,43 +367,57 @@
                     document.getElementById('riders-count').textContent = repartidores.length;
                     
                     if (repartidores.length === 0) {
-                        container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm py-4">No hay repartidores disponibles en este momento.</p>';
+                        container.innerHTML = '<p class="text-center text-on-surface-variant font-label-sm py-4">No hay repartidores activos en el mapa actualmente.</p>';
                         return;
                     }
 
-                    container.innerHTML = ''; // Limpiar mocks estáticos
+                    container.innerHTML = ''; // Limpiar
                     
                     repartidores.forEach((repartidor, index) => {
-                        // Simular ETA y distancia si no hay datos espaciales complejos aún
-                        const etaSimulado = Math.floor(Math.random() * 15) + 2;
-                        const distanciaSimulada = (Math.random() * 4 + 0.5).toFixed(1);
+                        const distText = repartidor.distancia_km !== null ? `${repartidor.distancia_km} km de distancia` : 'Ubicación desconocida';
+                        const etaText = repartidor.eta_minutos !== null ? `${repartidor.eta_minutos} MIN` : '— MIN';
                         
+                        // Badge para el repartidor más cercano
+                        const isClosest = index === 0 && repartidor.distancia_km !== null;
+                        const closestBadge = isClosest ? `<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/30">MÁS CERCANO</span>` : '';
+                        
+                        // Estado ocupado / disponible
+                        const statusBadge = repartidor.ocupado 
+                            ? `<span class="bg-amber-100/10 text-amber-500 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/25">OCUPADO</span>`
+                            : `<span class="bg-green-150/15 text-primary text-[10px] font-bold px-2 py-0.5 rounded border border-primary/20">DISPONIBLE</span>`;
+
                         const cardHtml = `
                             <div class="rider-card group relative bg-surface border-2 border-surface-container-highest rounded-xl p-md flex items-center gap-md transition-all active:scale-[0.98] cursor-pointer" 
                                  data-rider-id="${repartidor.id}" 
                                  onclick="selectRider(this, ${repartidor.id})">
                                 <div class="relative">
-                                    <div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-black text-xl border border-surface-container-highest">${repartidor.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase()}</div>
+                                    <div class="w-16 h-16 rounded-full bg-primary-container/10 text-primary flex items-center justify-center font-black text-xl border border-primary/20">${repartidor.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase()}</div>
                                 </div>
                                 <div class="flex-grow">
                                     <div class="flex justify-between items-start">
                                         <div>
-                                            <h4 class="font-title-md text-title-md text-on-surface">${repartidor.nombre}</h4>
-                                            <p class="font-label-sm text-label-sm text-on-surface-variant font-bold tracking-wider">TEL: ${repartidor.telefono}</p>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <h4 class="font-title-md text-title-md text-on-surface">${repartidor.nombre}</h4>
+                                                ${closestBadge}
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-2 mt-1">
+                                                <p class="font-label-sm text-label-sm text-on-surface-variant font-bold tracking-wider">TEL: ${repartidor.telefono}</p>
+                                                ${statusBadge}
+                                            </div>
                                         </div>
                                         <div class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full flex items-center gap-1 eta-badge">
                                             <span class="material-symbols-outlined text-[16px]">speed</span>
-                                            <span class="font-label-bold text-label-bold">${etaSimulado} MIN</span>
+                                            <span class="font-label-bold text-label-bold">${etaText}</span>
                                         </div>
                                     </div>
                                     <div class="mt-2 flex items-center gap-4">
                                         <div class="flex items-center gap-1 text-on-surface-variant">
                                             <span class="material-symbols-outlined text-[18px]">near_me</span>
-                                            <span class="font-label-sm text-label-sm">${distanciaSimulada} km de distancia</span>
+                                            <span class="font-label-sm text-label-sm">${distText}</span>
                                         </div>
                                         <div class="flex items-center gap-1 text-on-surface-variant">
-                                            <span class="material-symbols-outlined text-[18px] text-secondary">star</span>
-                                            <span class="font-label-sm text-label-sm">4.9 (Activo)</span>
+                                            <span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+                                            <span class="font-label-sm text-label-sm">Activo</span>
                                         </div>
                                     </div>
                                 </div>
@@ -408,11 +427,11 @@
                     });
 
                 } else {
-                    container.innerHTML = `<p class="text-center text-error font-label-sm">${result.message || 'Error al obtener repartidores.'}</p>`;
+                    container.innerHTML = `<p class="text-center text-error font-label-sm">${result.message || 'Error al calcular recomendaciones.'}</p>`;
                 }
             } catch (error) {
-                console.error("Error obteniendo repartidores:", error);
-                container.innerHTML = '<p class="text-center text-error font-label-sm">Error de conexión al cargar repartidores.</p>';
+                console.error("Error obteniendo repartidores sugeridos:", error);
+                container.innerHTML = '<p class="text-center text-error font-label-sm">Error de conexión al cargar recomendaciones.</p>';
             }
         }
 
