@@ -292,12 +292,24 @@
 <!-- Dynamic Map Preview (Real Leaflet Map) -->
 <section class="mb-md">
 <h2 class="font-title-md text-title-md text-on-surface mb-sm">Mapa de Operaciones</h2>
-<div class="relative w-full h-64 rounded-2xl overflow-hidden shadow-md border border-surface-container-high">
+<div class="relative w-full h-80 rounded-2xl overflow-hidden shadow-md border border-surface-container-high">
   <div id="mini-map" class="w-full h-full z-10"></div>
   <!-- Interactive Markers Overlay -->
-  <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-primary/20 flex items-center gap-2 z-[1000]">
+  <div class="absolute top-4 left-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-primary/20 flex items-center gap-2 z-[1000] shadow">
     <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
     <span class="font-label-sm text-label-sm font-bold text-primary" id="map-repartidores-count">Cargando...</span>
+  </div>
+  <!-- Floating Map Action Controls -->
+  <div class="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+    <button type="button" id="btn-map-reset" title="Centrar en Tabasco" class="w-10 h-10 bg-white/95 text-primary hover:bg-slate-100 rounded-xl shadow border border-slate-200 flex items-center justify-center active:scale-90 transition-all select-none">
+      <span class="material-symbols-outlined">map</span>
+    </button>
+    <button type="button" id="btn-map-cycle-riders" title="Enfocar siguiente repartidor" class="w-10 h-10 bg-white/95 text-secondary hover:bg-slate-100 rounded-xl shadow border border-slate-200 flex items-center justify-center active:scale-90 transition-all select-none">
+      <span class="material-symbols-outlined">two_wheeler</span>
+    </button>
+    <button type="button" id="btn-map-cycle-orders" title="Enfocar siguiente pedido" class="w-10 h-10 bg-white/95 text-tertiary hover:bg-slate-100 rounded-xl shadow border border-slate-200 flex items-center justify-center active:scale-90 transition-all select-none">
+      <span class="material-symbols-outlined">package_2</span>
+    </button>
   </div>
 </div>
 </section>
@@ -368,6 +380,8 @@
     let todosLosPedidos = [];
     let filtroEstado = 'todos';
     let busquedaTexto = '';
+    let riderFocusIdx = 0;
+    let orderFocusIdx = 0;
 
     // Variables globales para instancias de gráficos
     let chartGanancias = null;
@@ -853,11 +867,69 @@
         if (btnMenu) btnMenu.addEventListener('click', () => toggleSidebar(true));
         if (btnClose) btnClose.addEventListener('click', () => toggleSidebar(false));
         if (backdrop) backdrop.addEventListener('click', () => toggleSidebar(false));
-        if (btnLogout) btnLogout.addEventListener('click', () => {
-            localStorage.removeItem('usuario');
-            localStorage.removeItem('token');
-            window.location.href = 'inicio_de_sesion.html';
-        });
+        // Controles flotantes del mapa
+        const btnMapReset = document.getElementById('btn-map-reset');
+        const btnMapCycleRiders = document.getElementById('btn-map-cycle-riders');
+        const btnMapCycleOrders = document.getElementById('btn-map-cycle-orders');
+
+        if (btnMapReset) {
+            btnMapReset.addEventListener('click', () => {
+                map.setView([17.9895, -92.9475], 13);
+            });
+        }
+
+        if (btnMapCycleRiders) {
+            btnMapCycleRiders.addEventListener('click', async () => {
+                try {
+                    const response = await fetch('api/admin/repartidores-online', { headers: getAuthHeaders() });
+                    const result = await response.json();
+                    if (response.ok && result.status === 'success' && result.data.length > 0) {
+                        const list = result.data;
+                        riderFocusIdx = riderFocusIdx % list.length;
+                        const rep = list[riderFocusIdx];
+                        const lat = parseFloat(rep.latitud);
+                        const lng = parseFloat(rep.longitud);
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            map.setView([lat, lng], 15);
+                            if (riderMarkers[rep.id]) {
+                                riderMarkers[rep.id].openPopup();
+                            }
+                        }
+                        riderFocusIdx++;
+                    } else {
+                        alert("No hay repartidores activos online para enfocar en este momento.");
+                    }
+                } catch (e) {
+                    console.error("Error al enfocar repartidor:", e);
+                }
+            });
+        }
+
+        if (btnMapCycleOrders) {
+            btnMapCycleOrders.addEventListener('click', () => {
+                const pedidosActivos = todosLosPedidos.filter(p => ['pendiente', 'asignado', 'en_camino_recogida', 'en_ruta'].includes(p.estado));
+                if (pedidosActivos.length > 0) {
+                    orderFocusIdx = orderFocusIdx % pedidosActivos.length;
+                    const ped = pedidosActivos[orderFocusIdx];
+                    const lat = parseFloat(ped.latitud_recogida || ped.latitud_entrega);
+                    const lng = parseFloat(ped.longitud_recogida || ped.longitud_entrega);
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        map.setView([lat, lng], 15);
+                    }
+                    orderFocusIdx++;
+                } else {
+                    alert("No hay pedidos activos para enfocar en este momento.");
+                }
+            });
+        }
+
+        if (btnLogout) {
+            btnLogout.addEventListener('click', () => {
+                localStorage.removeItem('usuario');
+                localStorage.removeItem('token');
+                window.location.href = 'inicio_de_sesion.html';
+            });
+        }
 
         cargarEstadisticas();
         cargarListadoPedidos();

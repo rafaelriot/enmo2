@@ -222,16 +222,19 @@
 </header>
 <!-- UI Overlay Controls -->
 <div class="fixed right-margin-mobile top-1/4 flex flex-col gap-sm z-40">
-<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
+<button id="btn-map-reset" title="Centrar en Tabasco" class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all select-none">
 <span class="material-symbols-outlined text-primary">my_location</span>
 </button>
-<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
-<span class="material-symbols-outlined text-on-surface">layers</span>
+<button id="btn-map-cycle-riders" title="Enfocar siguiente repartidor" class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all select-none">
+<span class="material-symbols-outlined text-secondary" style="color: #625b71;">two_wheeler</span>
 </button>
-<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
+<button id="btn-map-cycle-orders" title="Enfocar siguiente pedido" class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all select-none">
+<span class="material-symbols-outlined text-tertiary" style="color: #386a20;">package_2</span>
+</button>
+<button id="btn-map-zoom-in" title="Acercar" class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all select-none">
 <span class="material-symbols-outlined text-on-surface">add</span>
 </button>
-<button class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all">
+<button id="btn-map-zoom-out" title="Alejar" class="w-12 h-12 glass-panel shadow-md rounded-xl flex items-center justify-center active:scale-95 transition-all select-none">
 <span class="material-symbols-outlined text-on-surface">remove</span>
 </button>
 </div>
@@ -372,6 +375,10 @@
 
     let riderMarkers = {};
     let orderMarkers = {};
+    let riderFocusIdx = 0;
+    let orderFocusIdx = 0;
+    let listadoRepartidoresActual = [];
+    let listadoPedidosActual = [];
 
     // ─── Mapa para ADMINISTRADOR / REPARTIDOR: muestra todos los repartidores y pedidos activos ───
     async function actualizarMapaRepartidores() {
@@ -389,6 +396,7 @@
             const pedResult = await pedResponse.json();
 
             if (repResponse.ok && repResult.status === 'success') {
+                listadoRepartidoresActual = repResult.data;
                 const activeIds = new Set(repResult.data.map(r => r.id));
 
                 // Quitar repartidores que se desconectaron
@@ -435,6 +443,7 @@
                 orderMarkers = {};
 
                 const pedidosActivos = pedResult.data.filter(p => ['pendiente', 'asignado', 'en_camino_recogida', 'en_ruta'].includes(p.estado));
+                listadoPedidosActual = pedidosActivos;
 
                 pedidosActivos.forEach(pedido => {
                     const latR = parseFloat(pedido.latitud_recogida);
@@ -692,6 +701,69 @@
             localStorage.removeItem('token');
             window.location.href = 'inicio_de_sesion.html';
         });
+
+        // Controles de mapa flotantes
+        const btnMapReset = document.getElementById('btn-map-reset');
+        const btnMapCycleRiders = document.getElementById('btn-map-cycle-riders');
+        const btnMapCycleOrders = document.getElementById('btn-map-cycle-orders');
+        const btnZoomIn = document.getElementById('btn-map-zoom-in');
+        const btnZoomOut = document.getElementById('btn-map-zoom-out');
+
+        if (btnMapReset) {
+            btnMapReset.addEventListener('click', () => {
+                map.setView([17.9895, -92.9475], 13);
+            });
+        }
+
+        if (btnMapCycleRiders) {
+            btnMapCycleRiders.addEventListener('click', () => {
+                if (listadoRepartidoresActual.length > 0) {
+                    riderFocusIdx = riderFocusIdx % listadoRepartidoresActual.length;
+                    const rep = listadoRepartidoresActual[riderFocusIdx];
+                    const lat = parseFloat(rep.latitud);
+                    const lng = parseFloat(rep.longitud);
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        map.setView([lat, lng], 15);
+                        toggleDrawer(rep);
+                    }
+                    riderFocusIdx++;
+                } else {
+                    alert("No hay repartidores activos online para enfocar en este momento.");
+                }
+            });
+        }
+
+        if (btnMapCycleOrders) {
+            btnMapCycleOrders.addEventListener('click', () => {
+                if (listadoPedidosActual.length > 0) {
+                    orderFocusIdx = orderFocusIdx % listadoPedidosActual.length;
+                    const ped = listadoPedidosActual[orderFocusIdx];
+                    const lat = parseFloat(ped.latitud_recogida || ped.latitud_entrega);
+                    const lng = parseFloat(ped.longitud_recogida || ped.longitud_entrega);
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        map.setView([lat, lng], 15);
+                        if (orderMarkers[`rec_${ped.id}`]) {
+                            orderMarkers[`rec_${ped.id}`].openPopup();
+                        }
+                    }
+                    orderFocusIdx++;
+                } else {
+                    alert("No hay pedidos activos en curso para enfocar en este momento.");
+                }
+            });
+        }
+
+        if (btnZoomIn) {
+            btnZoomIn.addEventListener('click', () => {
+                map.zoomIn();
+            });
+        }
+
+        if (btnZoomOut) {
+            btnZoomOut.addEventListener('click', () => {
+                map.zoomOut();
+            });
+        }
     });
 
     if (usuario.rol === 'administrador' || usuario.rol === 'repartidor') {
