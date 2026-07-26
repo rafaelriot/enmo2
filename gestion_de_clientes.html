@@ -148,37 +148,48 @@ function renderizarClientes() {
     const filtrados = clientesLista.filter(c => 
         (c.nombre && c.nombre.toLowerCase().includes(query)) ||
         (c.email && c.email.toLowerCase().includes(query)) ||
-        (c.telefono && c.telefono.includes(query))
+        (c.telefono && c.telefono.includes(query)) ||
+        (c.rol && c.rol.toLowerCase().includes(query))
     );
 
     if (filtrados.length === 0) {
-        container.innerHTML = '<p class="text-on-surface-variant text-center py-8 col-span-full">No se encontraron clientes registrados con los criterios especificados.</p>';
+        container.innerHTML = '<p class="text-on-surface-variant text-center py-8 col-span-full">No se encontraron usuarios registrados con los criterios especificados.</p>';
         return;
     }
 
     container.innerHTML = '';
     filtrados.forEach(c => {
         const iniciales = c.nombre ? c.nombre.split(' ').map(p => p[0]).join('').substring(0, 2).toUpperCase() : 'CL';
-        const fechaReg = c.created_at ? new Date(c.created_at).toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A';
 
         const avatarHtml = c.foto_url ?
             `<img src="${c.foto_url}" class="w-full h-full object-cover" />` :
             `<div class="w-full h-full bg-primary-container text-on-primary-container font-black flex items-center justify-center text-sm">${iniciales}</div>`;
 
+        let roleBadgeClass = 'bg-primary/10 text-primary';
+        if (c.rol === 'repartidor') {
+            roleBadgeClass = 'bg-amber-500/10 text-amber-700';
+        } else if (c.rol === 'administrador') {
+            roleBadgeClass = 'bg-blue-600/10 text-blue-700';
+        }
+
         const cardHtml = `
-            <div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm border border-surface-container-high border-l-4 speed-line-green hover:shadow-md transition-all flex flex-col justify-between">
+            <div class="bg-surface-container-lowest rounded-xl p-gutter shadow-sm border border-surface-container-high border-l-4 ${c.estado === 'activo' ? 'speed-line-green' : 'border-l-error'} hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
                     <div class="flex items-start justify-between gap-3 mb-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-surface-container-high">
+                            <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-surface-container-high relative">
                                 ${avatarHtml}
+                                ${c.estado !== 'activo' ? `<div class="absolute inset-0 bg-black/40 flex items-center justify-center text-[10px] text-white font-extrabold select-none">INACTIVO</div>` : ''}
                             </div>
                             <div class="min-w-0">
-                                <h3 class="font-label-bold text-on-surface text-sm truncate">${c.nombre}</h3>
+                                <h3 class="font-label-bold text-on-surface text-sm truncate flex items-center gap-1">
+                                    ${c.nombre}
+                                    ${c.estado !== 'activo' ? '<span class="text-error text-xs font-black">●</span>' : ''}
+                                </h3>
                                 <p class="text-xs text-on-surface-variant truncate">${c.email}</p>
                             </div>
                         </div>
-                        <span class="px-2 py-0.5 bg-primary/10 text-primary rounded text-[9px] font-bold uppercase tracking-wider">CLIENTE</span>
+                        <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${roleBadgeClass}">${c.rol}</span>
                     </div>
 
                     <div class="space-y-1 my-3 text-xs text-on-surface-variant">
@@ -193,14 +204,134 @@ function renderizarClientes() {
                     </div>
                 </div>
 
-                <div class="pt-3 border-t border-surface-container-high flex justify-between items-center text-[10px] font-label-bold uppercase">
-                    <span class="text-on-surface-variant">Pedidos Realizados</span>
-                    <span class="text-primary font-black text-xs">${c.total_pedidos || 0} envíos</span>
+                <div class="pt-3 border-t border-surface-container-high flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-[10px] font-label-bold uppercase text-on-surface-variant">
+                        <span>Pedidos Relacionados</span>
+                        <span class="text-primary font-black text-xs">${c.total_pedidos || 0} envíos</span>
+                    </div>
+                    
+                    <!-- ACCIONES DE ADMINISTRACIÓN -->
+                    <div class="flex items-center justify-between gap-2 bg-surface-container-low p-2 rounded-lg mt-1">
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] font-bold text-outline uppercase mr-1">Rol:</span>
+                            <select onchange="cambiarRol(${c.id}, this.value)" class="text-[11px] bg-white border border-outline rounded p-0.5 text-on-surface font-label-bold select-none cursor-pointer">
+                                <option value="cliente" ${c.rol === 'cliente' ? 'selected' : ''}>Cliente</option>
+                                <option value="repartidor" ${c.rol === 'repartidor' ? 'selected' : ''}>Repartidor</option>
+                                <option value="administrador" ${c.rol === 'administrador' ? 'selected' : ''}>Admin</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="cambiarEstado(${c.id}, '${c.estado === 'activo' ? 'inactivo' : 'activo'}')" class="text-[11px] px-2 py-1 rounded font-bold transition-all ${c.estado === 'activo' ? 'bg-error/10 text-error hover:bg-error/20' : 'bg-primary/10 text-primary hover:bg-primary/20'}">
+                                ${c.estado === 'activo' ? 'Desactivar' : 'Activar'}
+                            </button>
+                            <button onclick="eliminarUsuario(${c.id})" class="p-1 rounded text-error hover:bg-error-container/10 transition-colors flex items-center justify-center" title="Eliminar Usuario">
+                                <span class="material-symbols-outlined text-sm font-bold">delete</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
         container.insertAdjacentHTML('beforeend', cardHtml);
     });
+}
+
+async function cambiarRol(userId, rol) {
+    const adminUser = JSON.parse(localStorage.getItem('usuario') || '{}');
+    if (userId === adminUser.id && rol !== 'administrador') {
+        if (!confirm("⚠️ ¿Estás seguro de quitarte el rol de Administrador a ti mismo? Perderás acceso a este panel inmediatamente.")) {
+            cargarClientes(); // Recargar para revertir select
+            return;
+        }
+    }
+
+    try {
+        const response = await fetch('api/admin/usuarios/modificar', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                usuario_id: userId,
+                rol: rol
+            })
+        });
+        const result = await response.json();
+        if (response.ok && result.status === 'success') {
+            if (userId === adminUser.id && rol !== 'administrador') {
+                localStorage.removeItem('usuario');
+                localStorage.removeItem('token');
+                window.location.href = 'inicio_de_sesion.html';
+                return;
+            }
+            alert("Rol actualizado correctamente.");
+            cargarClientes();
+        } else {
+            alert("Error: " + (result.message || "No se pudo actualizar el rol."));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión al actualizar rol.");
+    }
+}
+
+async function cambiarEstado(userId, estado) {
+    const adminUser = JSON.parse(localStorage.getItem('usuario') || '{}');
+    if (userId === adminUser.id && estado === 'inactivo') {
+        alert("❌ No puedes desactivar tu propia cuenta de administrador en sesión.");
+        return;
+    }
+
+    try {
+        const response = await fetch('api/admin/usuarios/modificar', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                usuario_id: userId,
+                estado: estado
+            })
+        });
+        const result = await response.json();
+        if (response.ok && result.status === 'success') {
+            alert("Estado de cuenta actualizado correctamente.");
+            cargarClientes();
+        } else {
+            alert("Error: " + (result.message || "No se pudo actualizar el estado."));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión al actualizar estado.");
+    }
+}
+
+async function eliminarUsuario(userId) {
+    const adminUser = JSON.parse(localStorage.getItem('usuario') || '{}');
+    if (userId === adminUser.id) {
+        alert("❌ No puedes eliminar tu propia cuenta de administrador en sesión.");
+        return;
+    }
+
+    if (!confirm("⚠️ ¿Estás completamente seguro de eliminar este usuario? Esta acción es irreversible y borrará sus documentos y desvinculará sus pedidos asociados.")) {
+        return;
+    }
+
+    try {
+        const response = await fetch('api/admin/usuarios/eliminar', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                usuario_id: userId
+            })
+        });
+        const result = await response.json();
+        if (response.ok && result.status === 'success') {
+            alert("Usuario eliminado correctamente.");
+            cargarClientes();
+        } else {
+            alert("Error: " + (result.message || "No se pudo eliminar el usuario."));
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error de conexión al eliminar usuario.");
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -167,6 +167,16 @@ $app->group('/api/usuarios', function ($group) {
                     } catch (\Throwable $te) {}
                 }
 
+                // Si el rol en la base de datos está vacío o es NULL, asignarle el rol 'cliente' automáticamente
+                if (empty($user['rol'])) {
+                    try {
+                        $updateRolSql = "UPDATE usuarios SET rol = 'cliente' WHERE id = :id";
+                        $updateRolStmt = $db->prepare($updateRolSql);
+                        $updateRolStmt->execute([':id' => $user['id']]);
+                        $user['rol'] = 'cliente';
+                    } catch (\Throwable $te) {}
+                }
+
                 // Verificar si tiene documentos vencidos y actualizar su estado a inactivo
                 if ($user['rol'] === 'repartidor') {
                     $expSql = "SELECT COUNT(*) as exp_count 

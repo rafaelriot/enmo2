@@ -563,17 +563,19 @@ $app->group('/api/admin', function ($group) {
             $dbObj = new Db();
             $db = $dbObj->connect();
 
-            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado,
-                           (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_usuario_id = u.id) AS total_pedidos,
+            $sql = "SELECT u.id, u.nombre, u.email, u.telefono, u.foto_url, u.estado, u.rol,
+                           (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_usuario_id = u.id OR p.repartidor_id = u.id) AS total_pedidos,
                            (SELECT AVG(p.calificacion_cliente_estrellas) FROM pedidos p WHERE p.cliente_usuario_id = u.id AND p.calificacion_cliente_estrellas IS NOT NULL) AS calificacion_promedio
                     FROM usuarios u
-                    WHERE u.rol = 'cliente' OR u.rol IS NULL OR u.rol = ''
                     ORDER BY u.id DESC";
             $stmt = $db->query($sql);
             $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($clientes as &$c) {
                 $c['calificacion_promedio'] = $c['calificacion_promedio'] ? round((float)$c['calificacion_promedio'], 1) : null;
+                if (empty($c['rol'])) {
+                    $c['rol'] = 'cliente';
+                }
             }
 
             $response->getBody()->write(json_encode([
@@ -586,6 +588,97 @@ $app->group('/api/admin', function ($group) {
             $response->getBody()->write(json_encode([
                 "status" => "error",
                 "message" => "Error de base de datos: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Modificar rol o estado de un usuario (POST /api/admin/usuarios/modificar)
+    $group->post('/usuarios/modificar', function (Request $request, Response $response) {
+        $data = json_decode($request->getBody()->getContents(), true);
+        $userId = $data['usuario_id'] ?? null;
+        $nuevoRol = $data['rol'] ?? null;
+        $nuevoEstado = $data['estado'] ?? null;
+
+        if (empty($userId)) {
+            $response->getBody()->write(json_encode(["status" => "error", "message" => "ID de usuario es requerido."]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $updates = [];
+            $params = [':id' => $userId];
+
+            if ($nuevoRol !== null) {
+                $updates[] = "rol = :rol";
+                $params[':rol'] = $nuevoRol;
+            }
+            if ($nuevoEstado !== null) {
+                $updates[] = "estado = :estado";
+                $params[':estado'] = $nuevoEstado;
+            }
+
+            if (empty($updates)) {
+                $response->getBody()->write(json_encode(["status" => "error", "message" => "No hay campos para actualizar."]));
+                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            }
+
+            $sql = "UPDATE usuarios SET " . implode(", ", $updates) . " WHERE id = :id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Usuario actualizado correctamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Throwable $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error interno del servidor: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
+    // Eliminar un usuario (POST /api/admin/usuarios/eliminar)
+    $group->post('/usuarios/eliminar', function (Request $request, Response $response) {
+        $data = json_decode($request->getBody()->getContents(), true);
+        $userId = $data['usuario_id'] ?? null;
+
+        if (empty($userId)) {
+            $response->getBody()->write(json_encode(["status" => "error", "message" => "ID de usuario es requerido."]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+        }
+
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            // 1. Eliminar documentos del repartidor si existen
+            $db->prepare("DELETE FROM documentos_repartidor WHERE usuario_id = :id")->execute([':id' => $userId]);
+
+            // 2. Desvincular pedidos del cliente o repartidor
+            $db->prepare("UPDATE pedidos SET repartidor_id = NULL WHERE repartidor_id = :id")->execute([':id' => $userId]);
+            $db->prepare("UPDATE pedidos SET cliente_usuario_id = NULL WHERE cliente_usuario_id = :id")->execute([':id' => $userId]);
+
+            // 3. Eliminar usuario
+            $sql = "DELETE FROM usuarios WHERE id = :id";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':id' => $userId]);
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "message" => "Usuario eliminado correctamente."
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Throwable $e) {
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error interno del servidor: " . $e->getMessage()
             ]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
         }
