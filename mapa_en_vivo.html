@@ -371,18 +371,27 @@
     }).addTo(map);
 
     let riderMarkers = {};
+    let orderMarkers = {};
 
-    // ─── Mapa para ADMINISTRADOR / REPARTIDOR: muestra todos los repartidores online ───
+    // ─── Mapa para ADMINISTRADOR / REPARTIDOR: muestra todos los repartidores y pedidos activos ───
     async function actualizarMapaRepartidores() {
         try {
-            const response = await fetch('api/admin/repartidores-online', {
+            // 1. Obtener repartidores online
+            const repResponse = await fetch('api/admin/repartidores-online', {
                 headers: getAuthHeaders()
             });
-            const result = await response.json();
+            const repResult = await repResponse.json();
 
-            if (response.ok && result.status === 'success') {
-                const activeIds = new Set(result.data.map(r => r.id));
+            // 2. Obtener pedidos en curso
+            const pedResponse = await fetch(`api/pedidos?usuario_id=${usuario.id}`, {
+                headers: getAuthHeaders()
+            });
+            const pedResult = await pedResponse.json();
 
+            if (repResponse.ok && repResult.status === 'success') {
+                const activeIds = new Set(repResult.data.map(r => r.id));
+
+                // Quitar repartidores que se desconectaron
                 Object.keys(riderMarkers).forEach(id => {
                     if (!activeIds.has(parseInt(id))) {
                         map.removeLayer(riderMarkers[id]);
@@ -390,24 +399,101 @@
                     }
                 });
 
-                result.data.forEach(rep => {
+                // Renderizar repartidores con divIcon personalizados
+                repResult.data.forEach(rep => {
                     const lat = parseFloat(rep.latitud);
                     const lng = parseFloat(rep.longitud);
                     if (!isNaN(lat) && !isNaN(lng)) {
-                        const color = rep.ocupado ? '#feb700' : '#006e25';
+                        const iconRider = L.divIcon({
+                            html: `<div class="flex items-center justify-center w-8 h-8 rounded-full shadow-lg border-2 ${rep.ocupado ? 'bg-amber-500 border-amber-600' : 'bg-green-600 border-green-700'} text-white marker-float">
+                                     <span class="material-symbols-outlined text-[18px]">two_wheeler</span>
+                                   </div>`,
+                            className: 'custom-div-icon',
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16]
+                        });
+
                         if (riderMarkers[rep.id]) {
                             riderMarkers[rep.id].setLatLng([lat, lng]);
-                            riderMarkers[rep.id].setStyle({ color });
+                            // Asegurar callback actualizado
+                            riderMarkers[rep.id].off('click').on('click', e => { L.DomEvent.stopPropagation(e); toggleDrawer(rep); });
                         } else {
-                            const marker = L.circleMarker([lat, lng], { color, radius: 10, fillOpacity: 0.9 }).addTo(map);
+                            const marker = L.marker([lat, lng], { icon: iconRider }).addTo(map);
                             marker.on('click', e => { L.DomEvent.stopPropagation(e); toggleDrawer(rep); });
                             riderMarkers[rep.id] = marker;
                         }
                     }
                 });
             }
+
+            // 3. Dibujar pedidos activos
+            if (pedResponse.ok && pedResult.status === 'success') {
+                // Limpiar marcadores de pedidos previos
+                Object.values(orderMarkers).forEach(m => {
+                    try { map.removeLayer(m); } catch(e) {}
+                });
+                orderMarkers = {};
+
+                const pedidosActivos = pedResult.data.filter(p => ['pendiente', 'asignado', 'en_camino_recogida', 'en_ruta'].includes(p.estado));
+
+                pedidosActivos.forEach(pedido => {
+                    const latR = parseFloat(pedido.latitud_recogida);
+                    const lngR = parseFloat(pedido.longitud_recogida);
+                    const latE = parseFloat(pedido.latitud_entrega);
+                    const lngE = parseFloat(pedido.longitud_entrega);
+                    const orderId = pedido.id;
+
+                    const iconRecogida = L.divIcon({
+                        html: `<div class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500 border-2 border-orange-600 text-white shadow-lg">
+                                 <span class="material-symbols-outlined text-[16px]">store</span>
+                               </div>`,
+                        className: 'custom-div-icon',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    });
+
+                    const iconEntrega = L.divIcon({
+                        html: `<div class="flex items-center justify-center w-8 h-8 rounded-full bg-red-650 border-2 border-red-800 text-white shadow-lg animate-bounce">
+                                 <span class="material-symbols-outlined text-[16px]">home</span>
+                               </div>`,
+                        className: 'custom-div-icon',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    });
+
+                    if (!isNaN(latR) && !isNaN(lngR)) {
+                        const mRec = L.marker([latR, lngR], { icon: iconRecogida })
+                            .addTo(map)
+                            .bindPopup(`<b>Recogida del Pedido #EM-${orderId}</b><br>Cliente: ${pedido.cliente_nombre}<br>Dirección: ${pedido.direccion_recogida || 'No especificada'}`);
+                        orderMarkers[`rec_${orderId}`] = mRec;
+                    }
+
+                    if (!isNaN(latE) && !isNaN(lngE)) {
+                        const mEnt = L.marker([latE, lngE], { icon: iconEntrega })
+                            .addTo(map)
+                            .bindPopup(`<b>Entrega del Pedido #EM-${orderId}</b><br>Cliente: ${pedido.cliente_nombre}<br>Dirección: ${pedido.direccion_entrega}`);
+                        orderMarkers[`ent_${orderId}`] = mEnt;
+                    }
+
+                    if (!isNaN(latR) && !isNaN(lngR) && !isNaN(latE) && !isNaN(lngE)) {
+                        const poly = L.polyline([[latR, lngR], [latE, lngE]], { color: '#006e25', weight: 2.5, opacity: 0.5, dashArray: '6, 6' }).addTo(map);
+                        orderMarkers[`line_${orderId}`] = poly;
+                    }
+
+                    // Si el repartidor está en tránsito, dibujar línea de despacho
+                    if (pedido.repartidor_id && (pedido.estado === 'asignado' || pedido.estado === 'en_camino_recogida' || pedido.estado === 'en_ruta')) {
+                        const repMarker = riderMarkers[pedido.repartidor_id];
+                        if (repMarker) {
+                            const repLatLng = repMarker.getLatLng();
+                            const targetLatLng = (pedido.estado === 'en_ruta') ? [latE, lngE] : [latR, lngR];
+                            const repPoly = L.polyline([repLatLng, targetLatLng], { color: '#feb700', weight: 3, opacity: 0.7, dashArray: '4, 4' }).addTo(map);
+                            orderMarkers[`rep_line_${orderId}`] = repPoly;
+                        }
+                    }
+                });
+            }
         } catch (e) {
-            console.error('Error al actualizar mapa:', e);
+            console.error('Error al actualizar mapa de repartidores:', e);
         }
     }
 
