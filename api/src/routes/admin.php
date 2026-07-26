@@ -567,7 +567,7 @@ $app->group('/api/admin', function ($group) {
                            (SELECT COUNT(*) FROM pedidos p WHERE p.cliente_usuario_id = u.id) AS total_pedidos,
                            (SELECT AVG(p.calificacion_cliente_estrellas) FROM pedidos p WHERE p.cliente_usuario_id = u.id AND p.calificacion_cliente_estrellas IS NOT NULL) AS calificacion_promedio
                     FROM usuarios u
-                    WHERE u.rol = 'cliente'
+                    WHERE u.rol = 'cliente' OR u.rol IS NULL OR u.rol = ''
                     ORDER BY u.id DESC";
             $stmt = $db->query($sql);
             $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
