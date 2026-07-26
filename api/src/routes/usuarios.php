@@ -52,6 +52,32 @@ $app->group('/api/usuarios', function ($group) {
 
             // Verificar la contraseña (usando password_verify para passwords hashed)
             if ($user && password_verify($password, $user['password'])) {
+                // Verificar si tiene documentos vencidos y actualizar su estado a inactivo
+                if ($user['rol'] === 'repartidor') {
+                    $expSql = "SELECT COUNT(*) as exp_count 
+                               FROM documentos_repartidor 
+                               WHERE usuario_id = :uid 
+                                 AND estado = 'aprobado' 
+                                 AND fecha_expiracion IS NOT NULL 
+                                 AND fecha_expiracion < CURDATE()";
+                    $expStmt = $db->prepare($expSql);
+                    $expStmt->execute([':uid' => $user['id']]);
+                    $expResult = $expStmt->fetch();
+                    if ((int)($expResult['exp_count'] ?? 0) > 0) {
+                        $db->prepare("UPDATE usuarios SET estado = 'inactivo' WHERE id = :uid")->execute([':uid' => $user['id']]);
+                        $user['estado'] = 'inactivo';
+                    }
+                }
+
+                // Bloquear el acceso si el usuario está inactivo (permitiendo siempre a los administradores)
+                if ($user['estado'] !== 'activo' && $user['rol'] !== 'administrador') {
+                    $response->getBody()->write(json_encode([
+                        "status" => "error",
+                        "message" => "Tu cuenta está inactiva o tienes documentos regulatorios (licencia o seguro) vencidos. Por favor, ponte en contacto con la administración."
+                    ], JSON_UNESCAPED_UNICODE));
+                    return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
+                }
+
                 // Quitar password de la respuesta
                 unset($user['password']);
 
@@ -139,6 +165,32 @@ $app->group('/api/usuarios', function ($group) {
                         $updateFotoStmt->execute([':foto_url' => $foto_url, ':id' => $user['id']]);
                         $user['foto_url'] = $foto_url;
                     } catch (\Throwable $te) {}
+                }
+
+                // Verificar si tiene documentos vencidos y actualizar su estado a inactivo
+                if ($user['rol'] === 'repartidor') {
+                    $expSql = "SELECT COUNT(*) as exp_count 
+                               FROM documentos_repartidor 
+                               WHERE usuario_id = :uid 
+                                 AND estado = 'aprobado' 
+                                 AND fecha_expiracion IS NOT NULL 
+                                 AND fecha_expiracion < CURDATE()";
+                    $expStmt = $db->prepare($expSql);
+                    $expStmt->execute([':uid' => $user['id']]);
+                    $expResult = $expStmt->fetch();
+                    if ((int)($expResult['exp_count'] ?? 0) > 0) {
+                        $db->prepare("UPDATE usuarios SET estado = 'inactivo' WHERE id = :uid")->execute([':uid' => $user['id']]);
+                        $user['estado'] = 'inactivo';
+                    }
+                }
+
+                // Bloquear el acceso si el usuario está inactivo (permitiendo siempre a los administradores)
+                if ($user['estado'] !== 'activo' && $user['rol'] !== 'administrador') {
+                    $response->getBody()->write(json_encode([
+                        "status" => "error",
+                        "message" => "Tu cuenta está inactiva o tienes documentos regulatorios (licencia o seguro) vencidos. Por favor, ponte en contacto con la administración."
+                    ], JSON_UNESCAPED_UNICODE));
+                    return $response->withHeader('Content-Type', 'application/json')->withStatus(403);
                 }
 
                 // Generar Token JWT para Google login
@@ -812,7 +864,7 @@ $app->group('/api/usuarios', function ($group) {
             $dbObj = new Db();
             $db = $dbObj->connect();
 
-            $sql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo, created_at, updated_at
+            $sql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo, fecha_expiracion, created_at, updated_at
                     FROM documentos_repartidor
                     WHERE usuario_id = :uid
                     ORDER BY tipo_documento ASC";

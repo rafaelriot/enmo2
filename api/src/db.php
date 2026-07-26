@@ -64,6 +64,15 @@ class Db {
                     $dbConnection->exec("ALTER TABLE usuarios ADD COLUMN google_id VARCHAR(255) NULL AFTER foto_url");
                 }
             }
+
+            // Verificar si la tabla documentos_repartidor existe y actualizarla
+            $checkDocTable = $dbConnection->query("SHOW TABLES LIKE 'documentos_repartidor'");
+            if ($checkDocTable && $checkDocTable->rowCount() > 0) {
+                $checkExp = $dbConnection->query("SHOW COLUMNS FROM documentos_repartidor LIKE 'fecha_expiracion'");
+                if ($checkExp && $checkExp->rowCount() === 0) {
+                    $dbConnection->exec("ALTER TABLE documentos_repartidor ADD COLUMN fecha_expiracion DATE NULL AFTER ruta_archivo");
+                }
+            }
         } catch (\Throwable $t) {
             // Ignorar errores de alter si carece de permisos de DDL, permitiendo continuar la conexión
         }

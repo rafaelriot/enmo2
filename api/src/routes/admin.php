@@ -357,7 +357,7 @@ $app->group('/api/admin', function ($group) {
 
             // Para cada repartidor, obtener sus documentos
             foreach ($repartidores as &$rep) {
-                $docSql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo
+                $docSql = "SELECT id, tipo_documento, nombre_archivo, estado, motivo_rechazo, fecha_expiracion
                            FROM documentos_repartidor
                            WHERE usuario_id = :uid
                            ORDER BY tipo_documento ASC";
@@ -397,6 +397,7 @@ $app->group('/api/admin', function ($group) {
         $accion = $data['accion'] ?? null; // 'aprobar' o 'rechazar'
         $motivoRechazo = $data['motivo_rechazo'] ?? null;
         $revisadoPor = $data['admin_id'] ?? null;
+        $fechaExpiracion = $data['fecha_expiracion'] ?? null;
 
         if (empty($docId) || empty($accion)) {
             $response->getBody()->write(json_encode([
@@ -432,6 +433,7 @@ $app->group('/api/admin', function ($group) {
                     SET estado = :estado,
                         motivo_rechazo = :motivo,
                         revisado_por = :admin_id,
+                        fecha_expiracion = :fecha_exp,
                         updated_at = CURRENT_TIMESTAMP
                     WHERE id = :doc_id";
             $stmt = $db->prepare($sql);
@@ -439,6 +441,7 @@ $app->group('/api/admin', function ($group) {
                 ':estado' => $nuevoEstado,
                 ':motivo' => ($accion === 'rechazar') ? $motivoRechazo : null,
                 ':admin_id' => $revisadoPor,
+                ':fecha_exp' => ($accion === 'aprobar' && !empty($fechaExpiracion)) ? $fechaExpiracion : null,
                 ':doc_id' => $docId
             ]);
 

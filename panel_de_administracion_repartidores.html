@@ -388,7 +388,19 @@
                 let statusText = '';
                 if (doc.estado === 'aprobado') {
                     statusBadge = '<span class="material-symbols-outlined text-primary">check_circle</span>';
-                    statusText = '<span class="text-primary text-xs font-bold">Aprobado</span>';
+                    let expText = '';
+                    if (doc.fecha_expiracion) {
+                        const hoy = new Date();
+                        hoy.setHours(0,0,0,0);
+                        const fExp = new Date(doc.fecha_expiracion + 'T00:00:00');
+                        const expStr = fExp.toLocaleDateString();
+                        if (fExp < hoy) {
+                            expText = `<br><span class="text-error font-extrabold text-[10px] bg-error-container px-1 py-0.5 rounded border border-error/30">VENCIDO (${expStr})</span>`;
+                        } else {
+                            expText = `<br><span class="text-on-surface-variant text-[10px] bg-surface-container px-1 py-0.5 rounded">Vence: ${expStr}</span>`;
+                        }
+                    }
+                    statusText = `<span class="text-primary text-xs font-bold">Aprobado${expText}</span>`;
                 } else if (doc.estado === 'rechazado') {
                     statusBadge = '<span class="material-symbols-outlined text-error">cancel</span>';
                     statusText = `<span class="text-error text-xs font-bold">Rechazado: ${doc.motivo_rechazo || ''}</span>`;
@@ -426,9 +438,26 @@
 
         async function revisarDocumento(docId, accion) {
             let motivo = null;
+            let fechaExp = null;
             if (accion === 'rechazar') {
                 motivo = prompt("Ingresa el motivo de rechazo del documento:");
                 if (!motivo) return; // Cancelado
+            } else if (accion === 'aprobar') {
+                const docObj = candidatoSeleccionado.documentos.find(d => d.id === docId);
+                const docType = docObj ? docObj.tipo_documento : '';
+                
+                // Solicitar fecha de expiración para Licencia de Conducir o Seguro
+                if (['licencia_conducir', 'seguro_vehiculo'].includes(docType)) {
+                    fechaExp = prompt("Ingresa la fecha de expiración del documento (AAAA-MM-DD) o déjalo en blanco si no aplica:");
+                    if (fechaExp === null) return; // Canceló el prompt
+                    if (fechaExp !== '') {
+                        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                        if (!dateRegex.test(fechaExp)) {
+                            alert("Formato de fecha inválido. Debe usar AAAA-MM-DD (ej: 2027-12-31).");
+                            return;
+                        }
+                    }
+                }
             }
 
             const adminUser = JSON.parse(localStorage.getItem('usuario') || '{}');
@@ -441,6 +470,7 @@
                         documento_id: docId,
                         accion: accion,
                         motivo_rechazo: motivo,
+                        fecha_expiracion: fechaExp || null,
                         admin_id: adminUser.id || null
                     })
                 });
