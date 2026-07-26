@@ -588,14 +588,53 @@ $app->group('/api/admin', function ($group) {
         }
     });
 
-    // Obtener los logs más recientes del sistema (GET /api/admin/observabilidad/logs)
+    // Obtener los logs más recientes del sistema con filtros de búsqueda y nivel (GET /api/admin/observabilidad/logs)
     $group->get('/observabilidad/logs', function (Request $request, Response $response) {
-        $logs = App\Logger::getRecentLogs(100);
+        $queryParams = $request->getQueryParams();
+        $level = isset($queryParams['level']) ? strtoupper(trim($queryParams['level'])) : '';
+        $search = isset($queryParams['search']) ? strtolower(trim($queryParams['search'])) : '';
+        $limit = isset($queryParams['limit']) ? (int)$queryParams['limit'] : 100;
+        if ($limit <= 0) $limit = 100;
+        if ($limit > 1000) $limit = 1000;
+
+        // Leer una cantidad suficiente de logs históricos para poder filtrar con holgura
+        $allLogs = App\Logger::getRecentLogs(800);
+        $filtered = [];
+
+        foreach ($allLogs as $log) {
+            // Filtro por Nivel
+            if (!empty($level) && ($log['level'] ?? '') !== $level) {
+                continue;
+            }
+
+            // Filtro por Texto de Búsqueda (Búsqueda en mensaje, correlation_id, uri, ip, user_id)
+            if (!empty($search)) {
+                $msg = strtolower($log['message'] ?? '');
+                $cid = strtolower($log['correlation_id'] ?? '');
+                $uri = strtolower($log['uri'] ?? '');
+                $ip = strtolower($log['ip'] ?? '');
+                $uid = strtolower((string)($log['user_id'] ?? ''));
+
+                if (strpos($msg, $search) === false &&
+                    strpos($cid, $search) === false &&
+                    strpos($uri, $search) === false &&
+                    strpos($ip, $search) === false &&
+                    strpos($uid, $search) === false) {
+                    continue;
+                }
+            }
+
+            $filtered[] = $log;
+        }
+
+        // Cortar la cantidad según el límite solicitado
+        $sliced = array_slice($filtered, 0, $limit);
+
         $response->getBody()->write(json_encode([
             "status" => "success",
-            "total" => count($logs),
-            "data" => $logs
-        ]));
+            "total" => count($sliced),
+            "data" => $sliced
+        ], JSON_UNESCAPED_UNICODE));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     });
 

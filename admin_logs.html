@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>enMo2 - Logs y Diagnósticos</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="tailwind-config.js"></script>
+    <script src="app.js"></script>
+    <style>
+        body {
+            background-color: #0c0e12;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #e2e8f0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 pb-32">
+<script>
+// Guard: Solo administradores pueden acceder a esta página
+(function() {
+    const u = localStorage.getItem('usuario');
+    if (!u) { window.location.href = 'inicio_de_sesion.html'; return; }
+    const usr = JSON.parse(u);
+    if (usr.rol !== 'administrador') {
+        window.location.href = 'inicio_de_sesion.html';
+        return;
+    }
+})();
+</script>
+
+<!-- Navigation Drawer Backdrop -->
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-[9998] hidden opacity-0 transition-opacity duration-300"></div>
+
+<!-- Navigation Drawer -->
+<aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-slate-900 border-r border-slate-800 z-[9999] -translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6 shadow-2xl">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="font-display-lg text-[22px] font-black tracking-tighter text-primary">enMo2 Admin</h1>
+    <button id="btn-close-sidebar" class="p-1 rounded-full hover:bg-slate-800 transition-colors">
+      <span class="material-symbols-outlined text-slate-400">close</span>
+    </button>
+  </div>
+  <div class="flex items-center gap-4 p-4 bg-slate-850 rounded-xl mb-6">
+    <div class="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xl font-bold uppercase" id="sidebar-avatar">AD</div>
+    <div class="min-w-0 flex-grow">
+      <h4 class="font-title-md text-sm text-slate-200 truncate" id="sidebar-user-name">Administrador</h4>
+      <p class="text-xs text-slate-400 truncate" id="sidebar-user-email">admin@enmo2.com</p>
+    </div>
+  </div>
+  <nav class="flex-grow space-y-2" id="sidebar-nav">
+    <a href="dashboard_principal.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition-colors font-label-bold">
+      <span class="material-symbols-outlined">home</span>
+      <span>Dashboard Inicio</span>
+    </a>
+    <a href="panel_de_administracion_repartidores.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition-colors font-label-bold">
+      <span class="material-symbols-outlined">two_wheeler</span>
+      <span>Gestión Repartidores</span>
+    </a>
+    <a href="gestion_de_clientes.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition-colors font-label-bold">
+      <span class="material-symbols-outlined">group</span>
+      <span>Gestión Clientes</span>
+    </a>
+    <a href="mapa_en_vivo.html" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 text-slate-300 transition-colors font-label-bold">
+      <span class="material-symbols-outlined">map</span>
+      <span>Mapa en Vivo</span>
+    </a>
+    <a href="admin_logs.html" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary transition-colors font-label-bold">
+      <span class="material-symbols-outlined">terminal</span>
+      <span>Logs y Diagnósticos</span>
+    </a>
+  </nav>
+  <div class="pt-6 border-t border-slate-850">
+    <button id="btn-logout-sidebar" class="w-full py-3 rounded-xl bg-red-950/40 text-red-400 border border-red-900/50 font-label-bold text-sm hover:bg-red-950/60 active:scale-95 transition-all flex items-center justify-center gap-2">
+      <span class="material-symbols-outlined">logout</span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 h-16 flex justify-between items-center px-margin-mobile">
+    <div class="flex items-center gap-4">
+        <button id="btn-menu" class="material-symbols-outlined text-primary p-2 rounded-lg hover:bg-slate-800 transition-colors active:scale-95 duration-150">menu</button>
+        <span class="font-bold text-lg text-slate-200 tracking-tight flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">terminal</span>
+            Visor de Logs y Diagnósticos
+        </span>
+    </div>
+    <div class="flex items-center gap-4">
+        <button id="btn-logout" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all text-xs font-semibold">
+            <span class="material-symbols-outlined text-sm">logout</span> Cerrar Sesión
+        </button>
+        <div class="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-sm" id="top-avatar">AD</div>
+    </div>
+</header>
+
+<main class="mt-24 px-margin-mobile max-w-screen-xl mx-auto space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-100 tracking-tight">Logs de la Aplicación</h1>
+            <p class="text-xs text-slate-400 mt-1">Monitoreo de observabilidad integral y trazas de errores del servidor y cliente en tiempo real.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <label class="inline-flex items-center gap-2 cursor-pointer bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-xs text-slate-300 select-none hover:bg-slate-850">
+                <input type="checkbox" id="check-auto-refresh" class="rounded bg-slate-950 border-slate-700 text-primary focus:ring-primary focus:ring-offset-slate-900" checked />
+                <span>Auto-refrescar (10s)</span>
+            </label>
+            <button id="btn-refresh" class="bg-primary text-slate-950 font-semibold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 hover:bg-opacity-95 active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-sm">sync</span> Actualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <!-- Level Filter Pills -->
+            <div class="flex flex-wrap gap-2 w-full md:w-auto" id="filter-level-pills">
+                <button data-level="" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-primary text-slate-950 shadow-lg shadow-primary/10">TODOS</button>
+                <button data-level="INFO" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-800 text-blue-400 border border-slate-700/50 hover:bg-slate-750">INFO</button>
+                <button data-level="WARNING" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-800 text-amber-500 border border-slate-700/50 hover:bg-slate-750">WARNING</button>
+                <button data-level="ERROR" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-800 text-red-500 border border-slate-700/50 hover:bg-slate-750">ERROR</button>
+                <button data-level="CRITICAL" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-800 text-rose-600 border border-slate-700/50 hover:bg-slate-750">CRITICAL</button>
+            </div>
+            
+            <!-- Search input -->
+            <div class="relative w-full md:w-80">
+                <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-500 text-sm">search</span>
+                <input type="text" id="input-search" class="w-full bg-slate-950 border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs focus:ring-primary focus:border-primary placeholder:text-slate-650 text-slate-200" placeholder="Buscar por Correlation ID, mensaje, IP o URI..." />
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs List Container -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-850/50 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                        <th class="p-4 w-44">Tiempo</th>
+                        <th class="p-4 w-28">Nivel</th>
+                        <th class="p-4">Mensaje</th>
+                        <th class="p-4 w-32">Correlation ID</th>
+                        <th class="p-4 w-36">Endpoint</th>
+                        <th class="p-4 w-32">IP</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-tbody" class="divide-y divide-slate-800/60">
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-450">Cargando logs...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Sidebar controls
+        const btnMenu = document.getElementById('btn-menu');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+
+        const openSidebar = () => {
+            sidebar.classList.remove('-translate-x-full');
+            sidebarBackdrop.classList.remove('hidden');
+            setTimeout(() => sidebarBackdrop.classList.add('opacity-100'), 50);
+        };
+
+        const closeSidebar = () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.remove('opacity-100');
+            setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300);
+        };
+
+        if (btnMenu) btnMenu.addEventListener('click', openSidebar);
+        if (btnCloseSidebar) btnCloseSidebar.addEventListener('click', closeSidebar);
+        if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeSidebar);
+
+        // Session & Logout
+        const handleLogout = () => {
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('token');
+            window.location.href = 'inicio_de_sesion.html';
+        };
+
+        const btnLogout = document.getElementById('btn-logout');
+        const btnLogoutSidebar = document.getElementById('btn-logout-sidebar');
+        if (btnLogout) btnLogout.addEventListener('click', handleLogout);
+        if (btnLogoutSidebar) btnLogoutSidebar.addEventListener('click', handleLogout);
+
+        // Sidebar user info
+        const u = localStorage.getItem('usuario');
+        if (u) {
+            const usr = JSON.parse(u);
+            const nameEl = document.getElementById('sidebar-user-name');
+            const emailEl = document.getElementById('sidebar-user-email');
+            const sidebarAvatar = document.getElementById('sidebar-avatar');
+            const topAvatar = document.getElementById('top-avatar');
+
+            if (nameEl) nameEl.textContent = usr.nombre;
+            if (emailEl) emailEl.textContent = usr.email;
+            
+            const initials = usr.nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            if (sidebarAvatar) sidebarAvatar.textContent = initials;
+            if (topAvatar) topAvatar.textContent = initials;
+        }
+
+        // --- Logs logic ---
+        let currentLevel = '';
+        let currentSearch = '';
+        let autoRefreshInterval = null;
+
+        const getAuthHeaders = () => {
+            const token = localStorage.getItem('token');
+            return token ? { 'Authorization': `Bearer ${token}` } : {};
+        };
+
+        const loadLogs = async () => {
+            try {
+                const url = `api/admin/observabilidad/logs?level=${currentLevel}&search=${encodeURIComponent(currentSearch)}&limit=150`;
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        window.location.href = 'inicio_de_sesion.html';
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    renderLogs(result.data);
+                } else {
+                    showError(result.message || 'Error al obtener logs.');
+                }
+            } catch (err) {
+                showError(`Error de comunicación con la API: ${err.message}`);
+            }
+        };
+
+        const renderLogs = (logs) => {
+            const tbody = document.getElementById('logs-tbody');
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-500 font-semibold">No se encontraron logs que coincidan con los filtros aplicados.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            logs.forEach((log, index) => {
+                // Determine badge class according to severity
+                let badgeClass = 'bg-slate-800 text-slate-400';
+                if (log.level === 'INFO') badgeClass = 'bg-blue-950/50 text-blue-400 border border-blue-900/40';
+                else if (log.level === 'WARNING') badgeClass = 'bg-amber-950/50 text-amber-500 border border-amber-900/40';
+                else if (log.level === 'ERROR') badgeClass = 'bg-red-950/50 text-red-500 border border-red-900/40';
+                else if (log.level === 'CRITICAL') badgeClass = 'bg-rose-950/60 text-rose-500 border border-rose-900/50 animate-pulse';
+
+                const timestamp = log.timestamp ? log.timestamp.split('.')[0].replace('T', ' ') : 'N/A';
+                const method = log.method || 'CLI';
+                const uri = log.uri || 'N/A';
+                const correlationId = log.correlation_id || 'N/A';
+                const ip = log.ip || '127.0.0.1';
+
+                // Truncate long messages
+                const truncatedMessage = log.message.length > 120 ? log.message.substring(0, 120) + '...' : log.message;
+
+                // Main Row
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-850/40 cursor-pointer transition-colors';
+                row.innerHTML = `
+                    <td class="p-4 text-slate-400 font-mono">${timestamp}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${log.level}</span></td>
+                    <td class="p-4 font-medium text-slate-200 truncate max-w-lg">${truncatedMessage}</td>
+                    <td class="p-4 text-slate-400 font-mono">${correlationId}</td>
+                    <td class="p-4 text-slate-400 font-mono">${method} ${uri}</td>
+                    <td class="p-4 text-slate-400 font-mono">${ip}</td>
+                `;
+
+                // Expandable Details Row
+                const detailsRow = document.createElement('tr');
+                detailsRow.className = 'hidden bg-slate-900 border-l-2 border-primary';
+                
+                // Format context prettily
+                const formattedJson = JSON.stringify(log, null, 4);
+
+                detailsRow.innerHTML = `
+                    <td colspan="6" class="p-6 bg-slate-950/80 border-t border-b border-slate-800">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-xs text-primary flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-sm">settings_ethernet</span> Detalle Completo del Evento
+                                </span>
+                                <button class="btn-copy-log bg-slate-800 text-slate-300 font-semibold px-3 py-1 rounded hover:bg-slate-700 hover:text-slate-100 flex items-center gap-1 transition-all text-[11px]" data-log-id="${index}">
+                                    <span class="material-symbols-outlined text-xs">content_copy</span> Copiar JSON
+                                </button>
+                            </div>
+                            <pre class="bg-slate-900 border border-slate-800 p-4 rounded-xl text-[11px] font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap max-h-96">${escapeHtml(formattedJson)}</pre>
+                        </div>
+                    </td>
+                `;
+
+                // Toggle click
+                row.addEventListener('click', () => {
+                    const isHidden = detailsRow.classList.contains('hidden');
+                    // Hide other open details
+                    document.querySelectorAll('#logs-tbody tr.bg-slate-900').forEach(r => r.classList.add('hidden'));
+                    
+                    if (isHidden) {
+                        detailsRow.classList.remove('hidden');
+                    } else {
+                        detailsRow.classList.add('hidden');
+                    }
+                });
+
+                tbody.appendChild(row);
+                tbody.appendChild(detailsRow);
+            });
+
+            // Bind copy buttons
+            document.querySelectorAll('.btn-copy-log').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent row collapse toggle
+                    const index = btn.getAttribute('data-log-id');
+                    const text = JSON.stringify(logs[index], null, 4);
+                    navigator.clipboard.writeText(text).then(() => {
+                        const originalText = btn.innerHTML;
+                        btn.innerHTML = `<span class="material-symbols-outlined text-xs">done</span> Copiado!`;
+                        setTimeout(() => btn.innerHTML = originalText, 2000);
+                    }).catch(err => {
+                        console.error('Error al copiar:', err);
+                    });
+                });
+            });
+        };
+
+        const escapeHtml = (text) => {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        };
+
+        const showError = (msg) => {
+            const tbody = document.getElementById('logs-tbody');
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500 font-semibold">❌ ${msg}</td></tr>`;
+        };
+
+        // --- Filter Pills Interactions ---
+        const pillsContainer = document.getElementById('filter-level-pills');
+        if (pillsContainer) {
+            pillsContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+
+                // Deactivate current active button
+                pillsContainer.querySelectorAll('button').forEach(b => {
+                    b.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-slate-800 text-slate-400 border border-slate-700/50 hover:bg-slate-750';
+                });
+
+                // Activate selected button
+                // Choose color according to level
+                const level = btn.getAttribute('data-level');
+                currentLevel = level;
+
+                if (level === '') {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-primary text-slate-950 shadow-lg shadow-primary/10';
+                } else if (level === 'INFO') {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-900 text-blue-100 shadow-lg shadow-blue-900/20';
+                } else if (level === 'WARNING') {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-600 text-slate-950 shadow-lg shadow-amber-600/20';
+                } else if (level === 'ERROR') {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-red-650 text-red-100 shadow-lg shadow-red-650/20';
+                } else if (level === 'CRITICAL') {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-rose-700 text-rose-50 shadow-lg shadow-rose-700/20 animate-pulse';
+                }
+
+                loadLogs();
+            });
+        }
+
+        // --- Search Input ---
+        const inputSearch = document.getElementById('input-search');
+        let searchTimeout = null;
+        if (inputSearch) {
+            inputSearch.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentSearch = e.target.value;
+                    loadLogs();
+                }, 300);
+            });
+        }
+
+        // --- Auto Refresh and Manual Refresh ---
+        const btnRefresh = document.getElementById('btn-refresh');
+        const checkAutoRefresh = document.getElementById('check-auto-refresh');
+
+        if (btnRefresh) {
+            btnRefresh.addEventListener('click', loadLogs);
+        }
+
+        const manageAutoRefresh = () => {
+            clearInterval(autoRefreshInterval);
+            if (checkAutoRefresh && checkAutoRefresh.checked) {
+                autoRefreshInterval = setInterval(() => {
+                    loadLogs();
+                }, 10000);
+            }
+        };
+
+        if (checkAutoRefresh) {
+            checkAutoRefresh.addEventListener('change', manageAutoRefresh);
+        }
+
+        // Initial execution
+        loadLogs();
+        manageAutoRefresh();
+    });
+</script>
+</body>
+</html>

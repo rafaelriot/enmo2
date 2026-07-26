@@ -238,6 +238,7 @@ function setupSidebar(usuario) {
                     { icon: 'two_wheeler', label: 'Gestión Repartidores', href: 'panel_de_administracion_repartidores.html', active: currentPath.includes('panel_de_administracion_repartidores') },
                     { icon: 'group', label: 'Gestión Clientes', href: 'gestion_de_clientes.html', active: currentPath.includes('gestion_de_clientes') },
                     { icon: 'map', label: 'Mapa en Vivo', href: 'mapa_en_vivo.html', active: currentPath.includes('mapa_en_vivo') },
+                    { icon: 'terminal', label: 'Logs y Diagnósticos', href: 'admin_logs.html', active: currentPath.includes('admin_logs') },
                 ];
             } else {
                 links = [
