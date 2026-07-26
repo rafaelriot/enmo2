@@ -721,6 +721,45 @@ $app->group('/api/admin', function ($group) {
         }
     });
 
+    // Obtener el Leaderboard de Repartidores (GET /api/admin/leaderboard-repartidores)
+    $group->get('/leaderboard-repartidores', function (Request $request, Response $response) {
+        try {
+            $dbObj = new Db();
+            $db = $dbObj->connect();
+
+            $sql = "SELECT u.id, u.nombre, u.foto_url,
+                           COUNT(p.id) AS total_pedidos_completados,
+                           COALESCE(AVG(p.calificacion_estrellas), 5.0) AS calificacion_promedio,
+                           COALESCE(AVG(TIMESTAMPDIFF(MINUTE, p.created_at, p.updated_at)), 0) AS tiempo_promedio_minutos
+                    FROM usuarios u
+                    LEFT JOIN pedidos p ON p.repartidor_id = u.id AND p.estado = 'entregado'
+                    WHERE u.rol = 'repartidor' AND u.estado = 'activo'
+                    GROUP BY u.id, u.nombre, u.foto_url
+                    ORDER BY total_pedidos_completados DESC, calificacion_promedio DESC
+                    LIMIT 5";
+            $stmt = $db->query($sql);
+            $leaderboard = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($leaderboard as &$item) {
+                $item['calificacion_promedio'] = round((float)$item['calificacion_promedio'], 1);
+                $item['tiempo_promedio_minutos'] = round((float)$item['tiempo_promedio_minutos'], 0);
+            }
+
+            $response->getBody()->write(json_encode([
+                "status" => "success",
+                "data" => $leaderboard
+            ], JSON_UNESCAPED_UNICODE));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+        } catch (\Throwable $e) {
+            App\Logger::error("Error en leaderboard-repartidores: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            $response->getBody()->write(json_encode([
+                "status" => "error",
+                "message" => "Error interno del servidor: " . $e->getMessage()
+            ]));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+        }
+    });
+
 });
 
 // Endpoint público para reporte de errores JS del cliente (POST /api/observabilidad/client-log)

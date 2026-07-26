@@ -260,6 +260,35 @@
   </div>
 </section>
 
+<!-- Repartidores Leaderboard Card -->
+<section class="mb-md">
+  <div class="bg-surface-container-lowest p-md rounded-2xl custom-shadow border border-surface-container-high">
+    <h3 class="font-title-md text-title-md text-on-surface mb-sm flex items-center gap-xs">
+      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+      Desempeño y Leaderboard de Repartidores
+    </h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
+        <thead>
+          <tr class="bg-surface-container-low border-b border-surface-container-high text-on-surface-variant font-bold uppercase tracking-wider">
+            <th class="p-3 w-20 text-center">Puesto</th>
+            <th class="p-3">Repartidor</th>
+            <th class="p-3 text-center w-40">Entregas Completadas</th>
+            <th class="p-3 text-center w-36">Calificación Promedio</th>
+            <th class="p-3 text-center w-48">Tiempo Promedio</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-tbody" class="divide-y divide-surface-container-high">
+          <tr>
+            <td colspan="5" class="p-8 text-center text-on-surface-variant font-semibold">Cargando datos de rendimiento...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
 <!-- Dynamic Map Preview (Real Leaflet Map) -->
 <section class="mb-md">
 <h2 class="font-title-md text-title-md text-on-surface mb-sm">Mapa de Operaciones</h2>
@@ -456,6 +485,69 @@
             }
         } catch (error) {
             console.error("Error al cargar gráficos analíticos:", error);
+        }
+    }
+
+    // Función para cargar leaderboard de repartidores
+    async function cargarLeaderboard() {
+        const tbody = document.getElementById('leaderboard-tbody');
+        try {
+            const response = await fetch('api/admin/leaderboard-repartidores', {
+                headers: getAuthHeaders()
+            });
+            const result = await response.json();
+            if (response.ok && result.status === 'success') {
+                const data = result.data;
+                if (!tbody) return;
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-on-surface-variant italic">No hay historial de entregas de repartidores aún.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = data.map((rep, idx) => {
+                    const puesto = idx + 1;
+                    let medal = puesto;
+                    if (puesto === 1) medal = '🥇';
+                    else if (puesto === 2) medal = '🥈';
+                    else if (puesto === 3) medal = '🥉';
+
+                    const avatar = rep.foto_url
+                        ? `<img src="${rep.foto_url}" class="w-8 h-8 rounded-full object-cover" />`
+                        : `<div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">${rep.nombre.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase()}</div>`;
+
+                    const rating = rep.calificacion_promedio;
+                    let starColor = 'text-outline';
+                    if (rating >= 4.5) starColor = 'text-amber-500';
+                    else if (rating >= 3.0) starColor = 'text-amber-400';
+
+                    const ratingStars = `
+                        <div class="flex items-center justify-center gap-1 font-label-bold text-on-surface">
+                            <span class="material-symbols-outlined text-sm ${starColor}" style="font-variation-settings:'FILL' 1;">star</span>
+                            <span>${rating.toFixed(1)}</span>
+                        </div>
+                    `;
+
+                    const timeText = rep.tiempo_promedio_minutos > 0 ? `${rep.tiempo_promedio_minutos} min` : '—';
+
+                    return `
+                        <tr class="hover:bg-surface-container-low transition-colors">
+                            <td class="p-3 text-center font-display-lg text-title-md font-bold">${medal}</td>
+                            <td class="p-3 flex items-center gap-3">
+                                ${avatar}
+                                <span class="font-title-md text-sm text-on-surface font-semibold">${rep.nombre}</span>
+                            </td>
+                            <td class="p-3 text-center font-label-bold text-sm text-primary">${rep.total_pedidos_completados}</td>
+                            <td class="p-3 text-center">${ratingStars}</td>
+                            <td class="p-3 text-center font-mono text-xs text-on-surface-variant">${timeText}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        } catch (error) {
+            console.error("Error al cargar leaderboard:", error);
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-error font-semibold">❌ Error de conexión al cargar leaderboard.</td></tr>`;
+            }
         }
     }
 
@@ -771,12 +863,14 @@
         cargarListadoPedidos();
         actualizarMiniMapa();
         cargarGraficos();
+        cargarLeaderboard();
         cargarLogsObservabilidad();
 
         setInterval(cargarEstadisticas, 8000);
         setInterval(cargarListadoPedidos, 8000);
         setInterval(actualizarMiniMapa, 8000);
         setInterval(cargarGraficos, 16000);
+        setInterval(cargarLeaderboard, 16000);
         setInterval(cargarLogsObservabilidad, 15000);
     }
 
